@@ -62,7 +62,7 @@ export const patchResourcesDir = (resources: string, patcherJsPath: string): boo
             try {
                 undo[i]();
             } catch (cleanupErr) {
-                console.error("[Equicord] Rollback step failed", cleanupErr);
+                console.error("[Kittycord] Rollback step failed", cleanupErr);
             }
         }
         throw err;
@@ -104,14 +104,14 @@ export const findStaleSibling = (currentExeDir: string): string | null => {
             try {
                 isDir = statSync(join(discordPath, name)).isDirectory();
             } catch (statErr) {
-                console.error("[Equicord] Skipping unreadable sibling", name, statErr);
+                console.error("[Kittycord] Skipping unreadable sibling", name, statErr);
                 continue;
             }
             if (!isDir) continue;
             if (isNewer(name, latest)) latest = name;
         }
     } catch (err) {
-        console.error("[Equicord] Failed to scan for sibling versions", err);
+        console.error("[Kittycord] Failed to scan for sibling versions", err);
         return null;
     }
 

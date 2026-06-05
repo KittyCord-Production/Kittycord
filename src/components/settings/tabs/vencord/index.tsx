@@ -157,7 +157,7 @@ function EquicordSettings() {
                 <SpecialCard
                     title="Contributions"
                     subtitle="Thank you for contributing!"
-                    description="Since you've contributed to Equicord you now have a cool new badge!"
+                    description="Since you've contributed to Kittycord you now have a cool new badge!"
                     cardImage={COZY_CONTRIB_IMAGE}
                     backgroundImage={CONTRIB_BACKGROUND_IMAGE}
                     backgroundColor="#EDCC87"
@@ -220,7 +220,7 @@ function EquicordSettings() {
 
             <Heading className={Margins.top20}>Client Settings</Heading>
             <Paragraph className={Margins.bottom16}>
-                Configure how Equicord behaves and integrates with Discord. These settings affect the Discord client's appearance and behavior.
+                Configure how Kittycord behaves and integrates with Discord. These settings affect the Discord client's appearance and behavior.
             </Paragraph>
             <Notice.Info className={Margins.bottom20} style={{ width: "100%" }}>
                 You can customize where this settings section appears in Discord's settings menu by configuring the{" "}
@@ -243,7 +243,7 @@ function EquicordSettings() {
     );
 }
 
-export default wrapTab(EquicordSettings, "Equicord Settings");
+export default wrapTab(EquicordSettings, "Kittycord Settings");
 
 export function isEquicordDonor(userId: string): boolean {
     const donorBadges = BadgeAPI.getEquicordDonorBadges(userId);
