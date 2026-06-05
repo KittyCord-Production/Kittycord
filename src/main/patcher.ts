@@ -51,6 +51,13 @@ if (!IS_VANILLA) {
         console.error("[Kittycord] Failed to set up splash branding", err);
     }
 
+    // Install Kittycord's bundled themes into the user's themes folder (shows up under Settings > Themes).
+    try {
+        require("./bundledThemes");
+    } catch (err) {
+        console.error("[Kittycord] Failed to install bundled themes", err);
+    }
+
     /*
      * re-apply the patch when discord ships a new host version. skipped
      * on vesktop and equibop because they manage their own updates.
