@@ -1,8 +1,7 @@
 <div align="center">
   <a href="https://github.com/CenturyRV/Kittycord">
-    <img src="./browser/icon.png" width="128" alt="Kittycord">
+    <img src="./browser/logo.png" width="440" alt="Kittycord">
   </a>
-  <h1>Kittycord</h1>
   <p><b>The cutest Discord client mod — plugins, themes and a whole lot of pink.</b></p>
 </div>
 
