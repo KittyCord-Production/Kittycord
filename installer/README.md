@@ -4,10 +4,28 @@ There are two installers:
 
 | Script | For whom | What it does |
 |---|---|---|
-| `Kittycord-Online-Install.ps1` | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
+| `Kittycord-Installer-GUI.ps1` | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Graphical installer: downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
+| `Kittycord-Online-Install.ps1` | **End users (console)** | Same job as the GUI, as a plain console script. |
 | `Kittycord-Install.ps1` | **Developers** | Patches Discord to load your local `dist/desktop` build (run `pnpm build` first). |
 
-`Kittycord-Uninstall.ps1` reverts either one.
+`Kittycord-Uninstall.ps1` reverts any of them.
+
+## System requirements
+
+- **Windows 10 (version 1803 or newer) or Windows 11.** Everything the installer needs — .NET
+  Framework, Windows PowerShell and `curl` — is already built into these, so there's **nothing
+  extra to install**.
+- **The standard Discord desktop app** from [discord.com](https://discord.com/download), launched
+  at least once so it has finished setting up. (The **Microsoft Store** version of Discord can't be
+  patched — use the discord.com one.)
+- **An internet connection** (the installer downloads the build over HTTPS).
+- Run it as your **normal user — not** as Administrator.
+- On first launch, Windows SmartScreen may show "Windows protected your PC" because the `.exe` is
+  unsigned — click **"More info" → "Run anyway"**. Some antivirus may flag it for the same reason
+  (it's a PowerShell installer that downloads from GitHub); allow it / add an exclusion if needed.
+
+The installer checks these for you and shows a clear message if something's missing (Discord not
+installed, not launched yet, Store version, no internet, or run as Admin).
 
 ## Easiest: prebuilt `.exe`
 

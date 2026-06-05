@@ -17,6 +17,11 @@ latest build and patches your Discord client.
 
 ![Kittycord Installer](installer/preview.png)
 
+**Requirements:** Windows 10 (1803+) or 11 — nothing extra to install (.NET, PowerShell and curl
+are built in) — the standard Discord app from discord.com (launched once), and an internet
+connection. On first run, click **"More info" → "Run anyway"** on the SmartScreen prompt (the exe
+is unsigned). See [installer/README.md](installer/README.md) for details.
+
 To uninstall, run the installer again and choose uninstall, or use
 [installer/Kittycord-Uninstall.ps1](installer/Kittycord-Uninstall.ps1).
 

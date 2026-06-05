@@ -20,6 +20,21 @@ try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 }
 
+# Discord lives in the per-user %LOCALAPPDATA%; patching it while elevated causes file-ownership
+# problems. Refuse to run as Administrator with a clear message.
+try {
+    $kcId = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $kcPrincipal = New-Object System.Security.Principal.WindowsPrincipal($kcId)
+    if ($kcPrincipal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        [System.Windows.Forms.MessageBox]::Show(
+            "Please don't run the Kittycord installer as Administrator." + [Environment]::NewLine + [Environment]::NewLine +
+            "Close it and just double-click it as your normal user (not 'Run as administrator'). " +
+            "Running elevated can break Discord's file permissions.",
+            "Kittycord", "OK", "Warning") | Out-Null
+        exit 1
+    }
+} catch { }
+
 # ----- config -----
 $Repo        = "CenturyRV/Kittycord"
 $AsarUrl     = "https://github.com/$Repo/releases/latest/download/desktop.asar"
@@ -117,9 +132,29 @@ function Get-DiscordInstalls {
     return $found
 }
 
+# The Microsoft Store version of Discord is a packaged app under WindowsApps; its files are
+# read-only and can't be patched. Detect it so we can tell the user instead of "not found".
+function Test-MicrosoftStoreDiscord {
+    try { return [bool](Get-AppxPackage -Name "*Discord*" -ErrorAction SilentlyContinue | Select-Object -First 1) }
+    catch { return $false }
+}
+
+# When no patchable install is found, explain exactly why.
+function Get-NoInstallReason {
+    if (Test-MicrosoftStoreDiscord) {
+        return "Microsoft Store Discord found - that version can't be patched. Please uninstall it, install Discord from discord.com, then run this installer again."
+    }
+    foreach ($dir in @("Discord", "DiscordPTB", "DiscordCanary")) {
+        if (Test-Path (Join-Path $env:LOCALAPPDATA $dir)) {
+            return "Discord is installed but hasn't finished setting up. Open Discord once and let it fully load, then close it and run this installer again."
+        }
+    }
+    return "Discord was not found. Install the Discord desktop app from discord.com first, then run this installer again."
+}
+
 function Stop-Discord($proc) {
     Get-Process -Name $proc -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Milliseconds 600
+    Start-Sleep -Milliseconds 1200
 }
 
 function Invoke-Patch($install) {
@@ -268,10 +303,11 @@ $toggle = {
 $installs = @(Get-DiscordInstalls)
 if ($installs.Count -eq 0) {
     $empty = New-Object System.Windows.Forms.Label
-    $empty.Text = "No Discord installation found under %LOCALAPPDATA%."
+    $empty.Text = Get-NoInstallReason
     $empty.ForeColor = $cMuted
-    $empty.AutoSize = $true
-    $empty.Location = New-Object System.Drawing.Point(16, 16)
+    $empty.AutoSize = $false
+    $empty.Size = New-Object System.Drawing.Size(632, 84)
+    $empty.Location = New-Object System.Drawing.Point(16, 12)
     $listCard.Controls.Add($empty)
 } else {
     $rowY = 8
