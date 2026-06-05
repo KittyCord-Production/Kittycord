@@ -10,6 +10,7 @@ import { BrowserWindow, ipcMain, Menu, MenuItemConstructorOptions, shell } from 
 import aboutHtml from "file://about.html?minify";
 
 import { BRAND_NAME } from "../branding";
+import { KITTY_ICON_DATA_URL } from "./iconData";
 import { SETTINGS_DIR, THEMES_DIR } from "./utils/constants";
 
 let cachedUpdateAvailable = false;
@@ -84,7 +85,8 @@ function openAboutWindow() {
 
     const aboutParams = aboutHtml
         .replaceAll("{{VERSION}}", VERSION)
-        .replaceAll("{{GIT_HASH}}", gitHashShort);
+        .replaceAll("{{GIT_HASH}}", gitHashShort)
+        .replaceAll("{{ICON}}", KITTY_ICON_DATA_URL);
     const base64Html = Buffer.from(aboutParams).toString("base64");
     aboutWindow.loadURL(`data:text/html;base64,${base64Html}`);
     aboutWindow.on("closed", () => {
