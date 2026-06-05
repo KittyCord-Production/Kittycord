@@ -375,20 +375,46 @@ $workerBody = {
             New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
             if (Test-Path $AsarPath) { Remove-Item $AsarPath -Force -ErrorAction SilentlyContinue }
             $ok = $false; $err = "unknown error"
-            for ($t = 0; $t -lt 3 -and -not $ok; $t++) {
+
+            # Streamed download so we can show real progress (never looks frozen on slow connections).
+            for ($t = 0; $t -lt 2 -and -not $ok; $t++) {
+                $inStream = $null; $outStream = $null; $resp = $null
                 try {
-                    Invoke-WebRequest -Uri $AsarUrl -OutFile $AsarPath -UseBasicParsing -Headers @{ "User-Agent" = "Kittycord-Installer" } -TimeoutSec 180
+                    $req = [System.Net.HttpWebRequest]::Create($AsarUrl)
+                    $req.UserAgent = "Kittycord-Installer"
+                    $req.Timeout = 30000
+                    $req.ReadWriteTimeout = 120000
+                    $resp = $req.GetResponse()
+                    $total = $resp.ContentLength
+                    $inStream = $resp.GetResponseStream()
+                    $outStream = [System.IO.File]::Create($AsarPath)
+                    $buffer = New-Object byte[] 81920
+                    $sum = 0; $lastPct = -10
+                    while (($n = $inStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+                        $outStream.Write($buffer, 0, $n)
+                        $sum += $n
+                        if ($total -gt 0) {
+                            $pct = [int](($sum * 100) / $total)
+                            if ($pct -ge $lastPct + 10) { $lastPct = $pct; Log ("Downloading... " + $pct + "%") }
+                        }
+                    }
+                    $outStream.Close(); $inStream.Close(); $resp.Close()
                     if ((Test-Path $AsarPath) -and (Get-Item $AsarPath).Length -gt 500000) { $ok = $true }
                     else { $err = "downloaded file too small (is the repo public?)" }
-                } catch { $err = $_.Exception.Message }
-                if (-not $ok) {
+                } catch {
+                    $err = $_.Exception.Message
+                    try { if ($outStream) { $outStream.Close() } } catch { }
+                    try { if ($inStream) { $inStream.Close() } } catch { }
+                    try { if ($resp) { $resp.Close() } } catch { }
                     if (Test-Path $AsarPath) { Remove-Item $AsarPath -Force -ErrorAction SilentlyContinue }
                     Start-Sleep -Seconds 2
                 }
             }
+            # Fallback: bundled curl.exe (Windows 10/11).
             if (-not $ok) {
                 $curl = Join-Path $env:SystemRoot "System32\curl.exe"
                 if (Test-Path $curl) {
+                    Log "Retrying download via curl..."
                     & $curl -L --fail --silent --show-error -A Kittycord-Installer -o $AsarPath $AsarUrl 2>$null
                     if ((Test-Path $AsarPath) -and (Get-Item $AsarPath).Length -gt 500000) { $ok = $true }
                 }
@@ -418,7 +444,17 @@ $workerBody = {
                     Log ("Patched " + $i.Name + ".")
                 } catch { Log ("Error patching " + $i.Name + ": " + $_.Exception.Message); $st.Ok = $false }
             }
-            Log "Done. Start Discord again to use Kittycord."
+            # Relaunch the patched Discord(s) so the user sees Kittycord immediately - no manual restart.
+            foreach ($i in $sel) {
+                try {
+                    $updateExe = Join-Path $i.Resources "..\..\Update.exe"
+                    if (Test-Path $updateExe) {
+                        Start-Process -FilePath $updateExe -ArgumentList "--processStart", ($i.Proc + ".exe")
+                        Log ("Restarting " + $i.Name + "...")
+                    }
+                } catch { }
+            }
+            Log "Done. Kittycord is installed."
         } else {
             foreach ($i in $sel) {
                 try {
@@ -489,14 +525,14 @@ $btnInstall.Add_Click({
     $sel = Get-Selected
     if ($sel.Count -eq 0) { Write-Status "Select at least one Discord install first."; return }
     Set-Busy $true
-    $script:doneMsg = "Kittycord installed. Start Discord again to see it."
+    $script:doneMsg = "Kittycord installed! Discord is restarting - if it doesn't reopen, just start it."
     Start-Work "install" $sel
 })
 $btnRepair.Add_Click({
     $sel = Get-Selected
     if ($sel.Count -eq 0) { Write-Status "Select at least one Discord install first."; return }
     Set-Busy $true
-    $script:doneMsg = "Kittycord installed. Start Discord again to see it."
+    $script:doneMsg = "Kittycord installed! Discord is restarting - if it doesn't reopen, just start it."
     Start-Work "install" $sel
 })
 $btnUninstall.Add_Click({
