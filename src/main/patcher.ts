@@ -44,6 +44,13 @@ if (!IS_VANILLA) {
 
     patchTrayMenu();
 
+    // Rebrand Discord's startup splash window to Kittycord (best-effort, never throws).
+    try {
+        require("./kittycordSplash");
+    } catch (err) {
+        console.error("[Kittycord] Failed to set up splash branding", err);
+    }
+
     /*
      * re-apply the patch when discord ships a new host version. skipped
      * on vesktop and equibop because they manage their own updates.

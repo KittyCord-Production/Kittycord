@@ -34,8 +34,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
+            # --standalone makes the in-app updater use the HTTP updater (downloads the new
+            # desktop.asar from GitHub Releases) instead of the git updater, which is what an
+            # installer/asar distribution needs.
             - name: Build desktop (creates dist/desktop.asar + dist/equibop.asar)
-              run: pnpm build
+              run: pnpm buildStandalone
 
             - name: Build web (extensions + userscript)
               run: pnpm buildWeb
