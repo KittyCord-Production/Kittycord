@@ -1,84 +1,445 @@
-/* Kittycord — Hello Kitty (kawaii pink) theme.
-   Works by overriding Discord's themeable CSS variables, so it degrades gracefully
-   across Discord versions instead of relying on mangled class names. */
+/**
+ * @name        HelloKitty Glass
+ * @author      MaxiN
+ * @description Dunkles Frosted-Glass-Theme mit pinkem Akzent und abgerundeten Ecken.
+ *              Eigenstaendig, ohne externe Imports. Die Nachrichten-Textfarbe bleibt Discord-Standard.
+ * @version     1.1.0
+ */
+
+/* ============================================================================
+   0. SO PASST DU DAS THEME AN
+   ----------------------------------------------------------------------------
+   Alles Wichtige steht im :root-Block direkt darunter:
+     - Andere Akzentfarbe?       -> --vg-accent-h / -s / -l aendern (HSL).
+     - Mehr/weniger Blur?        -> --vg-blur (z.B. 12px ruhiger, 28px starker Glas).
+     - Mehr/weniger durchsichtig?-> --vg-glass-* Alpha-Werte (0 = klar, 1 = opak).
+     - Rundere/kantigere Ecken?  -> --vg-radius* anpassen.
+     - Eigenes Hintergrundbild?  -> siehe Block 2 (#app-mount).
+
+   HINWEIS: Die Nachrichten-Textfarbe wird bewusst NICHT veraendert (kein
+   --text-normal-Override) und bleibt damit Discord-Standard.
+   ========================================================================== */
 
 :root {
-    --kc-pink-50: #fff3f9;
-    --kc-pink-100: #ffe3f1;
-    --kc-pink-200: #ffd0e7;
-    --kc-pink-300: #ffb6d6;
-    --kc-pink-400: #ff8ac4;
-    --kc-pink-500: #ff5fa6;
-    --kc-pink-600: #ec3f8c;
-    --kc-ink: #5a3247;
+  /* --- Akzentfarbe (Pink) als HSL-Bausteine ------------------------------ */
+  --vg-accent-h: 333;
+  --vg-accent-s: 90%;
+  --vg-accent-l: 66%;
+  --vg-accent: hsl(var(--vg-accent-h) var(--vg-accent-s) var(--vg-accent-l));
 
-    /* Brand / accent (legacy brand scale) */
-    --brand-experiment: var(--kc-pink-500);
-    --brand-experiment-560: var(--kc-pink-600);
-    --brand-experiment-600: var(--kc-pink-600);
-    --brand-500: var(--kc-pink-500);
-    --brand-560: var(--kc-pink-600);
-    --brand-600: var(--kc-pink-600);
-    --brand-260: var(--kc-pink-200);
-    --brand-360: var(--kc-pink-300);
+  /* "LIVE"/Stream-Indikator - kraeftiges Rot, damit eine laufende
+     Bildschirmuebertragung sofort auffaellt (hebt sich klar vom Pink ab). */
+  --vg-live: #ed4245;
 
-    /* Backgrounds (legacy theming vars) */
-    --background-primary: var(--kc-pink-50);
-    --background-secondary: var(--kc-pink-100);
-    --background-secondary-alt: var(--kc-pink-200);
-    --background-tertiary: var(--kc-pink-200);
-    --background-floating: var(--kc-pink-50);
-    --background-nested-floating: var(--kc-pink-50);
-    --background-mobile-primary: var(--kc-pink-50);
-    --background-mobile-secondary: var(--kc-pink-100);
-    --channeltextarea-background: var(--kc-pink-100);
-    --background-modifier-hover: rgba(255 138 196 / 16%);
-    --background-modifier-selected: rgba(255 138 196 / 28%);
-    --background-modifier-active: rgba(255 138 196 / 32%);
-    --background-message-hover: rgba(255 138 196 / 10%);
+  /* --- Dunkle Basis (leicht ins Pink/Plum gezogen) ----------------------- */
+  --vg-base-h: 327;
+  --vg-base-s: 26%;
+  --vg-base-hsl: var(--vg-base-h) var(--vg-base-s) 9%;
 
-    /* Newer "base" background tokens (best-effort) */
-    --bg-base-low: var(--kc-pink-100);
-    --bg-base-lower: var(--kc-pink-50);
-    --bg-base-lowest: var(--kc-pink-50);
-    --bg-surface-overlay: var(--kc-pink-50);
-    --bg-surface-raised: var(--kc-pink-100);
+  /* --- Glas-Look --------------------------------------------------------- */
+  --vg-blur: 20px;            /* Staerke des Frosted-Glass-Weichzeichners      */
+  --vg-glass-1: hsl(var(--vg-base-hsl) / 0.42);  /* grosse Flaechen (Chat)    */
+  --vg-glass-2: hsl(var(--vg-base-hsl) / 0.30);  /* Sidebars (durchsichtiger) */
+  --vg-glass-3: hsl(var(--vg-base-hsl) / 0.55);  /* Karten / Eingabe          */
+  --vg-glass-4: hsl(var(--vg-base-hsl) / 0.82);  /* Popouts/Modals (lesbar)   */
+  --vg-border:  hsl(var(--vg-accent-h) 40% 75% / 0.12); /* feine Glaskante    */
 
-    /* Text */
-    --text-normal: var(--kc-ink);
-    --text-default: var(--kc-ink);
-    --text-muted: #a06b86;
-    --header-primary: var(--kc-ink);
-    --header-secondary: #8a5872;
-    --interactive-normal: var(--kc-ink);
-    --interactive-active: var(--kc-pink-600);
-
-    /* Links & misc accents */
-    --text-link: var(--kc-pink-600);
-    --mention-foreground: var(--kc-pink-600);
+  /* --- Abgerundete Ecken ------------------------------------------------- */
+  --vg-radius-sm: 8px;
+  --vg-radius:    14px;
+  --vg-radius-lg: 22px;
 }
 
-/* Cute accent on the message input and buttons */
-[class*="themedBackground"],
-[class*="channelTextArea"] {
-    background-color: var(--kc-pink-100) !important; /* input keeps its own inner bg token */
+/* ============================================================================
+   1. DISCORD-VARIABLEN UMFAERBEN
+   ----------------------------------------------------------------------------
+   Discord nutzt diese Variablen praktisch ueberall. Transparent/pink gesetzt,
+   faerbt sich der Grossteil der UI automatisch um - robust gegen Updates, weil
+   die Variablennamen stabil sind. (--text-normal bleibt bewusst unangetastet.)
+   ========================================================================== */
+
+:root,
+.theme-dark,
+.theme-darker,
+.theme-light,
+.theme-midnight {
+  /* --- Hintergruende (klassische Tokens) -------------------------------- */
+  --background-primary:        var(--vg-glass-1);
+  --background-secondary:      var(--vg-glass-2);
+  --background-secondary-alt:  hsl(var(--vg-base-hsl) / 0.40);
+  --background-tertiary:       hsl(var(--vg-base-hsl) / 0.26);
+  --background-accent:         var(--vg-accent);
+  --background-floating:       var(--vg-glass-4);
+  --background-nested-floating: var(--vg-glass-4);
+  --background-mobile-primary:   var(--vg-glass-1);
+  --background-mobile-secondary: var(--vg-glass-2);
+  --channeltextarea-background:  var(--vg-glass-3);
+  --background-message-hover:  hsl(var(--vg-accent-h) 50% 50% / 0.06);
+
+  --background-modifier-hover:    hsl(var(--vg-accent-h) 60% 60% / 0.07);
+  --background-modifier-active:   hsl(var(--vg-accent-h) 60% 60% / 0.11);
+  --background-modifier-selected: hsl(var(--vg-accent-h) 60% 60% / 0.14);
+  --background-modifier-accent:   var(--vg-border);
+
+  --input-background:          var(--vg-glass-3);
+  --modal-background:          var(--vg-glass-4);
+  --modal-footer-background:   hsl(var(--vg-base-hsl) / 0.88);
+  --deprecated-card-bg:           var(--vg-glass-3);
+  --deprecated-card-editable-bg:  var(--vg-glass-3);
+  --deprecated-quickswitcher-input-background: var(--vg-glass-3);
+  --deprecated-text-input-bg:     var(--vg-glass-3);
+  --activity-card-background:     var(--vg-glass-3);
+
+  /* --- Hintergruende (neue base/surface Tokens) ------------------------- */
+  --background-base-lowest:  hsl(var(--vg-base-hsl) / 0.30);
+  --background-base-lower:   hsl(var(--vg-base-hsl) / 0.38);
+  --background-base-low:     hsl(var(--vg-base-hsl) / 0.48);
+  --background-surface-higher:  hsl(var(--vg-base-hsl) / 0.55);
+  --background-surface-high:    hsl(var(--vg-base-hsl) / 0.62);
+  --background-surface-highest: hsl(var(--vg-base-hsl) / 0.70);
+  --card-background-default:    var(--vg-glass-3);
+
+  /* --- Raender ----------------------------------------------------------- */
+  --border-subtle: var(--vg-border);
+  --border-muted:  hsl(var(--vg-accent-h) 40% 75% / 0.16);
+  --border-normal: hsl(var(--vg-accent-h) 40% 75% / 0.22);
+  --border-strong: hsl(var(--vg-accent-h) 40% 75% / 0.30);
+  --app-frame-border: var(--vg-border);
+
+  /* --- Akzent / Brand-Palette (alles Pink) ------------------------------ */
+  --brand-100: hsl(var(--vg-accent-h) var(--vg-accent-s) 92%);
+  --brand-130: hsl(var(--vg-accent-h) var(--vg-accent-s) 88%);
+  --brand-160: hsl(var(--vg-accent-h) var(--vg-accent-s) 85%);
+  --brand-200: hsl(var(--vg-accent-h) var(--vg-accent-s) 82%);
+  --brand-230: hsl(var(--vg-accent-h) var(--vg-accent-s) 79%);
+  --brand-260: hsl(var(--vg-accent-h) var(--vg-accent-s) 76%);
+  --brand-300: hsl(var(--vg-accent-h) var(--vg-accent-s) 74%);
+  --brand-330: hsl(var(--vg-accent-h) var(--vg-accent-s) 72%);
+  --brand-360: hsl(var(--vg-accent-h) var(--vg-accent-s) 70%);
+  --brand-400: hsl(var(--vg-accent-h) var(--vg-accent-s) 68%);
+  --brand-430: hsl(var(--vg-accent-h) var(--vg-accent-s) 67%);
+  --brand-460: hsl(var(--vg-accent-h) var(--vg-accent-s) 66%);
+  --brand-500: var(--vg-accent);
+  --brand-530: hsl(var(--vg-accent-h) var(--vg-accent-s) 63%);
+  --brand-560: hsl(var(--vg-accent-h) var(--vg-accent-s) 60%);
+  --brand-600: hsl(var(--vg-accent-h) var(--vg-accent-s) 56%);
+  --brand-630: hsl(var(--vg-accent-h) var(--vg-accent-s) 53%);
+  --brand-660: hsl(var(--vg-accent-h) var(--vg-accent-s) 50%);
+  --brand-700: hsl(var(--vg-accent-h) var(--vg-accent-s) 46%);
+  --brand-730: hsl(var(--vg-accent-h) var(--vg-accent-s) 43%);
+  --brand-760: hsl(var(--vg-accent-h) var(--vg-accent-s) 40%);
+  --brand-800: hsl(var(--vg-accent-h) var(--vg-accent-s) 37%);
+  --brand-830: hsl(var(--vg-accent-h) var(--vg-accent-s) 34%);
+  --brand-860: hsl(var(--vg-accent-h) var(--vg-accent-s) 31%);
+  --brand-900: hsl(var(--vg-accent-h) var(--vg-accent-s) 28%);
+
+  --brand-experiment:     var(--vg-accent);
+  --brand-experiment-360: hsl(var(--vg-accent-h) var(--vg-accent-s) 70%);
+  --brand-experiment-460: hsl(var(--vg-accent-h) var(--vg-accent-s) 66%);
+  --brand-experiment-500: var(--vg-accent);
+  --brand-experiment-560: hsl(var(--vg-accent-h) var(--vg-accent-s) 60%);
+  --brand-experiment-600: hsl(var(--vg-accent-h) var(--vg-accent-s) 56%);
+  --brand-experiment-700: hsl(var(--vg-accent-h) var(--vg-accent-s) 46%);
+
+  /* Links, Erwaehnungen, Buttons, aktive Steuerungen (NICHT der Nachrichtentext) */
+  --text-link:                 hsl(var(--vg-accent-h) var(--vg-accent-s) 74%);
+  --text-link-low-saturation:  hsl(var(--vg-accent-h) 50% 74%);
+  --header-primary:            #f7eef5;
+  --control-brand-foreground:  hsl(var(--vg-accent-h) var(--vg-accent-s) 74%);
+  --button-filled-brand-background:        var(--vg-accent);
+  --button-filled-brand-background-hover:  hsl(var(--vg-accent-h) var(--vg-accent-s) 60%);
+  --button-filled-brand-background-active: hsl(var(--vg-accent-h) var(--vg-accent-s) 55%);
+  --mention-foreground:        hsl(var(--vg-accent-h) var(--vg-accent-s) 82%);
+  --mention-background:        hsl(var(--vg-accent-h) 70% 55% / 0.12);
+  --input-placeholder-text:    hsl(var(--vg-base-h) 15% 60%);
+
+  /* Scrollbars dezent halten */
+  --scrollbar-auto-thumb:  hsl(var(--vg-accent-h) 30% 50% / 0.35);
+  --scrollbar-auto-track:  transparent;
+  --scrollbar-thin-thumb:  hsl(var(--vg-accent-h) 30% 50% / 0.30);
+  --scrollbar-thin-track:  transparent;
+  --scrollbar-auto-scrollbar-color-thumb: hsl(var(--vg-accent-h) 30% 50% / 0.35);
+  --scrollbar-auto-scrollbar-color-track: transparent;
 }
 
-/* Rounded, soft corners (toggle) */
-.kc-hellokitty-rounded [class*="chat_"],
-.kc-hellokitty-rounded [class*="container_"],
-.kc-hellokitty-rounded [class*="card_"],
-.kc-hellokitty-rounded [class*="message_"],
-.kc-hellokitty-rounded [class*="button_"] {
-    border-radius: 16px !important; /* override Discord's tighter radii for a softer look */
+/* ============================================================================
+   2. HINTERGRUND HINTER DEM GANZEN CLIENT
+   ----------------------------------------------------------------------------
+   Damit der Glas-Blur etwas zum Weichzeichnen hat, braucht der unterste Layer
+   einen sichtbaren Hintergrund. Dunkler Pink-Verlauf mit zwei zarten Glows.
+
+   >> Eigenes Wallpaper? Ersetze den 'background'-Wert unten durch z.B.:
+        background: url("https://example.com/dein-bild.jpg") center/cover fixed;
+   ========================================================================== */
+
+#app-mount {
+  background:
+    radial-gradient(circle at 18% 0%,
+        hsl(var(--vg-accent-h) 60% 22% / 0.55), transparent 55%),
+    radial-gradient(circle at 100% 100%,
+        hsl(340 55% 18% / 0.45), transparent 55%),
+    linear-gradient(140deg,
+        hsl(327 30% 8%) 0%,
+        hsl(322 28% 6%) 50%,
+        hsl(320 28% 4%) 100%) !important;
+  background-attachment: fixed !important;
 }
 
-/* Pink scrollbars (toggle) */
-.kc-hellokitty-pinkbars ::-webkit-scrollbar-thumb {
-    background-color: var(--kc-pink-400) !important; /* themed scrollbar thumb */
-    border-radius: 10px !important;
+/* ============================================================================
+   3. FROSTED-GLASS AUF DEN HAUPT-PANELS
+   ----------------------------------------------------------------------------
+   backdrop-filter weichzeichnet, was hinter dem (jetzt transparenten) Panel
+   liegt. Gezielt auf die grossen Container, nicht auf alles - das haelt die
+   Performance gut.
+   ========================================================================== */
+
+/* Server-Leiste, Channel-Sidebar, Mitgliederliste, Chat-Flaeche */
+[class*="guilds_"],
+[class*="sidebar_"]:not([class*="sidebarRegion"]),
+[class*="sidebarList_"],
+[class*="membersWrap_"],
+[class*="members_"]:not([class*="member_"]),
+[class*="chatContent_"],
+[class*="chat_"]:not([class*="chatContent_"]) {
+  backdrop-filter: blur(var(--vg-blur)) saturate(135%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(135%);
+  background-color: transparent !important;
 }
 
-.kc-hellokitty-pinkbars ::-webkit-scrollbar-track {
-    background-color: transparent !important; /* clean track */
+/* Schwebende Ebenen: Popouts, Kontextmenues, Modals, Tooltips, Suche */
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"],
+[class*="layer_"] [class*="root_"],
+[class*="modal_"],
+[class*="tooltip_"],
+[class*="autocomplete_"],
+[class*="quickswitcher_"],
+[class*="searchPopout"] {
+  backdrop-filter: blur(calc(var(--vg-blur) + 8px)) saturate(140%);
+  -webkit-backdrop-filter: blur(calc(var(--vg-blur) + 8px)) saturate(140%);
+}
+
+/* User-Panel (unten links, Account/Voice) als Glas */
+[class*="panels_"],
+[class*="form_"]:not([class*="formContainer"]) {
+  backdrop-filter: blur(var(--vg-blur)) saturate(130%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(130%);
+}
+
+/* Nachrichten-Eingabeleiste ("chat box"):
+   Discord faerbt sie ueber ein inneres "themedBackground"-Element mit einem
+   grauen Default-Token, den die Variablen-Overrides NICHT treffen. Darum hier
+   direkt einfaerben. Aeusseres Element traegt das pinke Glas, inneres graues
+   Element wird transparent -> nur EIN Blur-Layer, kein doppelter.
+   (Das betrifft die Eingabeleiste, nicht den Nachrichtentext.) */
+[class*="channelTextArea_"] {
+  background-color: var(--vg-glass-3) !important;
+  backdrop-filter: blur(var(--vg-blur)) saturate(135%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(135%);
+  border: 1px solid var(--vg-border);
+  border-radius: var(--vg-radius) !important;
+}
+[class*="channelTextArea_"] [class*="themedBackground_"],
+[class*="channelTextArea_"] [class*="scrollableContainer_"] {
+  background-color: transparent !important;
+}
+
+/* Discords eigene "Glas"-Backdrops nicht doppelt mattieren */
+[class*="bg_"][class*="blur"] {
+  background-color: transparent !important;
+}
+
+/* ============================================================================
+   4. ABGERUNDETE ECKEN
+   ----------------------------------------------------------------------------
+   Avatare, Buttons, Karten, Eingaben, Popouts, Embeds, Bilder.
+   ========================================================================== */
+
+/* Eingabefeld & Suchfelder */
+[class*="channelTextArea_"],
+[class*="scrollableContainer_"],
+[class*="searchBar_"],
+[class*="input_"] {
+  border-radius: var(--vg-radius) !important;
+}
+
+/* Buttons */
+[class*="button_"]:not([class*="lookBlank"]):not([class*="reaction"]),
+[class*="lookFilled_"],
+[class*="lookOutlined_"] {
+  border-radius: var(--vg-radius-sm) !important;
+}
+
+/* Karten, Embeds, Popouts, Modals, Codebloecke, Anhaenge */
+[class*="card_"],
+[class*="embedWrapper"],
+[class*="embed_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="menu_"],
+[class*="tooltip_"],
+[class*="imageWrapper_"],
+[class*="clickableWrapper_"],
+[class*="attachment_"],
+[class*="wrapperAudio_"],
+[class*="codeContainer"],
+pre,
+[class*="hljs"] {
+  border-radius: var(--vg-radius) !important;
+}
+
+/* Avatare & Bilder rund(er) */
+[class*="avatar_"],
+[class*="wrapper_"] > svg foreignObject,
+img[class*="avatar"] {
+  border-radius: 50% !important;
+}
+
+/* Mitglieder-/Erwaehnungs-Pills */
+[class*="mention"],
+[class*="role_"],
+[class*="pill_"],
+[class*="tag_"] {
+  border-radius: var(--vg-radius-sm) !important;
+}
+
+/* Grosse Container deutlich runder */
+[class*="chatContent_"],
+[class*="membersWrap_"],
+[class*="container_"][class*="userPopout"],
+[class*="profileCard"] {
+  border-radius: var(--vg-radius-lg) !important;
+}
+
+/* ============================================================================
+   5. FEINSCHLIFF
+   ----------------------------------------------------------------------------
+   Feine Glaskanten, lesbarer aktiver Channel, dezenter Akzent.
+   ========================================================================== */
+
+/* Feine, helle Kante auf Glas-Panels fuer den "echten" Glas-Eindruck */
+[class*="chatContent_"],
+[class*="membersWrap_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="card_"] {
+  border: 1px solid var(--vg-border);
+}
+
+/* Aktiver / ausgewaehlter Channel: pinker Touch + linker Marker */
+[class*="modeSelected_"] [class*="link_"],
+[class*="modeSelected_"] {
+  background: hsl(var(--vg-accent-h) 60% 55% / 0.16) !important;
+}
+[class*="modeSelected_"]::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 70%;
+  border-radius: 0 4px 4px 0;
+  background: var(--vg-accent);
+}
+
+/* Channel-Hover */
+[class*="link_"]:hover {
+  background: hsl(var(--vg-accent-h) 60% 60% / 0.08) !important;
+}
+
+/* Discords vollflaechige opake Hintergruende aufbrechen, damit der
+   Verlauf/Blur durchkommt (z.B. App-Frame & Basis-Layout). */
+[class*="appAsidePanelWrapper_"],
+[class*="base_"],
+[class*="content_"]:not([class*="contentColumn"]),
+[class*="container_"][class*="chat"],
+[class*="page_"] {
+  background-color: transparent !important;
+}
+
+/* Eigene Scrollbar-Optik (WebKit) */
+::-webkit-scrollbar-thumb {
+  border-radius: 8px !important;
+}
+
+/* ============================================================================
+   6. "LIVE" / STREAM-INDIKATOR ROT
+   ----------------------------------------------------------------------------
+   Uebertraegt jemand seinen Bildschirm, zeigt Discord ein "Live"-Badge. Im
+   pinken Theme ginge das im Akzent unter - daher kraeftig rot. Farbe aenderbar
+   ueber --vg-live im Konfig-Block.
+   ========================================================================== */
+[class*="live_"],
+[class*="liveBadge"],
+[class*="liveIndicator"],
+[class*="liveTag"],
+[class*="goLiveChiclet"] {
+  background-color: var(--vg-live) !important;
+  border-color: var(--vg-live) !important;
+  color: #fff !important;
+}
+
+/* "LIVE"-Badge als vollstaendig runde Pille statt eckig. */
+[class*="live_"]:not([class*="container"]):not([class*="wrapper"]),
+[class*="liveBadge"],
+[class*="liveTag"],
+[class*="goLiveChiclet"] {
+  border-radius: 999px !important;
+  padding: 1px 8px !important;
+}
+
+/* ============================================================================
+   7. KONTEXTMENUE-POSITION REPARIEREN (Untermenues sassen weit weg)
+   ----------------------------------------------------------------------------
+   PROBLEM: Untermenues ("Apps", "Rollen", "Verschieben nach") oeffneten weit
+   abgesetzt vom Hauptmenue - man kam mit der Maus nicht hinueber.
+
+   URSACHE: backdrop-filter UND transform machen ein Element laut CSS-Spec zum
+   "Containing Block" fuer position:fixed-Kinder. Discord positioniert
+   Kontext-Untermenues per position:fixed. Lag der Filter auf einer Menue-Ebene,
+   die Vorfahr des Untermenues ist, wurde dessen Koordinatensystem verschoben.
+
+   FIX: Auf den schwebenden Kontextmenue-Ebenen KEIN backdrop-filter (diese Regel
+   ueberschreibt die Blur-Regeln aus Abschnitt 3 gezielt nur hier). transform
+   lassen wir unangetastet, damit Discords eigene Positionierung bleibt. Statt
+   Durchsicht-Blur bekommen die Menues eine dichte Glasfarbe - dunkel & lesbar.
+   ========================================================================== */
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"],
+[class*="layer_"] [class*="root_"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Menues/Popouts ohne Blur trotzdem dunkel & lesbar halten */
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"] {
+  background-color: var(--vg-glass-4) !important;
+}
+
+/* ============================================================================
+   8. PING-/ERWAEHNUNGS-BADGES HERVORHEBEN
+   ----------------------------------------------------------------------------
+   Die roten Zaehler an Server-Icons und neben Channels werden kraeftig rot, als
+   runde Pille dargestellt und pulsieren sanft - ein neuer Ping faellt sofort auf.
+
+   >> Farbe aendern: --vg-ping. Tempo: in der Animation die 2.8s anpassen.
+      Pulsieren stoert? Dann die Zeile "animation: ..." entfernen.
+   ========================================================================== */
+:root { --vg-ping: #f23f42; }
+
+@keyframes vg-ping-pulse {
+  0%, 100% { box-shadow: 0 0 4px 0 hsl(0 85% 55% / 0.25); }
+  50%      { box-shadow: 0 0 7px 1px hsl(0 85% 55% / 0.45); }
+}
+
+[class*="numberBadge_"],
+[class*="mentionBadge"],
+[class*="unreadMentionsBar_"] {
+  background-color: var(--vg-ping) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  min-width: 16px !important;
+  padding: 0 5px !important;
+  animation: vg-ping-pulse 2.8s ease-in-out infinite;
 }

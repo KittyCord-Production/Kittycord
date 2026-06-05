@@ -14,6 +14,7 @@ import { Logger } from "@utils/Logger";
 import { Plugin } from "@utils/types";
 import { React, showToast, Toasts } from "@webpack/common";
 
+import { BRAND_ICON } from "../../../../branding";
 import { PluginMeta } from "~plugins";
 
 import { openPluginModal } from "./PluginModal";
@@ -99,16 +100,14 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
             title: "Modified Vencord Plugin"
         },
         {
-            // TODO: replace placeholder badge with a dedicated Kittycord asset once branding assets exist
             condition: isKittycordPlugin,
-            src: "https://equicord.org/assets/favicon.png",
+            src: BRAND_ICON,
             alt: "Kittycord",
             title: "Kittycord Plugin"
         },
         {
-            // TODO: replace placeholder badge with a dedicated moggcord asset once branding assets exist
             condition: isMoggcordPlugin,
-            src: "https://equicord.org/assets/favicon.png",
+            src: BRAND_ICON,
             alt: "Moggcord",
             title: "Moggcord Plugin"
         },
