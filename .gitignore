@@ -35,3 +35,6 @@ ExtensionCache/
 
 # wakatime related stuff
 .wakatime-project
+
+# Claude Code local settings (personal, per-user - not committed)
+.claude/settings.local.json
