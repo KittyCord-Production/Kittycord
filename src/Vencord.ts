@@ -122,6 +122,9 @@ let notifiedForUpdatesThisSession = false;
 
 async function runUpdateCheck() {
     if (IS_UPDATER_DISABLED) return;
+    // Once we've notified (or auto-updated + notified) this session, stop re-checking, so the periodic
+    // re-check below never re-downloads the asar or shows the notice twice.
+    if (notifiedForUpdatesThisSession) return;
 
     const notify = (data: NotificationData) => {
         if (notifiedForUpdatesThisSession) return;
@@ -208,10 +211,9 @@ async function init() {
     if (!IS_DEV && !IS_WEB && !IS_UPDATER_DISABLED) {
         runUpdateCheck();
 
-        // this tends to get really annoying, so only do this if the user has auto-update without notification enabled
-        if (Settings.autoUpdate && !Settings.autoUpdateNotification) {
-            setInterval(runUpdateCheck, 1000 * 60 * 30); // 30 minutes
-        }
+        // Re-check periodically so a long-running client still notices new releases without a restart.
+        // runUpdateCheck() bails out after it has notified once this session, so this never spams.
+        setInterval(runUpdateCheck, 1000 * 60 * 30); // 30 minutes
     }
 
     if (IS_DEV) {
