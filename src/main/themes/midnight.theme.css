@@ -1,0 +1,374 @@
+/**
+ * @name        Midnight
+ * @author      Kittycord
+ * @description Tiefes Frosted-Glass-Theme in Blau/Indigo. Akzente ueber kuehle Blautoene, rotes LIVE-Badge bleibt erhalten. Eigenstaendig, ohne externe Imports. (Nachrichten-Textfarbe bleibt Discord-Standard.)
+ * @version     1.0.0
+ */
+
+/* ============================================================================
+   0. SO PASST DU DAS THEME AN
+   ----------------------------------------------------------------------------
+   Alles Wichtige steht im :root-Block direkt darunter:
+     - Hellere/dunklere Akzente?   -> --vg-accent-l aendern (Helligkeit in %).
+     - Doch etwas Farbe rein?      -> --vg-accent-s hochsetzen (0% = neutral grau)
+                                      und --vg-accent-h auf einen Farbton stellen.
+     - Mehr/weniger Blur?          -> --vg-blur (z.B. 12px ruhiger, 28px starker Glas).
+     - Mehr/weniger durchsichtig?  -> --vg-glass-* Alpha-Werte (0 = klar, 1 = opak).
+     - Rundere/kantigere Ecken?    -> --vg-radius* anpassen.
+     - Eigenes Hintergrundbild?    -> siehe Block 2 (#app-mount).
+   HINWEIS: Die Nachrichten-Textfarbe wird bewusst NICHT veraendert (kein
+   --text-normal-Override) und bleibt damit Discord-Standard.
+   ========================================================================== */
+
+:root {
+  /* "Akzent" = kuehles Indigo-Blau. */
+  --vg-accent-h: 218;
+  --vg-accent-s: 90%;
+  --vg-accent-l: 70%;
+  --vg-accent: hsl(var(--vg-accent-h) var(--vg-accent-s) var(--vg-accent-l));
+
+  /* LIVE/Stream-Indikator - bleibt kraeftig rot. */
+  --vg-live: #ed4245;
+
+  /* Dunkle, navy getoente Basis. */
+  --vg-base-h: 222;
+  --vg-base-s: 30%;
+  --vg-base-hsl: var(--vg-base-h) var(--vg-base-s) 8%;
+
+  /* Glas-Look. */
+  --vg-blur: 20px;
+  --vg-glass-1: hsl(var(--vg-base-hsl) / 0.42);
+  --vg-glass-2: hsl(var(--vg-base-hsl) / 0.30);
+  --vg-glass-3: hsl(var(--vg-base-hsl) / 0.55);
+  --vg-glass-4: hsl(var(--vg-base-hsl) / 0.82);
+  --vg-border:  hsl(0 0% 78% / 0.12);
+
+  /* Abgerundete Ecken. */
+  --vg-radius-sm: 8px;
+  --vg-radius:    14px;
+  --vg-radius-lg: 22px;
+}
+
+/* ============================================================================
+   1. DISCORD-VARIABLEN UMFAERBEN (transparent/neutral)
+   ========================================================================== */
+:root,
+.theme-dark,
+.theme-darker,
+.theme-light,
+.theme-midnight {
+  --background-primary:        var(--vg-glass-1);
+  --background-secondary:      var(--vg-glass-2);
+  --background-secondary-alt:  hsl(var(--vg-base-hsl) / 0.40);
+  --background-tertiary:       hsl(var(--vg-base-hsl) / 0.26);
+  --background-accent:         var(--vg-accent);
+  --background-floating:       var(--vg-glass-4);
+  --background-nested-floating: var(--vg-glass-4);
+  --background-mobile-primary:   var(--vg-glass-1);
+  --background-mobile-secondary: var(--vg-glass-2);
+  --channeltextarea-background:  var(--vg-glass-3);
+  --background-message-hover:  hsl(0 0% 60% / 0.05);
+
+  --background-modifier-hover:    hsl(0 0% 72% / 0.07);
+  --background-modifier-active:   hsl(0 0% 72% / 0.11);
+  --background-modifier-selected: hsl(0 0% 72% / 0.14);
+  --background-modifier-accent:   var(--vg-border);
+
+  --input-background:          var(--vg-glass-3);
+  --modal-background:          var(--vg-glass-4);
+  --modal-footer-background:   hsl(var(--vg-base-hsl) / 0.88);
+  --deprecated-card-bg:           var(--vg-glass-3);
+  --deprecated-card-editable-bg:  var(--vg-glass-3);
+  --deprecated-quickswitcher-input-background: var(--vg-glass-3);
+  --deprecated-text-input-bg:     var(--vg-glass-3);
+  --activity-card-background:     var(--vg-glass-3);
+
+  --background-base-lowest:  hsl(var(--vg-base-hsl) / 0.30);
+  --background-base-lower:   hsl(var(--vg-base-hsl) / 0.38);
+  --background-base-low:     hsl(var(--vg-base-hsl) / 0.48);
+  --background-surface-higher:  hsl(var(--vg-base-hsl) / 0.55);
+  --background-surface-high:    hsl(var(--vg-base-hsl) / 0.62);
+  --background-surface-highest: hsl(var(--vg-base-hsl) / 0.70);
+  --card-background-default:    var(--vg-glass-3);
+
+  --border-subtle: var(--vg-border);
+  --border-muted:  hsl(0 0% 78% / 0.16);
+  --border-normal: hsl(0 0% 78% / 0.22);
+  --border-strong: hsl(0 0% 78% / 0.30);
+  --app-frame-border: var(--vg-border);
+
+  /* Brand-Palette in Blautoenen. */
+  --brand-100: hsl(var(--vg-accent-h) var(--vg-accent-s) 92%);
+  --brand-130: hsl(var(--vg-accent-h) var(--vg-accent-s) 88%);
+  --brand-160: hsl(var(--vg-accent-h) var(--vg-accent-s) 85%);
+  --brand-200: hsl(var(--vg-accent-h) var(--vg-accent-s) 82%);
+  --brand-230: hsl(var(--vg-accent-h) var(--vg-accent-s) 79%);
+  --brand-260: hsl(var(--vg-accent-h) var(--vg-accent-s) 76%);
+  --brand-300: hsl(var(--vg-accent-h) var(--vg-accent-s) 74%);
+  --brand-330: hsl(var(--vg-accent-h) var(--vg-accent-s) 72%);
+  --brand-360: hsl(var(--vg-accent-h) var(--vg-accent-s) 70%);
+  --brand-400: hsl(var(--vg-accent-h) var(--vg-accent-s) 68%);
+  --brand-430: hsl(var(--vg-accent-h) var(--vg-accent-s) 67%);
+  --brand-460: hsl(var(--vg-accent-h) var(--vg-accent-s) 66%);
+  --brand-500: var(--vg-accent);
+  --brand-530: hsl(var(--vg-accent-h) var(--vg-accent-s) 63%);
+  --brand-560: hsl(var(--vg-accent-h) var(--vg-accent-s) 60%);
+  --brand-600: hsl(var(--vg-accent-h) var(--vg-accent-s) 56%);
+  --brand-630: hsl(var(--vg-accent-h) var(--vg-accent-s) 53%);
+  --brand-660: hsl(var(--vg-accent-h) var(--vg-accent-s) 50%);
+  --brand-700: hsl(var(--vg-accent-h) var(--vg-accent-s) 46%);
+  --brand-730: hsl(var(--vg-accent-h) var(--vg-accent-s) 43%);
+  --brand-760: hsl(var(--vg-accent-h) var(--vg-accent-s) 40%);
+  --brand-800: hsl(var(--vg-accent-h) var(--vg-accent-s) 37%);
+  --brand-830: hsl(var(--vg-accent-h) var(--vg-accent-s) 34%);
+  --brand-860: hsl(var(--vg-accent-h) var(--vg-accent-s) 31%);
+  --brand-900: hsl(var(--vg-accent-h) var(--vg-accent-s) 28%);
+
+  --brand-experiment:     var(--vg-accent);
+  --brand-experiment-360: hsl(var(--vg-accent-h) var(--vg-accent-s) 70%);
+  --brand-experiment-460: hsl(var(--vg-accent-h) var(--vg-accent-s) 66%);
+  --brand-experiment-500: var(--vg-accent);
+  --brand-experiment-560: hsl(var(--vg-accent-h) var(--vg-accent-s) 60%);
+  --brand-experiment-600: hsl(var(--vg-accent-h) var(--vg-accent-s) 56%);
+  --brand-experiment-700: hsl(var(--vg-accent-h) var(--vg-accent-s) 46%);
+
+  /* Hervorhebungen = hell; Buttons = dunkel (weisser Button-Text bleibt lesbar). */
+  --text-link:                 hsl(0 0% 86%);
+  --text-link-low-saturation:  hsl(0 0% 74%);
+  --header-primary:            #f3f3f4;
+  --control-brand-foreground:  hsl(0 0% 86%);
+  --button-filled-brand-background:        hsl(0 0% 26%);
+  --button-filled-brand-background-hover:  hsl(0 0% 32%);
+  --button-filled-brand-background-active: hsl(0 0% 21%);
+  --mention-foreground:        hsl(0 0% 88%);
+  --mention-background:        hsl(0 0% 65% / 0.12);
+  --input-placeholder-text:    hsl(0 0% 50%);
+
+  --scrollbar-auto-thumb:  hsl(0 0% 50% / 0.35);
+  --scrollbar-auto-track:  transparent;
+  --scrollbar-thin-thumb:  hsl(0 0% 50% / 0.30);
+  --scrollbar-thin-track:  transparent;
+  --scrollbar-auto-scrollbar-color-thumb: hsl(0 0% 50% / 0.35);
+  --scrollbar-auto-scrollbar-color-track: transparent;
+}
+
+/* ============================================================================
+   2. HINTERGRUND HINTER DEM GANZEN CLIENT
+   >> Eigenes Wallpaper? 'background' unten ersetzen durch z.B.:
+        background: url("https://example.com/bild.jpg") center/cover fixed;
+   ========================================================================== */
+#app-mount {
+  background:
+    radial-gradient(circle at 18% 0%, hsl(222 60% 20% / 0.6), transparent 55%),
+    radial-gradient(circle at 100% 100%, hsl(222 55% 14% / 0.5), transparent 55%),
+    linear-gradient(140deg, hsl(222 50% 9%) 0%, hsl(222 48% 6%) 50%, hsl(222 45% 4%) 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* ============================================================================
+   3. FROSTED-GLASS AUF DEN HAUPT-PANELS
+   ========================================================================== */
+[class*="guilds_"],
+[class*="sidebar_"]:not([class*="sidebarRegion"]),
+[class*="sidebarList_"],
+[class*="membersWrap_"],
+[class*="members_"]:not([class*="member_"]),
+[class*="chatContent_"],
+[class*="chat_"]:not([class*="chatContent_"]) {
+  backdrop-filter: blur(var(--vg-blur)) saturate(115%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(115%);
+  background-color: transparent !important;
+}
+
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"],
+[class*="layer_"] [class*="root_"],
+[class*="modal_"],
+[class*="tooltip_"],
+[class*="autocomplete_"],
+[class*="quickswitcher_"],
+[class*="searchPopout"] {
+  backdrop-filter: blur(calc(var(--vg-blur) + 8px)) saturate(120%);
+  -webkit-backdrop-filter: blur(calc(var(--vg-blur) + 8px)) saturate(120%);
+}
+
+[class*="panels_"],
+[class*="form_"]:not([class*="formContainer"]) {
+  backdrop-filter: blur(var(--vg-blur)) saturate(110%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(110%);
+}
+
+/* Nachrichten-Eingabeleiste: aeusseres Element traegt das Glas, inneres graues
+   themedBackground wird transparent (nur EIN Blur-Layer). Betrifft die Leiste,
+   nicht den Nachrichtentext. */
+[class*="channelTextArea_"] {
+  background-color: var(--vg-glass-3) !important;
+  backdrop-filter: blur(var(--vg-blur)) saturate(115%);
+  -webkit-backdrop-filter: blur(var(--vg-blur)) saturate(115%);
+  border: 1px solid var(--vg-border);
+  border-radius: var(--vg-radius) !important;
+}
+[class*="channelTextArea_"] [class*="themedBackground_"],
+[class*="channelTextArea_"] [class*="scrollableContainer_"] {
+  background-color: transparent !important;
+}
+
+[class*="bg_"][class*="blur"] {
+  background-color: transparent !important;
+}
+
+/* ============================================================================
+   4. ABGERUNDETE ECKEN
+   ========================================================================== */
+[class*="channelTextArea_"],
+[class*="scrollableContainer_"],
+[class*="searchBar_"],
+[class*="input_"] {
+  border-radius: var(--vg-radius) !important;
+}
+
+[class*="button_"]:not([class*="lookBlank"]):not([class*="reaction"]),
+[class*="lookFilled_"],
+[class*="lookOutlined_"] {
+  border-radius: var(--vg-radius-sm) !important;
+}
+
+[class*="card_"],
+[class*="embedWrapper"],
+[class*="embed_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="menu_"],
+[class*="tooltip_"],
+[class*="imageWrapper_"],
+[class*="clickableWrapper_"],
+[class*="attachment_"],
+[class*="wrapperAudio_"],
+[class*="codeContainer"],
+pre,
+[class*="hljs"] {
+  border-radius: var(--vg-radius) !important;
+}
+
+[class*="avatar_"],
+[class*="wrapper_"] > svg foreignObject,
+img[class*="avatar"] {
+  border-radius: 50% !important;
+}
+
+[class*="mention"],
+[class*="role_"],
+[class*="pill_"],
+[class*="tag_"] {
+  border-radius: var(--vg-radius-sm) !important;
+}
+
+[class*="chatContent_"],
+[class*="membersWrap_"],
+[class*="container_"][class*="userPopout"],
+[class*="profileCard"] {
+  border-radius: var(--vg-radius-lg) !important;
+}
+
+/* ============================================================================
+   5. FEINSCHLIFF (Akzent ueber Helligkeit, nicht Farbe)
+   ========================================================================== */
+[class*="chatContent_"],
+[class*="membersWrap_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="card_"] {
+  border: 1px solid var(--vg-border);
+}
+
+[class*="modeSelected_"] [class*="link_"],
+[class*="modeSelected_"] {
+  background: hsl(0 0% 78% / 0.16) !important;
+}
+[class*="modeSelected_"]::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 70%;
+  border-radius: 0 4px 4px 0;
+  background: var(--vg-accent);
+}
+
+[class*="link_"]:hover {
+  background: hsl(0 0% 75% / 0.08) !important;
+}
+
+[class*="appAsidePanelWrapper_"],
+[class*="base_"],
+[class*="content_"]:not([class*="contentColumn"]),
+[class*="container_"][class*="chat"],
+[class*="page_"] {
+  background-color: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px !important;
+}
+
+/* ============================================================================
+   6. "LIVE" / STREAM-INDIKATOR ROT (einziger Farbtupfer)
+   ========================================================================== */
+[class*="live_"],
+[class*="liveBadge"],
+[class*="liveIndicator"],
+[class*="liveTag"],
+[class*="goLiveChiclet"] {
+  background-color: var(--vg-live) !important;
+  border-color: var(--vg-live) !important;
+  color: #fff !important;
+}
+
+[class*="live_"]:not([class*="container"]):not([class*="wrapper"]),
+[class*="liveBadge"],
+[class*="liveTag"],
+[class*="goLiveChiclet"] {
+  border-radius: 999px !important;
+  padding: 1px 8px !important;
+}
+
+/* ============================================================================
+   7. KONTEXTMENUE-POSITION REPARIEREN
+   backdrop-filter macht ein Element zum Containing Block fuer position:fixed-
+   Kinder; Discord positioniert Kontext-Untermenues per position:fixed. Daher
+   auf den schwebenden Menue-Ebenen KEIN backdrop-filter (transform unangetastet
+   lassen). Stattdessen dichte Glasfarbe fuer Lesbarkeit.
+   ========================================================================== */
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"],
+[class*="layer_"] [class*="root_"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[class*="layerContainer_"] [class*="menu_"],
+[class*="layerContainer_"] [class*="popout_"] {
+  background-color: var(--vg-glass-4) !important;
+}
+
+/* ============================================================================
+   8. PING-/ERWAEHNUNGS-BADGES HERVORHEBEN
+   ========================================================================== */
+:root { --vg-ping: #f23f42; }
+
+@keyframes vg-ping-pulse {
+  0%, 100% { box-shadow: 0 0 4px 0 hsl(0 85% 55% / 0.25); }
+  50%      { box-shadow: 0 0 7px 1px hsl(0 85% 55% / 0.45); }
+}
+
+[class*="numberBadge_"],
+[class*="mentionBadge"],
+[class*="unreadMentionsBar_"] {
+  background-color: var(--vg-ping) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  min-width: 16px !important;
+  padding: 0 5px !important;
+  animation: vg-ping-pulse 2.8s ease-in-out infinite;
+}

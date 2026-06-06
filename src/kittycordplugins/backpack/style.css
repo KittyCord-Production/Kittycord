@@ -1,0 +1,5 @@
+/* Backpack: when packed, hide every chat-bar plugin button except the Backpack button itself.
+   The Backpack button is identified by the .kc-backpack-marker span it renders inside. */
+body.kc-backpack-collapsed .vc-chatbar-button:not(:has(.kc-backpack-marker)) {
+    display: none !important;
+}

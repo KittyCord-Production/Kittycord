@@ -108,8 +108,8 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
         {
             condition: isMoggcordPlugin,
             src: BRAND_ICON,
-            alt: "Moggcord",
-            title: "Moggcord Plugin"
+            alt: "Kittycord",
+            title: "Kittycord Plugin"
         },
         {
             condition: isEquicordPlugin,
