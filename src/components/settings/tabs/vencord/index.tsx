@@ -23,6 +23,7 @@ import BadgeAPI from "@plugins/_api/badges";
 import { gitRemote } from "@shared/vencordUserAgent";
 import { DONOR_ROLE_ID, GUILD_ID, IS_WINDOWS, VC_DONOR_ROLE_ID, VC_GUILD_ID } from "@utils/constants";
 import { classNameFactory } from "@utils/css";
+import { openInviteModal } from "@utils/discord";
 import { Margins } from "@utils/margins";
 import { isAnyPluginDev } from "@utils/misc";
 import { relaunch } from "@utils/native";
@@ -148,6 +149,22 @@ function Switches() {
     });
 }
 
+const COMMUNITY_INVITE = "KaBMzypPHT";
+
+function DiscordIcon({ className }: { className?: string; }) {
+    return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19.27 5.33A16.6 16.6 0 0 0 14.9 4l-.27.5a13.8 13.8 0 0 1 3.94 1.27 11.7 11.7 0 0 0-9.16 0A12.6 12.6 0 0 1 13.36 4.5L13.1 4c-1.66.18-3.2.6-4.36 1.33C5.08 8.6 4.5 12.27 4.7 15.9a16.5 16.5 0 0 0 5.05 2.56l.6-.93a10.9 10.9 0 0 1-1.7-.82l.42-.32c3.2 1.5 6.66 1.5 9.84 0l.42.32c-.54.3-1.1.58-1.7.82l.6.93a16.4 16.4 0 0 0 5.05-2.56c.27-4.2-.7-7.83-3.34-10.57ZM9.68 13.93c-.8 0-1.45-.74-1.45-1.65 0-.9.64-1.65 1.45-1.65.82 0 1.47.75 1.45 1.65 0 .9-.64 1.65-1.45 1.65Zm5.36 0c-.8 0-1.45-.74-1.45-1.65 0-.9.64-1.65 1.45-1.65.82 0 1.47.75 1.45 1.65 0 .9-.63 1.65-1.45 1.65Z" />
+        </svg>
+    );
+}
+
+function joinCommunity() {
+    openInviteModal(COMMUNITY_INVITE).catch(() =>
+        VencordNative.native.openExternal(`https://discord.gg/${COMMUNITY_INVITE}`)
+    );
+}
+
 function EquicordSettings() {
     const user = UserStore?.getCurrentUser();
 
@@ -181,6 +198,11 @@ function EquicordSettings() {
             </Paragraph>
 
             <QuickActionCard>
+                <QuickAction
+                    Icon={DiscordIcon}
+                    text="Join our Discord"
+                    action={joinCommunity}
+                />
                 <QuickAction
                     Icon={LogIcon}
                     text="Notification Log"
