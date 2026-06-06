@@ -15,7 +15,8 @@ import { localCorrect } from "./corrections";
 
 // Groq's HTTP POST has to run in the main process: Discord's renderer CSP blocks fetch to
 // api.groq.com. This is the ONLY external network request the plugin ever makes.
-const Native = VencordNative.pluginHelpers.AutoCorrect as PluginNative<typeof import("./native")>;
+// undefined on the web/browser build (no main process) - the online engines then fall back to Local.
+const Native = VencordNative.pluginHelpers.AutoCorrect as PluginNative<typeof import("./native")> | undefined;
 
 const logger = new Logger("AutoCorrect");
 
@@ -93,7 +94,7 @@ async function aiCorrect(text: string, apiKey: string): Promise<string> {
 
     let corrected: string;
     try {
-        corrected = await Native.correct(apiKey, buildSystemPrompt(), text);
+        corrected = await Native!.correct(apiKey, buildSystemPrompt(), text);
     } catch (e) {
         logger.warn("Correction request failed, keeping original message.", e);
         return text;
@@ -109,32 +110,42 @@ async function aiCorrect(text: string, apiKey: string): Promise<string> {
     return corrected;
 }
 
+let nativeWarned = false;
+function warnNoNative(engineName: string) {
+    if (nativeWarned) return;
+    nativeWarned = true;
+    logger.warn(`${engineName} mode needs the Kittycord desktop app (and a full restart after updating); it can't run on the web/browser build. Using the offline Local engine instead.`);
+}
+
 async function correctText(text: string): Promise<string> {
     const lang = settings.store.language ?? "en";
     const engine = settings.store.engine ?? "local";
 
-    // AI (Groq) — only when selected AND a key is set.
+    // AI (Groq) — only when selected, a key is set, AND the native module is available.
     if (engine === "ai") {
         const apiKey = settings.store.apiKey?.trim();
-        if (apiKey) return aiCorrect(text, apiKey);
-    }
-
-    // DeepL round-trip — only when selected AND a key is set. Logs the reason on failure.
-    if (engine === "deepl") {
-        // Fall back to the Translate plugin's DeepL key so the user doesn't have to enter it twice.
+        if (apiKey) {
+            if (Native?.correct) return aiCorrect(text, apiKey);
+            warnNoNative("AI");
+        }
+    } else if (engine === "deepl") {
+        // Reuse the Translate plugin's DeepL key so it doesn't have to be entered twice.
         const deeplKey = settings.store.deeplKey?.trim()
             || (Settings.plugins?.Translate?.deeplApiKey as string | undefined)?.trim();
         if (deeplKey && text.trim().length >= 3) {
-            try {
-                return await Native.deeplRoundtrip(deeplKey, lang, text);
-            } catch (e) {
-                logger.warn("DeepL correction failed — keeping original message.", e);
-                return text;
+            if (Native?.deeplRoundtrip) {
+                try {
+                    return await Native.deeplRoundtrip(deeplKey, lang, text);
+                } catch (e) {
+                    logger.warn("DeepL correction failed — keeping original message.", e);
+                    return text;
+                }
             }
+            warnNoNative("DeepL");
         }
     }
 
-    // Local (default, and fallback when an online engine has no key): offline, nothing leaves the machine.
+    // Local (default + fallback): offline, nothing leaves the machine.
     const capitalize = (settings.store.aggressiveness ?? "low") !== "low";
     return localCorrect(text, lang, capitalize);
 }
