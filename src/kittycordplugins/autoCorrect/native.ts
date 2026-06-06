@@ -49,3 +49,47 @@ export async function correct(_: IpcMainInvokeEvent, apiKey: string, systemPromp
         return text;
     }
 }
+
+const DEEPL_TARGET: Record<string, string> = { en: "EN-US", de: "DE", fr: "FR", es: "ES", it: "IT", pt: "PT-PT" };
+const DEEPL_SOURCE: Record<string, string> = { en: "EN", de: "DE", fr: "FR", es: "ES", it: "IT", pt: "PT" };
+
+async function deeplTranslate(base: string, apiKey: string, text: string, targetLang: string, sourceLang?: string): Promise<string | null> {
+    const body: Record<string, unknown> = { text: [text], target_lang: targetLang };
+    if (sourceLang) body.source_lang = sourceLang;
+
+    const res = await fetch(`${base}/v2/translate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `DeepL-Auth-Key ${apiKey}` },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const out = data?.translations?.[0]?.text;
+    return typeof out === "string" && out.trim() !== "" ? out : null;
+}
+
+/**
+ * "Round-trip" cleanup using the DeepL TRANSLATION API (the free tier does translation, not the
+ * paid Write/correction). Translates the text to a pivot language and back, which yields
+ * grammatical text. NOTE: this REWRITES the message - wording/tone/meaning can change; it is not a
+ * faithful spell-checker. Free DeepL keys end in ":fx" (api-free host). Returns the ORIGINAL text
+ * on any failure, so a message is never dropped/garbled by a failed request.
+ */
+export async function deeplRoundtrip(_: IpcMainInvokeEvent, apiKey: string, lang: string, text: string): Promise<string> {
+    const key = (apiKey || "").trim();
+    if (!key) return text;
+
+    const base = key.endsWith(":fx") ? "https://api-free.deepl.com" : "https://api.deepl.com";
+    const l = DEEPL_TARGET[lang] ? lang : "en";
+    const pivot = l === "en" ? { t: "DE", s: "DE" } : { t: "EN-US", s: "EN" };
+
+    try {
+        const mid = await deeplTranslate(base, key, text, pivot.t, DEEPL_SOURCE[l]);
+        if (!mid) return text;
+        const final = await deeplTranslate(base, key, mid, DEEPL_TARGET[l], pivot.s);
+        return final && final.trim() !== "" ? final : text;
+    } catch {
+        return text;
+    }
+}

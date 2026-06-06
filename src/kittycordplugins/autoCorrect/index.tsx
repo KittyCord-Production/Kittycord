@@ -25,16 +25,22 @@ let active = true;
 const settings = definePluginSettings({
     engine: {
         type: OptionType.SELECT,
-        description: "Local = offline, fixes common typos + capitalizes sentences, nothing is ever sent anywhere. AI = full grammar + punctuation (commas etc.), but sends your message text to Groq and needs your own key below.",
+        description: "Local = offline, fixes common typos + capitalizes sentences, nothing is sent anywhere. AI (Groq) = full grammar + punctuation, sends text to Groq (needs your key). DeepL = re-translates your text DE<->EN to clean it (works with a free DeepL key, but REWRITES the wording).",
         options: [
             { label: "Local (offline, no key, private)", value: "local", default: true },
-            { label: "AI via Groq (needs your own key)", value: "ai" }
+            { label: "AI via Groq (needs your own key)", value: "ai" },
+            { label: "DeepL round-trip (DeepL key; rewrites text)", value: "deepl" }
         ]
     },
     apiKey: {
         type: OptionType.STRING,
         default: "",
         description: "Only used in AI mode. Your own free Groq API key (console.groq.com). WARNING: in AI mode the text of each message you send is sent to Groq's servers (a third party). Leave empty to never send anything."
+    },
+    deeplKey: {
+        type: OptionType.STRING,
+        default: "",
+        description: "Only used in DeepL mode. Your DeepL API key (free keys end in ':fx', from deepl.com/your-account). WARNING: in DeepL mode your message is sent to DeepL and re-translated DE<->EN, which CLEANS but REWRITES it - wording/meaning can change. Leave empty to never send anything."
     },
     language: {
         type: OptionType.SELECT,
@@ -105,15 +111,21 @@ async function aiCorrect(text: string, apiKey: string): Promise<string> {
 
 async function correctText(text: string): Promise<string> {
     const lang = settings.store.language ?? "en";
+    const engine = settings.store.engine ?? "local";
 
-    // AI mode only when the user selected it AND supplied their own key.
-    if (settings.store.engine === "ai") {
+    // AI (Groq) — only when selected AND a key is set.
+    if (engine === "ai") {
         const apiKey = settings.store.apiKey?.trim();
         if (apiKey) return aiCorrect(text, apiKey);
-        // AI selected but no key -> fall back to the offline corrector.
     }
 
-    // Local mode: offline, nothing leaves the machine. Capitalize on medium/high.
+    // DeepL round-trip — only when selected AND a key is set. Returns the original on any failure.
+    if (engine === "deepl") {
+        const deeplKey = settings.store.deeplKey?.trim();
+        if (deeplKey && text.trim().length >= 3) return Native.deeplRoundtrip(deeplKey, lang, text);
+    }
+
+    // Local (default, and fallback when an online engine has no key): offline, nothing leaves the machine.
     const capitalize = (settings.store.aggressiveness ?? "low") !== "low";
     return localCorrect(text, lang, capitalize);
 }
