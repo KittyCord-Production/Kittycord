@@ -53,7 +53,7 @@ export async function correct(_: IpcMainInvokeEvent, apiKey: string, systemPromp
 const DEEPL_TARGET: Record<string, string> = { en: "EN-US", de: "DE", fr: "FR", es: "ES", it: "IT", pt: "PT-PT" };
 const DEEPL_SOURCE: Record<string, string> = { en: "EN", de: "DE", fr: "FR", es: "ES", it: "IT", pt: "PT" };
 
-async function deeplTranslate(base: string, apiKey: string, text: string, targetLang: string, sourceLang?: string): Promise<string | null> {
+async function deeplTranslate(base: string, apiKey: string, text: string, targetLang: string, sourceLang?: string): Promise<string> {
     const body: Record<string, unknown> = { text: [text], target_lang: targetLang };
     if (sourceLang) body.source_lang = sourceLang;
 
@@ -62,11 +62,12 @@ async function deeplTranslate(base: string, apiKey: string, text: string, target
         headers: { "Content-Type": "application/json", Authorization: `DeepL-Auth-Key ${apiKey}` },
         body: JSON.stringify(body)
     });
-    if (!res.ok) return null;
+    if (!res.ok) throw new Error(`DeepL HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 150)}`);
 
     const data = await res.json();
     const out = data?.translations?.[0]?.text;
-    return typeof out === "string" && out.trim() !== "" ? out : null;
+    if (typeof out !== "string" || out.trim() === "") throw new Error("DeepL returned no translation");
+    return out;
 }
 
 /**
@@ -84,12 +85,9 @@ export async function deeplRoundtrip(_: IpcMainInvokeEvent, apiKey: string, lang
     const l = DEEPL_TARGET[lang] ? lang : "en";
     const pivot = l === "en" ? { t: "DE", s: "DE" } : { t: "EN-US", s: "EN" };
 
-    try {
-        const mid = await deeplTranslate(base, key, text, pivot.t, DEEPL_SOURCE[l]);
-        if (!mid) return text;
-        const final = await deeplTranslate(base, key, mid, DEEPL_TARGET[l], pivot.s);
-        return final && final.trim() !== "" ? final : text;
-    } catch {
-        return text;
-    }
+    // Errors propagate to the renderer (which logs them + keeps the original message), so failures
+    // like an invalid key or exceeded quota are visible instead of silently doing nothing.
+    const mid = await deeplTranslate(base, key, text, pivot.t, DEEPL_SOURCE[l]);
+    const final = await deeplTranslate(base, key, mid, DEEPL_TARGET[l], pivot.s);
+    return final.trim() ? final : text;
 }

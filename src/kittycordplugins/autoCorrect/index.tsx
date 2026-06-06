@@ -6,7 +6,7 @@
 
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { addMessagePreSendListener, MessageSendListener, removeMessagePreSendListener } from "@api/MessageEvents";
-import { definePluginSettings } from "@api/Settings";
+import { definePluginSettings, Settings } from "@api/Settings";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, PluginNative } from "@utils/types";
 import { React } from "@webpack/common";
@@ -40,7 +40,7 @@ const settings = definePluginSettings({
     deeplKey: {
         type: OptionType.STRING,
         default: "",
-        description: "Only used in DeepL mode. Your DeepL API key (free keys end in ':fx', from deepl.com/your-account). WARNING: in DeepL mode your message is sent to DeepL and re-translated DE<->EN, which CLEANS but REWRITES it - wording/meaning can change. Leave empty to never send anything."
+        description: "Only used in DeepL mode. Your DeepL API key (free keys end in ':fx', from deepl.com/your-account). If left empty, the DeepL key from the Translate plugin is reused automatically. WARNING: in DeepL mode your message is sent to DeepL and re-translated DE<->EN, which CLEANS but REWRITES it - wording/meaning can change."
     },
     language: {
         type: OptionType.SELECT,
@@ -119,10 +119,19 @@ async function correctText(text: string): Promise<string> {
         if (apiKey) return aiCorrect(text, apiKey);
     }
 
-    // DeepL round-trip — only when selected AND a key is set. Returns the original on any failure.
+    // DeepL round-trip — only when selected AND a key is set. Logs the reason on failure.
     if (engine === "deepl") {
-        const deeplKey = settings.store.deeplKey?.trim();
-        if (deeplKey && text.trim().length >= 3) return Native.deeplRoundtrip(deeplKey, lang, text);
+        // Fall back to the Translate plugin's DeepL key so the user doesn't have to enter it twice.
+        const deeplKey = settings.store.deeplKey?.trim()
+            || (Settings.plugins?.Translate?.deeplApiKey as string | undefined)?.trim();
+        if (deeplKey && text.trim().length >= 3) {
+            try {
+                return await Native.deeplRoundtrip(deeplKey, lang, text);
+            } catch (e) {
+                logger.warn("DeepL correction failed — keeping original message.", e);
+                return text;
+            }
+        }
     }
 
     // Local (default, and fallback when an online engine has no key): offline, nothing leaves the machine.
