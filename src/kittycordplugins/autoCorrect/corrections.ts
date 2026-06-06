@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Offline correction: a curated map of common misspellings per language + one safe rule.
-// No dictionary download, no network, no key - everything stays on the user's machine.
-// It only fixes clear, unambiguous typos (whole-word, case-preserving); it never rephrases.
-// Entries are deliberately conservative to avoid "correcting" real words.
+// Offline correction (no network, no key): a curated map of common misspellings per language,
+// plus safe sentence-start capitalization. It ONLY fixes clear, unambiguous typos (whole-word,
+// case-preserving) and capitalization - it never guesses, never inserts commas/periods, and never
+// changes valid words. Full punctuation + grammar is the AI engine's job (it understands context).
 
 const COMMON_TYPOS: Record<string, Record<string, string>> = {
     en: {
-        teh: "the", thsi: "this", taht: "that", adn: "and", ot: "to",
+        teh: "the", thsi: "this", taht: "that", adn: "and", ot: "to", yuo: "you",
         recieve: "receive", recieved: "received", seperate: "separate", seperated: "separated",
         definately: "definitely", definatly: "definitely", occured: "occurred", occuring: "occurring",
         untill: "until", wich: "which", becuase: "because", becasue: "because", alot: "a lot",
@@ -22,28 +22,37 @@ const COMMON_TYPOS: Record<string, Record<string, string>> = {
         existance: "existence", familar: "familiar", finaly: "finally", foriegn: "foreign",
         gaurd: "guard", goverment: "government", grammer: "grammar", happend: "happened",
         harrass: "harass", immediatly: "immediately", independant: "independent", knowlege: "knowledge",
-        libary: "library", lisence: "license", maintainance: "maintenance", neccessary: "necessary",
-        occassion: "occasion", occurence: "occurrence", persistant: "persistent", posession: "possession",
-        prefered: "preferred", priviledge: "privilege", probaly: "probably", pronounciation: "pronunciation",
-        publically: "publicly", recomend: "recommend", recomended: "recommended", refered: "referred",
-        relevent: "relevant", religous: "religious", remeber: "remember", resturant: "restaurant",
-        rythm: "rhythm", sucessful: "successful", suprise: "surprise", suprised: "surprised",
-        tommorow: "tomorrow", truely: "truly", unfortunatly: "unfortunately", usualy: "usually",
-        vaccum: "vacuum", yuo: "you", youre: "you're", theyre: "they're", dont: "don't",
-        cant: "can't", didnt: "didn't", doesnt: "doesn't", isnt: "isn't", wasnt: "wasn't",
-        couldnt: "couldn't", shouldnt: "shouldn't", wouldnt: "wouldn't", havent: "haven't",
-        hasnt: "hasn't", arent: "aren't", werent: "weren't", im: "I'm", ive: "I've",
-        thats: "that's", whats: "what's", theres: "there's"
+        libary: "library", maintainance: "maintenance", neccessary: "necessary", occassion: "occasion",
+        occurence: "occurrence", persistant: "persistent", posession: "possession", prefered: "preferred",
+        priviledge: "privilege", probaly: "probably", pronounciation: "pronunciation", publically: "publicly",
+        recomend: "recommend", recomended: "recommended", refered: "referred", relevent: "relevant",
+        religous: "religious", remeber: "remember", resturant: "restaurant", rythm: "rhythm",
+        sucessful: "successful", suprise: "surprise", suprised: "surprised", tommorow: "tomorrow",
+        tomorow: "tomorrow", truely: "truly", unfortunatly: "unfortunately", usualy: "usually",
+        vaccum: "vacuum", youre: "you're", theyre: "they're", dont: "don't", cant: "can't",
+        didnt: "didn't", doesnt: "doesn't", isnt: "isn't", wasnt: "wasn't", couldnt: "couldn't",
+        shouldnt: "shouldn't", wouldnt: "wouldn't", havent: "haven't", hasnt: "hasn't",
+        arent: "aren't", werent: "weren't", im: "I'm", ive: "I've", thats: "that's",
+        whats: "what's", theres: "there's"
     },
     de: {
-        seperat: "separat", Standart: "Standard", warscheinlich: "wahrscheinlich",
-        wahrscheindlich: "wahrscheinlich", villeicht: "vielleicht", vileicht: "vielleicht",
-        intressant: "interessant", interesant: "interessant", nähmlich: "nämlich",
-        Rythmus: "Rhythmus", Addresse: "Adresse", agressiv: "aggressiv", garnicht: "gar nicht",
-        garnichts: "gar nichts", garkein: "gar kein", zumindestens: "zumindest",
-        wiederspiegeln: "widerspiegeln", aufjedenfall: "auf jeden Fall",
-        standartmäßig: "standardmäßig", einzigste: "einzige", Entschuldung: "Entschuldigung",
-        tatsächlig: "tatsächlich", debugen: "debuggen"
+        richti: "richtig", ricthig: "richtig", richtsig: "richtig",
+        wirklcih: "wirklich", wircklich: "wirklich",
+        natürlcih: "natürlich", natülich: "natürlich",
+        zusamen: "zusammen", komen: "kommen", imer: "immer",
+        bischen: "bisschen", bisl: "bissl",
+        vileicht: "vielleicht", villeicht: "vielleicht", villeich: "vielleicht",
+        eigendlich: "eigentlich", ungefehr: "ungefähr", zimlich: "ziemlich",
+        trozdem: "trotzdem", jetz: "jetzt", jezt: "jetzt",
+        hofentlich: "hoffentlich", wiso: "wieso", gennant: "genannt",
+        bekommem: "bekommen", kanst: "kannst", garantirt: "garantiert",
+        seperat: "separat", standart: "Standard", warscheinlich: "wahrscheinlich",
+        wahrscheindlich: "wahrscheinlich", intressant: "interessant", interesant: "interessant",
+        nähmlich: "nämlich", rythmus: "Rhythmus", addresse: "Adresse", agressiv: "aggressiv",
+        garnicht: "gar nicht", garnichts: "gar nichts", garkein: "gar kein",
+        zumindestens: "zumindest", wiederspiegeln: "widerspiegeln", aufjedenfall: "auf jeden Fall",
+        standartmäßig: "standardmäßig", einzigste: "einzige", entschuldung: "Entschuldigung",
+        tatsächlig: "tatsächlich", debugen: "debuggen", schliesslich: "schließlich"
     },
     fr: {
         parceque: "parce que", quelquechose: "quelque chose", aujourdhui: "aujourd'hui",
@@ -82,18 +91,33 @@ function applyCase(original: string, replacement: string): string {
     return replacement;
 }
 
-/** Offline typo correction. Returns the corrected text (or the original if nothing matched). */
-export function localCorrect(text: string, lang: string): string {
+// Capitalize the first letter of the message and the first letter after sentence-ending
+// punctuation. Only touches a lowercase letter right after start / ". " / "! " / "? " — never
+// inserts punctuation, never changes anything else.
+function capitalizeSentences(text: string): string {
+    return text.replace(/(^\s*|[.!?]\s+)([a-zäöüà-ÿ])/g, (_m, pre, ch) => pre + ch.toUpperCase());
+}
+
+/**
+ * Offline typo + capitalization correction.
+ * @param text the message text
+ * @param lang language code (en/de/fr/es/it/pt)
+ * @param capitalize also capitalize sentence beginnings (tied to aggressiveness >= medium)
+ */
+export function localCorrect(text: string, lang: string, capitalize: boolean): string {
     const map = COMMON_TYPOS[lang];
-    if (!map) return text; // no list for this language -> never apply another language's fixes
 
-    let out = text.replace(buildRegex(lang, map), match => {
-        const fix = map[match.toLowerCase()];
-        return fix ? applyCase(match, fix) : match;
-    });
+    let out = text;
+    if (map) {
+        out = out.replace(buildRegex(lang, map), match => {
+            const fix = map[match.toLowerCase()];
+            return fix ? applyCase(match, fix) : match;
+        });
+        // English: a lone lowercase "i" is virtually always "I".
+        if (lang === "en") out = out.replace(/\bi\b/g, "I");
+    }
 
-    // English: a lone lowercase "i" is virtually always "I".
-    if (lang === "en") out = out.replace(/\bi\b/g, "I");
+    if (capitalize) out = capitalizeSentences(out);
 
     return out;
 }

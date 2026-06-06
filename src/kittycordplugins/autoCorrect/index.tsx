@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { addMessagePreSendListener, MessageSendListener, removeMessagePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, PluginNative } from "@utils/types";
+import { React } from "@webpack/common";
 
 import { localCorrect } from "./corrections";
 
@@ -17,10 +19,13 @@ const Native = VencordNative.pluginHelpers.AutoCorrect as PluginNative<typeof im
 
 const logger = new Logger("AutoCorrect");
 
+// Per-session on/off, toggled via the chat-bar button. Starts on when the plugin is enabled.
+let active = true;
+
 const settings = definePluginSettings({
     engine: {
         type: OptionType.SELECT,
-        description: "Local = offline, fixes common typos, nothing is ever sent anywhere. AI = smarter full grammar correction, but sends your message text to Groq and needs your own key below.",
+        description: "Local = offline, fixes common typos + capitalizes sentences, nothing is ever sent anywhere. AI = full grammar + punctuation (commas etc.), but sends your message text to Groq and needs your own key below.",
         options: [
             { label: "Local (offline, no key, private)", value: "local", default: true },
             { label: "AI via Groq (needs your own key)", value: "ai" }
@@ -45,28 +50,28 @@ const settings = definePluginSettings({
     },
     aggressiveness: {
         type: OptionType.SELECT,
-        description: "How much AutoCorrect is allowed to change. Your message text is still sent to Groq either way.",
+        description: "Local: Low = typos only; Medium/High also capitalize sentence starts. AI: how much rewriting Groq may do.",
         options: [
-            { label: "Low — fix obvious typos only", value: "low", default: true },
-            { label: "Medium — typos plus light grammar", value: "medium" },
+            { label: "Low — fix obvious typos only", value: "low" },
+            { label: "Medium — typos + capitalization", value: "medium", default: true },
             { label: "High — full rewrite for clean text", value: "high" }
         ]
     }
 });
 
 const LANG_PROMPTS: Record<string, string> = {
-    en: "You are a spell-checker. Fix ONLY spelling and grammar mistakes. Return ONLY the corrected text, with no explanation and no quotes. FORBIDDEN: adding words, changing the meaning, or rephrasing. If the text is already correct, return it unchanged.",
-    de: "Du bist ein Rechtschreibprüfer. Korrigiere AUSSCHLIESSLICH Rechtschreib- und Grammatikfehler. Gib NUR den korrigierten Text zurück, ohne Erklärung und ohne Anführungszeichen. VERBOTEN: Wörter hinzufügen, die Bedeutung ändern oder umformulieren. Wenn der Text bereits korrekt ist, gib ihn unverändert zurück.",
-    fr: "Tu es un correcteur orthographique. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire. Retourne UNIQUEMENT le texte corrigé, sans explication ni guillemets. INTERDIT : ajouter des mots, changer le sens ou reformuler. Si le texte est déjà correct, retourne-le inchangé.",
-    es: "Eres un corrector ortográfico. Corrige SOLO errores de ortografía y gramática. Devuelve SOLO el texto corregido, sin explicación ni comillas. PROHIBIDO: añadir palabras, cambiar el significado o reformular. Si el texto ya es correcto, devuélvelo sin cambios.",
-    it: "Sei un correttore ortografico. Correggi SOLO errori di ortografia e grammatica. Restituisci SOLO il testo corretto, senza spiegazioni né virgolette. VIETATO: aggiungere parole, cambiare il significato o riformulare. Se il testo è già corretto, restituiscilo invariato.",
-    pt: "Você é um corretor ortográfico. Corrija SOMENTE erros de ortografia e gramática. Retorne SOMENTE o texto corrigido, sem explicação e sem aspas. PROIBIDO: adicionar palavras, mudar o sentido ou reformular. Se o texto já estiver correto, retorne-o sem alterações."
+    en: "You are a spell-checker and punctuation fixer. Fix spelling, grammar, capitalization and punctuation (add commas/periods where they belong). Return ONLY the corrected text, with no explanation and no quotes. Do NOT change the meaning or add new ideas. If already correct, return it unchanged.",
+    de: "Du bist ein Rechtschreib- und Zeichensetzungs-Korrektor. Korrigiere Rechtschreibung, Grammatik, Groß-/Kleinschreibung und Zeichensetzung (setze Kommas/Punkte an die richtigen Stellen). Gib NUR den korrigierten Text zurück, ohne Erklärung und ohne Anführungszeichen. Ändere NICHT die Bedeutung und füge keine Inhalte hinzu. Wenn bereits korrekt, gib ihn unverändert zurück.",
+    fr: "Tu es un correcteur d'orthographe et de ponctuation. Corrige l'orthographe, la grammaire, les majuscules et la ponctuation (ajoute les virgules/points où il faut). Retourne UNIQUEMENT le texte corrigé, sans explication ni guillemets. Ne change pas le sens et n'ajoute rien. Si déjà correct, retourne-le inchangé.",
+    es: "Eres un corrector de ortografía y puntuación. Corrige ortografía, gramática, mayúsculas y puntuación (añade comas/puntos donde correspondan). Devuelve SOLO el texto corregido, sin explicación ni comillas. No cambies el significado ni añadas nada. Si ya es correcto, devuélvelo sin cambios.",
+    it: "Sei un correttore di ortografia e punteggiatura. Correggi ortografia, grammatica, maiuscole e punteggiatura (aggiungi virgole/punti dove servono). Restituisci SOLO il testo corretto, senza spiegazioni né virgolette. Non cambiare il significato né aggiungere nulla. Se già corretto, restituiscilo invariato.",
+    pt: "Você é um corretor de ortografia e pontuação. Corrija ortografia, gramática, maiúsculas e pontuação (adicione vírgulas/pontos onde for preciso). Retorne SOMENTE o texto corrigido, sem explicação e sem aspas. Não mude o sentido nem adicione nada. Se já estiver correto, retorne-o sem alterações."
 };
 
 const AGGR_SUFFIX: Record<string, string> = {
-    low: " STRICT: do NOT touch style. Fix only obvious typos and basic grammar. Do NOT change the choice of words. Keep the text as identical as possible. Return ONLY the text.",
-    medium: " Fix mistakes and slightly improve clarity where needed, but never change the meaning.",
-    high: " Fix everything and rewrite into clean, fluent, well-formed text without changing the meaning."
+    low: " STRICT: fix only clear spelling/grammar/punctuation mistakes. Keep the wording as identical as possible. Return ONLY the text.",
+    medium: " Fix mistakes and punctuation and slightly improve clarity where needed, but never change the meaning.",
+    high: " Fix everything and rewrite into clean, fluent, well-punctuated text without changing the meaning."
 };
 
 function buildSystemPrompt(): string {
@@ -93,14 +98,7 @@ async function aiCorrect(text: string, apiKey: string): Promise<string> {
 
     // Reject empty, unchanged, or wildly different results — keep the original.
     if (!corrected || corrected === text) return text;
-    if (corrected.length > text.length * 1.5 || corrected.length < text.length * 0.4) return text;
-
-    // In low mode, the word count must stay close — a big change means a rewrite, not a typo fix.
-    if ((settings.store.aggressiveness ?? "low") === "low") {
-        const src = wordCount(text);
-        const out = wordCount(corrected);
-        if (Math.abs(out - src) > Math.max(1, Math.floor(src * 0.15))) return text;
-    }
+    if (corrected.length > text.length * 1.6 || corrected.length < text.length * 0.4) return text;
 
     return corrected;
 }
@@ -115,23 +113,57 @@ async function correctText(text: string): Promise<string> {
         // AI selected but no key -> fall back to the offline corrector.
     }
 
-    // Local mode: offline, nothing leaves the machine.
-    return localCorrect(text, lang);
+    // Local mode: offline, nothing leaves the machine. Capitalize on medium/high.
+    const capitalize = (settings.store.aggressiveness ?? "low") !== "low";
+    return localCorrect(text, lang, capitalize);
 }
+
+function AutoCorrectIcon({ enabled = true, width = 20, height = 20 }: { enabled?: boolean; width?: string | number; height?: string | number; }) {
+    return (
+        <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                fill="currentColor"
+                opacity={enabled ? 1 : 0.35}
+                d="M8.87 2.31A.5.5 0 0 1 9.34 2h10.92c.36 0 .6.36.47.69l-.6 1.5a.5.5 0 0 1-.47.31h-4.28l-4.17 15h4.05c.36 0 .6.36.47.69l-.6 1.5a.5.5 0 0 1-.47.31H3.74a.5.5 0 0 1-.47-.69l.6-1.5a.5.5 0 0 1 .47-.31h4.28l4.17-15H8.74a.5.5 0 0 1-.47-.69l.6-1.5Z"
+            />
+            {!enabled && <path fill="var(--status-danger)" d="M21.178 1.707 22.592 3.12 4.12 21.593l-1.414-1.415L21.178 1.707Z" />}
+        </svg>
+    );
+}
+
+const AutoCorrectChatBarButton: ChatBarButtonFactory = ({ isMainChat }) => {
+    const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+    if (!isMainChat) return null;
+
+    return (
+        <ChatBarButton
+            tooltip={active ? "AutoCorrect: ON — click to pause" : "AutoCorrect: OFF — click to enable"}
+            onClick={() => { active = !active; forceUpdate(); }}
+        >
+            <AutoCorrectIcon enabled={active} />
+        </ChatBarButton>
+    );
+};
 
 let listener: MessageSendListener;
 
 export default definePlugin({
     name: "AutoCorrect",
-    description: "Fixes spelling/grammar of the message you're about to send. Default Local mode is offline, needs no key and sends nothing anywhere (fixes common typos). Optional AI mode uses Groq for full grammar correction - it needs your own free key and sends your message text to Groq (a third party).",
+    description: "Fixes the message you're about to send. Local (default) is offline & private: fixes common typos and capitalizes sentences - no key, nothing sent. AI mode does full grammar + punctuation (commas etc.) via Groq, but needs your own free key and sends your message text to Groq. Toggle it from the button in the chat bar.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Chat", "Utility"],
-    dependencies: ["MessageEventsAPI"],
+    dependencies: ["MessageEventsAPI", "ChatInputButtonAPI"],
     settings,
 
+    chatBarButton: {
+        icon: AutoCorrectIcon,
+        render: AutoCorrectChatBarButton
+    },
+
     start() {
+        active = true;
         listener = addMessagePreSendListener(async (_channelId, message) => {
-            if (!message.content) return;
+            if (!active || !message.content) return;
             message.content = await correctText(message.content);
         });
     },
