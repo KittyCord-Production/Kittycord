@@ -858,10 +858,6 @@ function forceAccountPanelRerender() {
         const MAS = WP?.findByProps?.("getUsers", "getValidUsers", "getHasLoggedInAccounts");
         if (MAS && MAS.emitChange) MAS.emitChange();
 
-        // Dispatch local update without corrupting global store
-        // Forces React to re-calculate useCurrentUser hooks
-        FluxDispatcher.dispatch({ type: "USER_SETTINGS_PROTO_UPDATE", settings: { type: 1, proto: {} } });
-
         // Restart full DOM scan
         if (needsDomTextObserver()) startDomObserver();
         else stopDomObserver();
