@@ -1347,47 +1347,28 @@ export default definePlugin({
                 merged.avatarDecorationData = decoData;
             }
 
-            if (isEnabled && (storedData.nitro || storedData.badgeFlags != null)) {
-                merged.premiumType = storedData.nitro ? 2 : 0;
+            if (isEnabled && storedData.nitro) {
+                merged.premiumType = 2;
 
-                if (storedData.nitro) {
-                    if (storedData.accentColor != null) {
-                        const c2 = storedData.accentColor2 ?? storedData.accentColor;
-                        merged.themeColors = [storedData.accentColor, c2];
-                    }
-                    const nl = storedData.nitroLevel ?? 0;
-                    const LEVEL_MONTHS = [1, 2, 3, 6, 12, 24, 36, 72];
-                    const since = new Date();
-                    since.setMonth(since.getMonth() - (LEVEL_MONTHS[nl] ?? 1));
-                    merged.premiumSince = since;
+                if (storedData.accentColor != null) {
+                    const c2 = storedData.accentColor2 ?? storedData.accentColor;
+                    merged.themeColors = [storedData.accentColor, c2];
+                }
+                const nl = storedData.nitroLevel ?? 0;
+                const LEVEL_MONTHS = [1, 2, 3, 6, 12, 24, 36, 72];
+                const since = new Date();
+                since.setMonth(since.getMonth() - (LEVEL_MONTHS[nl] ?? 1));
+                merged.premiumSince = since;
 
-                    const bm = storedData.boostMonths ?? -1;
-                    if (bm >= 0) {
-                        const BOOST_M = [1, 2, 3, 6, 9, 12, 15, 18, 24];
-                        const boostSince = new Date();
-                        boostSince.setMonth(boostSince.getMonth() - (BOOST_M[bm] ?? 1));
-                        merged.premiumGuildSince = boostSince;
-                    } else {
-                        merged.premiumGuildSince = null;
-                    }
+                const bm = storedData.boostMonths ?? -1;
+                if (bm >= 0) {
+                    const BOOST_M = [1, 2, 3, 6, 9, 12, 15, 18, 24];
+                    const boostSince = new Date();
+                    boostSince.setMonth(boostSince.getMonth() - (BOOST_M[bm] ?? 1));
+                    merged.premiumGuildSince = boostSince;
                 } else {
-                    merged.premiumSince = null;
                     merged.premiumGuildSince = null;
                 }
-
-                // Make sure the original badges are overwritten in the profile
-                merged.publicFlags = (storedData.badgeFlags != null) ? storedData.badgeFlags : profile.publicFlags;
-                merged.badges = []; // Force Discord to recompute the list from publicFlags and premiumType
-            } else if (isEnabled && storedData.nitro === false) {
-                // If Nitro simulation is OFF, force removal of simulated badges
-                merged.premiumType = profile.premiumType ?? 0;
-                merged.premiumSince = profile.premiumSince ?? null;
-                merged.premiumGuildSince = profile.premiumGuildSince ?? null;
-            } else {
-                // Never force to 0 or null if Nitro is not simulated.
-                if (profile.premiumType) merged.premiumType = profile.premiumType;
-                if (profile.premiumSince) merged.premiumSince = profile.premiumSince;
-                if (profile.premiumGuildSince) merged.premiumGuildSince = profile.premiumGuildSince;
             }
 
             const result = { ...profile, ...merged };
