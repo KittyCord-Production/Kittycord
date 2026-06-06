@@ -28,7 +28,8 @@ export default definePlugin({
     description: "Shows a Kittycord Developer badge on the profiles of Kittycord's developers. Visible to everyone running Kittycord.",
     authors: [{ name: "Kittycord", id: 0n }],
     dependencies: ["BadgeAPI"],
-    enabledByDefault: true,
+    // Always on and not user-disableable, so the developer badge always shows.
+    required: true,
 
     start() {
         addProfileBadge(DeveloperBadge);
