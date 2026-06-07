@@ -1,7 +1,7 @@
 {
     "name": "kittycord",
     "private": "true",
-    "version": "1.14.13.1",
+    "version": "1.14.13.2",
     "description": "Kittycord — a Discord client mod combining the best of Vencord, Equicord and moggcord",
     "homepage": "https://github.com/CenturyRV/Kittycord#readme",
     "bugs": {
