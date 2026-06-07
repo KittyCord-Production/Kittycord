@@ -6,13 +6,13 @@
 
 import { isNonNullish } from "@utils/guards";
 import { classes } from "@utils/misc";
-import { ProfilePreset } from "@vencord/discord-types";
 import { ContextMenuApi, Menu, React, TextInput } from "@webpack/common";
 
 import { cl } from "..";
 import { deletePreset, movePreset, renamePreset, updatePresetField } from "../utils/actions";
 import { getCurrentProfile } from "../utils/profile";
 import { PresetSection, type ProfilePresetEx } from "../utils/storage";
+import type { ProfilePreset } from "../utils/types";
 
 interface PresetListProps {
     presets: ProfilePresetEx[];
