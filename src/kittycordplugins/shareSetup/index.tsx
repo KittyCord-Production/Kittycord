@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { showNotification } from "@api/Notifications";
 import { Flex } from "@components/Flex";
 import { ErrorBoundary } from "@components/index";
@@ -15,6 +16,7 @@ import type { Message, MessageAttachment, User } from "@vencord/discord-types";
 import { Alerts, Button, IconUtils, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
+import { BRAND_ICON } from "../../branding";
 import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent } from "./registry";
 import { applyShare, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
 
@@ -30,6 +32,24 @@ const SCOPE_OPTIONS: { label: string; value: ShareScope; }[] = [
     { label: "Everything (plugins, CSS, plugin data)", value: "all" }
 ];
 const scopeLabel = (s: ShareScope) => SCOPE_OPTIONS.find(o => o.value === s)?.label ?? s;
+
+const kittycordFriends = new Set<string>();
+
+const UsesKittycordBadge: ProfileBadge = {
+    id: "kittycord-user",
+    description: "Uses Kittycord",
+    iconSrc: BRAND_ICON,
+    position: BadgePosition.END,
+    shouldShow: ({ userId }) => kittycordFriends.has(userId)
+};
+
+async function refreshKittycordFriends() {
+    const ids = await getKittycordFriendIds();
+    kittycordFriends.clear();
+    for (const id of ids) kittycordFriends.add(id);
+}
+
+let refreshTimer: ReturnType<typeof setInterval> | null = null;
 
 function restartPrompt() {
     showNotification({
@@ -251,7 +271,7 @@ export default definePlugin({
     description: "Send your Kittycord plugins, themes and settings to a friend in one click. They get a one-tap import card right in the DM.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility"],
-    dependencies: ["MessageAccessoriesAPI", "ContextMenuAPI"],
+    dependencies: ["MessageAccessoriesAPI", "ContextMenuAPI", "BadgeAPI"],
 
     toolboxActions: {
         "Share setup with a friend"() {
@@ -277,5 +297,21 @@ export default definePlugin({
         if (!attachment) return null;
         const own = message.author?.id === UserStore.getCurrentUser()?.id;
         return <ImportCard message={message} attachment={attachment} own={own} />;
+    },
+
+    async start() {
+        addProfileBadge(UsesKittycordBadge);
+        await registerSelf();
+        await refreshKittycordFriends();
+        refreshTimer = setInterval(refreshKittycordFriends, 10 * 60 * 1000);
+    },
+
+    stop() {
+        removeProfileBadge(UsesKittycordBadge);
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+        kittycordFriends.clear();
     }
 });
