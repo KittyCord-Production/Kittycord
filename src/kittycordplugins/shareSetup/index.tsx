@@ -83,7 +83,7 @@ function SendModal({ rootProps, user }: { rootProps: any; user: User; }) {
     );
 }
 
-function ImportCardInner({ message, attachment }: { message: Message; attachment: MessageAttachment; }) {
+function ImportCardInner({ message, attachment, own }: { message: Message; attachment: MessageAttachment; own: boolean; }) {
     const author = message.author?.username ?? "Someone";
 
     async function startImport() {
@@ -96,7 +96,7 @@ function ImportCardInner({ message, attachment }: { message: Message; attachment
         }
 
         Alerts.show({
-            title: `Import ${author}'s Kittycord setup?`,
+            title: own ? "Restore your Kittycord setup?" : `Import ${author}'s Kittycord setup?`,
             body: (
                 <div style={{ textAlign: "left" }}>
                     <Text variant="text-md/normal">Includes: <b>{scopeLabel(envelope.scope)}</b></Text>
@@ -110,7 +110,7 @@ function ImportCardInner({ message, attachment }: { message: Message; attachment
                     </Text>
                 </div>
             ),
-            confirmText: "Import",
+            confirmText: own ? "Restore" : "Import",
             cancelText: "Cancel",
             onConfirm: async () => {
                 try {
@@ -125,8 +125,8 @@ function ImportCardInner({ message, attachment }: { message: Message; attachment
 
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>
-            <Text variant="text-md/semibold" style={{ flex: 1 }}>📦 {author} shared their Kittycord setup</Text>
-            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={startImport}>Import</Button>
+            <Text variant="text-md/semibold" style={{ flex: 1 }}>📦 {own ? "Your Kittycord setup" : `${author} shared their Kittycord setup`}</Text>
+            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={startImport}>{own ? "Restore" : "Import"}</Button>
         </div>
     );
 }
@@ -273,9 +273,9 @@ export default definePlugin({
     },
 
     renderMessageAccessory({ message }) {
-        if (message.author?.id === UserStore.getCurrentUser()?.id) return null;
         const attachment = findShareAttachment(message.attachments);
         if (!attachment) return null;
-        return <ImportCard message={message} attachment={attachment} />;
+        const own = message.author?.id === UserStore.getCurrentUser()?.id;
+        return <ImportCard message={message} attachment={attachment} own={own} />;
     }
 });
