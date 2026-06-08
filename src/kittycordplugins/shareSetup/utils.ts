@@ -8,6 +8,7 @@ import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { exportSettings, importSettings } from "@api/SettingsSync/offline";
 import { Logger } from "@utils/Logger";
 import { sleep } from "@utils/misc";
+import type { PluginNative } from "@utils/types";
 import { CloudUpload, MessageAttachment } from "@vencord/discord-types";
 import { CloudUploadPlatform } from "@vencord/discord-types/enums";
 import { findLazy } from "@webpack";
@@ -31,6 +32,7 @@ const FILE_SUFFIX = ".kcshare";
 const MAX_SHARE_BYTES = 2_000_000;
 
 const CloudUploader = findLazy(m => m.prototype?.trackUploadFinished) as typeof CloudUpload;
+const Native = VencordNative?.pluginHelpers?.ShareSetup as PluginNative<typeof import("./native")> | undefined;
 
 function enabledPluginNames(): string[] {
     return Object.values(plugins)
@@ -146,17 +148,31 @@ async function refreshCdnUrl(url: string): Promise<string | null> {
     }
 }
 
-export async function fetchShare(attachment: MessageAttachment): Promise<ShareEnvelope> {
+async function downloadSetupText(attachment: MessageAttachment): Promise<string> {
     const url = attachment.url || attachment.proxy_url;
 
-    let res = await fetch(url);
+    if (Native) {
+        let r = await Native.downloadSetup(url);
+        if (!r.ok) {
+            const fresh = await refreshCdnUrl(url);
+            if (fresh) r = await Native.downloadSetup(fresh);
+        }
+        if (r.ok) return r.data;
+        throw new Error("Could not download that setup file.");
+    }
+
+    const webUrl = attachment.proxy_url || attachment.url;
+    let res = await fetch(webUrl);
     if (!res.ok) {
-        const fresh = await refreshCdnUrl(url);
+        const fresh = await refreshCdnUrl(webUrl);
         if (fresh) res = await fetch(fresh);
     }
     if (!res.ok) throw new Error("Could not download that setup file.");
+    return res.text();
+}
 
-    return parseEnvelope(await res.text());
+export async function fetchShare(attachment: MessageAttachment): Promise<ShareEnvelope> {
+    return parseEnvelope(await downloadSetupText(attachment));
 }
 
 export async function applyShare(envelope: ShareEnvelope) {
