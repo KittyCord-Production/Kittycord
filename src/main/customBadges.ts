@@ -13,7 +13,7 @@ import { ipcMain } from "electron";
 
 const ENDPOINT: string = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
 const SNOWFLAKE_RE = /^\d{17,20}$/;
-const MAX_EMOJI_LEN = 16;
+const MAX_ICON_LEN = 512;
 const MAX_LABEL_LEN = 24;
 
 interface CustomBadge {
@@ -39,7 +39,7 @@ async function getBadges(): Promise<CustomBadge[]> {
 async function setBadge(id: unknown, emoji: unknown, label: unknown): Promise<{ ok: boolean; error?: string; }> {
     if (!ENDPOINT) return { ok: false, error: "Not available" };
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
-    if (typeof emoji !== "string" || emoji.length === 0 || emoji.length > MAX_EMOJI_LEN) return { ok: false, error: "Invalid emoji" };
+    if (typeof emoji !== "string" || emoji.length === 0 || emoji.length > MAX_ICON_LEN) return { ok: false, error: "Invalid icon" };
     if (typeof label !== "string" || label.length === 0 || label.length > MAX_LABEL_LEN) return { ok: false, error: "Invalid label" };
 
     try {
