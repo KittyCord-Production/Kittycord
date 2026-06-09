@@ -6,14 +6,17 @@
 
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { showNotification } from "@api/Notifications";
+import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
+import { FormSwitch } from "@components/FormSwitch";
 import { ErrorBoundary } from "@components/index";
 import { getUniqueUsername } from "@utils/discord";
+import { Logger } from "@utils/Logger";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
-import definePlugin from "@utils/types";
+import definePlugin, { OptionType } from "@utils/types";
 import type { Message, MessageAttachment, User } from "@vencord/discord-types";
-import { Alerts, Button, IconUtils, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, Forms, IconUtils, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
 import { BRAND_ICON } from "../../branding";
@@ -50,6 +53,56 @@ async function refreshKittycordFriends() {
 }
 
 let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+const logger = new Logger("ShareSetup");
+
+async function enableFriendDiscovery() {
+    await registerSelf();
+    await refreshKittycordFriends();
+}
+
+function FriendDiscoveryToggle() {
+    const [consent, setConsent] = React.useState<boolean | null>(null);
+    const [configured, setConfigured] = React.useState(false);
+
+    React.useEffect(() => {
+        getShareConsent()
+            .then(s => { setConsent(s.consent); setConfigured(s.endpointConfigured); })
+            .catch(() => { });
+    }, []);
+
+    async function onChange(value: boolean) {
+        setConsent(value);
+        await setShareConsent(value);
+        if (value) await enableFriendDiscovery();
+        else kittycordFriends.clear();
+    }
+
+    return (
+        <>
+            <FormSwitch
+                title="Find which friends use Kittycord"
+                description="Checks your friend list against the Kittycord server to show which friends also use it, and lets them find you. The server only ever keeps a salted hash of each id — never your friend list, your token or any messages."
+                value={consent === true}
+                onChange={onChange}
+                hideBorder
+            />
+            {!configured && (
+                <Forms.FormText style={{ opacity: 0.7 }}>
+                    Friend discovery isn't available here.
+                </Forms.FormText>
+            )}
+        </>
+    );
+}
+
+const settings = definePluginSettings({
+    friendDiscovery: {
+        type: OptionType.COMPONENT,
+        description: "Friend discovery",
+        component: FriendDiscoveryToggle
+    }
+});
 
 function restartPrompt() {
     showNotification({
@@ -272,6 +325,7 @@ export default definePlugin({
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility"],
     dependencies: ["MessageAccessoriesAPI", "ContextMenuAPI", "BadgeAPI"],
+    settings,
 
     toolboxActions: {
         "Share setup with a friend"() {
@@ -301,9 +355,25 @@ export default definePlugin({
 
     async start() {
         addProfileBadge(UsesKittycordBadge);
-        await registerSelf();
-        await refreshKittycordFriends();
         refreshTimer = setInterval(refreshKittycordFriends, 10 * 60 * 1000);
+
+        try {
+            const { consent, endpointConfigured } = await getShareConsent();
+            if (endpointConfigured && consent === null) {
+                Alerts.show({
+                    title: "Find friends who use Kittycord? 🐱",
+                    body: "Want to see which of your friends also use Kittycord, and let them find you? Your friend list is checked against the Kittycord server, which only ever keeps a salted hash of each id — never your friend list, your token or any messages. You can change this anytime under Plugins → ShareSetup.",
+                    confirmText: "Yes, find friends",
+                    cancelText: "No thanks",
+                    onConfirm: async () => { await setShareConsent(true); await enableFriendDiscovery(); },
+                    onCancel: () => void setShareConsent(false)
+                });
+            } else if (consent === true) {
+                await enableFriendDiscovery();
+            }
+        } catch (e) {
+            logger.error("friend discovery init failed", e);
+        }
     },
 
     stop() {
