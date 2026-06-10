@@ -73,9 +73,9 @@ function VencordPopoutButton() {
     );
 }
 
-migratePluginSettings("EquicordToolbox", "VencordToolbox");
+migratePluginSettings("KittycordToolbox", "EquicordToolbox", "VencordToolbox");
 export default definePlugin({
-    name: "EquicordToolbox",
+    name: "KittycordToolbox",
     description: "Adds a button next to the inbox button in the channel header that houses Kittycord quick actions",
     tags: ["Voice", "Accessibility"],
     authors: [Devs.Ven, Devs.AutumnVN],
