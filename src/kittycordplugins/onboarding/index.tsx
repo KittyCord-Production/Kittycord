@@ -16,6 +16,8 @@ import definePlugin from "@utils/types";
 import { Button, React, showToast, Text, Toasts } from "@webpack/common";
 import type { ComponentType } from "react";
 
+import { BRAND_WEBSITE } from "../../branding";
+
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
 const ModalRoot = ModalRootRaw as ComponentType<any>;
 const ModalHeader = ModalHeaderRaw as ComponentType<any>;
@@ -98,6 +100,11 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
 
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "12px 0" }}>
                     Tip: open the toolbox above the chat bar for Modes and “Share setup with a friend”.
+                </Text>
+
+                <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
+                    New here? Find guides and more at{" "}
+                    <a role="button" onClick={() => VencordNative.native.openExternal(BRAND_WEBSITE)} style={{ cursor: "pointer", color: "var(--text-link)" }}>kittycord.dev</a>.
                 </Text>
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "8px 0 16px" }}>
