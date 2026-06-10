@@ -38,7 +38,7 @@ const PACKS: Pack[] = [
     { id: "essentials", title: "Kittycord essentials", description: "Modes, sharing your setup with friends, and private bookmarks.", plugins: ["Modes", "ShareSetup", "Bookmarks"], default: true },
     { id: "calm", title: "Calm & performance", description: "Quiet hours for your status, and a lighter, smoother Discord.", plugins: ["QuietHours", "PerformanceMode"], default: true },
     { id: "organise", title: "Organise", description: "Tag messages with private labels and tuck chat-bar buttons away.", plugins: ["MessageTags", "Backpack"], default: false },
-    { id: "cute", title: "Cute look", description: "A pink kawaii glass theme.", plugins: ["HelloKittyTheme"], default: false }
+    { id: "cute", title: "Cute look", description: "A pink kawaii glass theme and the Kittycord logo on the home button.", plugins: ["HelloKittyTheme", "KittyLogo"], default: false }
 ];
 
 function applyPacks(chosen: Record<string, boolean>): boolean {

@@ -1,0 +1,12 @@
+/* Kittycord — KittyLogo: swap the Discord logo on the home button for the Kittycord cat. */
+
+[data-list-item-id="guildsnav___home"] :has(> svg) {
+  background-image: var(--kc-logo) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+}
+
+[data-list-item-id="guildsnav___home"] svg {
+  visibility: hidden !important;
+}
