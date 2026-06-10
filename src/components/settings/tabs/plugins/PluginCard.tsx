@@ -14,9 +14,9 @@ import { Logger } from "@utils/Logger";
 import { Plugin } from "@utils/types";
 import { React, showToast, Toasts } from "@webpack/common";
 
-import { BRAND_ICON } from "../../../../branding";
 import { PluginMeta } from "~plugins";
 
+import { BRAND_ICON } from "../../../../branding";
 import { openPluginModal } from "./PluginModal";
 
 const logger = new Logger("PluginCard");
@@ -95,9 +95,9 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
     const pluginInfo = [
         {
             condition: isModifiedPlugin,
-            src: "https://equicord.org/assets/icons/equicord/modified.png",
+            src: BRAND_ICON,
             alt: "Modified",
-            title: "Modified Vencord Plugin"
+            title: "Modified plugin"
         },
         {
             condition: isKittycordPlugin,
@@ -113,21 +113,21 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
         },
         {
             condition: isEquicordPlugin,
-            src: "https://equicord.org/assets/favicon.png",
-            alt: "Equicord",
-            title: "Equicord Plugin"
+            src: BRAND_ICON,
+            alt: "Built-in",
+            title: "Built-in plugin"
         },
         {
             condition: isVencordPlugin,
-            src: "https://equicord.org/assets/icons/vencord/icon-light.png",
-            alt: "Vencord",
-            title: "Vencord Plugin"
+            src: BRAND_ICON,
+            alt: "Built-in",
+            title: "Built-in plugin"
         },
         {
             condition: isUserPlugin,
-            src: "https://equicord.org/assets/icons/misc/userplugin.png",
+            src: BRAND_ICON,
             alt: "User",
-            title: "User Plugin"
+            title: "User plugin"
         }
     ];
 

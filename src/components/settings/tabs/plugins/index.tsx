@@ -222,9 +222,11 @@ export default function PluginSettings() {
                 if (!folderName.startsWith("src/kittycordplugins/") && !folderName.startsWith("src/moggcordplugins/")) return false;
                 break;
             }
-            case SearchStatus.VENCORD:
-                if (!PluginMeta[plugin.name].folderName.startsWith("src/plugins/")) return false;
+            case SearchStatus.VENCORD: {
+                const { folderName } = PluginMeta[plugin.name];
+                if (!folderName.startsWith("src/plugins/") && !folderName.startsWith("src/equicordplugins/")) return false;
                 break;
+            }
             case SearchStatus.NEW:
                 if (!newPluginsSet?.has(plugin.name)) return false;
                 break;
@@ -424,7 +426,7 @@ export default function PluginSettings() {
                             { label: "Show Enabled", value: SearchStatus.ENABLED },
                             { label: "Show Disabled", value: SearchStatus.DISABLED },
                             { label: "Show Kittycord", value: SearchStatus.EQUICORD },
-                            { label: "Show Vencord", value: SearchStatus.VENCORD },
+                            { label: "Show Built-in", value: SearchStatus.VENCORD },
                             { label: "Show New", value: SearchStatus.NEW },
                             hasUserPlugins && { label: "Show UserPlugins", value: SearchStatus.USER_PLUGINS },
                             { label: "Show API Plugins", value: SearchStatus.API_PLUGINS },
