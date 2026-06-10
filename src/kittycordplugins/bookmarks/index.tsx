@@ -10,7 +10,7 @@ import { Flex } from "@components/Flex";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message } from "@vencord/discord-types";
-import { Button, ChannelStore, MessageActions, React, Text } from "@webpack/common";
+import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
 import type { ComponentType } from "react";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -70,6 +70,8 @@ function BookmarkIcon(props: any) {
 
 function BookmarksModal({ rootProps }: { rootProps: any; }) {
     const [list, setList] = React.useState<Bookmark[]>(bookmarks);
+    const [query, setQuery] = React.useState("");
+    const [guild, setGuild] = React.useState("");
 
     function remove(id: string) {
         bookmarks = bookmarks.filter(b => b.messageId !== id);
@@ -77,16 +79,37 @@ function BookmarksModal({ rootProps }: { rootProps: any; }) {
         setList([...bookmarks]);
     }
 
+    const serverOptions = [
+        { label: "All servers", value: "" },
+        ...[...new Set(list.map(b => b.guildId ?? "dm"))].map(key => ({
+            value: key,
+            label: key === "dm" ? "Direct Messages" : (GuildStore.getGuild(key)?.name ?? "Unknown server")
+        }))
+    ];
+
+    const needle = query.toLowerCase();
+    const shown = list.filter(b =>
+        (!needle || b.author.toLowerCase().includes(needle) || b.content.toLowerCase().includes(needle))
+        && (guild === "" || (b.guildId ?? "dm") === guild));
+
     return (
         <ModalRoot {...rootProps} size={ModalSize.LARGE}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Bookmarks ({list.length})</Text>
-                <ModalCloseButton onClick={rootProps.onClose} />
+                <Flex style={{ flexDirection: "column", gap: 8, width: "100%" }}>
+                    <Flex style={{ alignItems: "center" }}>
+                        <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Bookmarks ({shown.length}/{list.length})</Text>
+                        <ModalCloseButton onClick={rootProps.onClose} />
+                    </Flex>
+                    <TextInput value={query} onChange={setQuery} placeholder="Search by author or text…" />
+                    {serverOptions.length > 2 && (
+                        <SearchableSelect options={serverOptions} value={guild} onChange={(v: string) => setGuild(v)} closeOnSelect />
+                    )}
+                </Flex>
             </ModalHeader>
             <ModalContent>
-                {list.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>No bookmarks yet. Hover a message and click the bookmark button.</Text>
-                    : list.map(b => (
+                {shown.length === 0
+                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>{list.length === 0 ? "No bookmarks yet. Hover a message and click the bookmark button." : "Nothing matches your search."}</Text>
+                    : shown.map(b => (
                         <Flex key={b.messageId} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <Text variant="text-sm/semibold">{b.author}</Text>

@@ -11,7 +11,7 @@ import { Flex } from "@components/Flex";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message } from "@vencord/discord-types";
-import { Button, Menu, MessageActions, React, Text } from "@webpack/common";
+import { Button, Menu, MessageActions, React, Text, TextInput } from "@webpack/common";
 import type { ComponentType } from "react";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -28,6 +28,7 @@ interface TaggedMessage {
     author: string;
     content: string;
     tags: string[];
+    time?: number;
 }
 
 let store: Record<string, TaggedMessage> = {};
@@ -47,7 +48,8 @@ async function toggleTag(msg: Message, tag: string) {
         channelId: msg.channel_id,
         author: msg.author?.username ?? "Unknown",
         content: (msg.content || "").slice(0, 140),
-        tags: []
+        tags: [],
+        time: Date.now()
     };
 
     if (entry.tags.includes(tag)) entry.tags = entry.tags.filter(t => t !== tag);
@@ -62,7 +64,15 @@ async function toggleTag(msg: Message, tag: string) {
 
 function TagsModal({ rootProps }: { rootProps: any; }) {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+    const [query, setQuery] = React.useState("");
+    const [active, setActive] = React.useState<string[]>([]);
+
     const entries = Object.entries(store);
+    const allTags = [...new Set(entries.flatMap(([, e]) => e.tags))].sort();
+
+    function toggleFilter(tag: string) {
+        setActive(a => (a.includes(tag) ? a.filter(t => t !== tag) : [...a, tag]));
+    }
 
     function removeAll(id: string) {
         delete store[id];
@@ -70,16 +80,39 @@ function TagsModal({ rootProps }: { rootProps: any; }) {
         forceUpdate();
     }
 
+    const needle = query.toLowerCase();
+    const shown = entries
+        .filter(([, e]) =>
+            (!needle || e.author.toLowerCase().includes(needle) || e.content.toLowerCase().includes(needle))
+            && (active.length === 0 || active.some(t => e.tags.includes(t))))
+        .sort((a, b) => (b[1].time ?? 0) - (a[1].time ?? 0));
+
     return (
         <ModalRoot {...rootProps} size={ModalSize.LARGE}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Tagged messages ({entries.length})</Text>
-                <ModalCloseButton onClick={rootProps.onClose} />
+                <Flex style={{ flexDirection: "column", gap: 8, width: "100%" }}>
+                    <Flex style={{ alignItems: "center" }}>
+                        <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Tagged messages ({shown.length}/{entries.length})</Text>
+                        <ModalCloseButton onClick={rootProps.onClose} />
+                    </Flex>
+                    <TextInput value={query} onChange={setQuery} placeholder="Search by author or text…" />
+                    {allTags.length > 0 && (
+                        <Flex style={{ gap: 6, flexWrap: "wrap" }}>
+                            {allTags.map(t => (
+                                <span
+                                    key={t}
+                                    onClick={() => toggleFilter(t)}
+                                    style={{ cursor: "pointer", background: "var(--brand-500)", color: "var(--white)", borderRadius: 8, padding: "2px 8px", fontSize: 12, opacity: active.includes(t) ? 1 : 0.4 }}
+                                >{t}</span>
+                            ))}
+                        </Flex>
+                    )}
+                </Flex>
             </ModalHeader>
             <ModalContent>
-                {entries.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>No tagged messages yet. Right-click a message → Tags.</Text>
-                    : entries.map(([id, e]) => (
+                {shown.length === 0
+                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>{entries.length === 0 ? "No tagged messages yet. Right-click a message → Tags." : "Nothing matches your search."}</Text>
+                    : shown.map(([id, e]) => (
                         <Flex key={id} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <Text variant="text-sm/semibold">{e.author} {e.tags.map(t => (
