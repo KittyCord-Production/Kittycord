@@ -6,6 +6,7 @@
 
 import "./style.css";
 
+import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
 import { useForceUpdater } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
@@ -20,19 +21,38 @@ interface FakeState {
 const caught = new Map<string, FakeState>();
 const updaters = new Set<() => void>();
 
-function notify() {
+function rerender() {
     updaters.forEach(update => update());
+}
+
+function label({ mute, deaf }: FakeState) {
+    if (mute && deaf) return "Faking mute & deafen";
+    if (deaf) return "Faking deafen";
+    return "Faking mute";
+}
+
+function announce(userId: string, state: FakeState) {
+    if (!settings.store.notify) return;
+    const user = UserStore.getUser(userId);
+    const name = user?.globalName ?? user?.username ?? "Someone";
+    showNotification({
+        title: "FakeVoice caught",
+        body: `${name} is ${label(state).toLowerCase()} but still talking.`,
+        icon: user?.getAvatarURL?.(),
+        color: "#ff5fa6"
+    });
 }
 
 function mark(userId: string, state: FakeState) {
     const prev = caught.get(userId);
     if (prev && prev.mute === state.mute && prev.deaf === state.deaf) return;
     caught.set(userId, state);
-    notify();
+    if (!prev) announce(userId, state);
+    rerender();
 }
 
 function clear(userId: string) {
-    if (caught.delete(userId)) notify();
+    if (caught.delete(userId)) rerender();
 }
 
 const SPEAKING_VOICE = 1 << 0;
@@ -56,12 +76,6 @@ function onVoiceStateUpdates({ voiceStates }: { voiceStates: Array<{ userId: str
         else
             mark(voiceState.userId, { mute: !!voiceState.selfMute, deaf: !!voiceState.selfDeaf });
     }
-}
-
-function label({ mute, deaf }: FakeState) {
-    if (mute && deaf) return "Faking mute & deafen";
-    if (deaf) return "Faking deafen";
-    return "Faking mute";
 }
 
 function FakeIndicator({ userId, small }: { userId: string; small?: boolean; }) {
@@ -99,6 +113,12 @@ function FakeIndicator({ userId, small }: { userId: string; small?: boolean; }) 
 }
 
 const settings = definePluginSettings({
+    voiceRows: {
+        type: OptionType.BOOLEAN,
+        description: "Show the indicator in voice channel user lists",
+        default: true,
+        restartNeeded: true
+    },
     memberList: {
         type: OptionType.BOOLEAN,
         description: "Show the indicator next to names in the member list",
@@ -107,6 +127,11 @@ const settings = definePluginSettings({
     profiles: {
         type: OptionType.BOOLEAN,
         description: "Show the indicator in user profiles",
+        default: true
+    },
+    notify: {
+        type: OptionType.BOOLEAN,
+        description: "Send a notification the first time someone is caught faking",
         default: true
     }
 });
@@ -118,6 +143,20 @@ export default definePlugin({
     dependencies: ["MemberListDecoratorsAPI", "NicknameIconsAPI"],
     tags: ["Voice", "Utility"],
     settings,
+
+    patches: [
+        {
+            find: "#{intl::GUEST_NAME_SUFFIX})]",
+            predicate: () => settings.store.voiceRows,
+            replacement: {
+                match: /(#{intl::GUEST_NAME_SUFFIX}.{0,50}?"".{0,100})\](?=\}\))(?<=user:(\i).+?)/,
+                replace: "$1,$self.renderVoiceRow($2?.id)]"
+            }
+        }
+    ],
+
+    renderVoiceRow: (userId?: string) =>
+        userId ? <FakeIndicator userId={userId} small /> : null,
 
     renderMemberListDecorator: ({ user }: { user: User; }) =>
         settings.store.memberList ? <FakeIndicator userId={user.id} small /> : null,
@@ -134,6 +173,6 @@ export default definePlugin({
         FluxDispatcher.unsubscribe("SPEAKING", onSpeaking);
         FluxDispatcher.unsubscribe("VOICE_STATE_UPDATES", onVoiceStateUpdates);
         caught.clear();
-        notify();
+        rerender();
     }
 });
