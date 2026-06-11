@@ -61,6 +61,22 @@ async function register(id: string) {
     } catch { /* offline / endpoint down -> ignore */ }
 }
 
+async function unregister(id: string) {
+    if (!ENDPOINT) return;
+    if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return;
+
+    try {
+        await fetch(`${ENDPOINT}/share/unregister`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+        const state = read();
+        state.lastRegister = 0;
+        write(state);
+    } catch { /* offline / endpoint down -> ignore */ }
+}
+
 async function friendsCheck(ids: unknown): Promise<string[]> {
     if (!ENDPOINT) return [];
     if (read().consent === false) return [];
@@ -96,5 +112,7 @@ ipcMain.handle(IpcEvents.SET_SHARE_CONSENT, (_e, consent: boolean) => {
 });
 
 ipcMain.handle(IpcEvents.SHARE_REGISTER, (_e, id: string) => register(id));
+
+ipcMain.handle(IpcEvents.SHARE_UNREGISTER, (_e, id: string) => unregister(id));
 
 ipcMain.handle(IpcEvents.SHARE_FRIENDS_CHECK, (_e, ids: unknown) => friendsCheck(ids));

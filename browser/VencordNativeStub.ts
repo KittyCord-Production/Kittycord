@@ -145,6 +145,7 @@ window.VencordNative = {
         getConsent: async () => ({ consent: null as boolean | null, endpointConfigured: false }),
         setConsent: NOOP_ASYNC,
         register: NOOP_ASYNC,
+        unregister: NOOP_ASYNC,
         friendsCheck: async () => [] as string[],
     },
 

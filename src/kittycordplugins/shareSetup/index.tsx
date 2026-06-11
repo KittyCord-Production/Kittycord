@@ -20,7 +20,7 @@ import { Alerts, Button, Forms, IconUtils, Menu, React, RelationshipStore, Searc
 import type { ComponentType } from "react";
 
 import { BRAND_ICON } from "../../branding";
-import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent } from "./registry";
+import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
 import { applyShare, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -75,14 +75,17 @@ function FriendDiscoveryToggle() {
         setConsent(value);
         await setShareConsent(value);
         if (value) await enableFriendDiscovery();
-        else kittycordFriends.clear();
+        else {
+            kittycordFriends.clear();
+            await unregisterSelf();
+        }
     }
 
     return (
         <>
             <FormSwitch
                 title="Find which friends use Kittycord"
-                description="Checks your friend list against the Kittycord server to show which friends also use it, and lets them find you. The server only ever keeps a salted hash of each id — never your friend list, your token or any messages."
+                description="Checks your friend list against the Kittycord server to show which friends also use it, and lets them find you. The server only ever keeps a salted hash of each id — never your friend list, your token or any messages. Turning this off deletes your entry from the server."
                 value={consent !== false}
                 onChange={onChange}
                 hideBorder

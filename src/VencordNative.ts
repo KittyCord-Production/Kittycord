@@ -114,6 +114,7 @@ export default {
         getConsent: () => invoke<{ consent: boolean | null; endpointConfigured: boolean; }>(IpcEvents.GET_SHARE_CONSENT),
         setConsent: (consent: boolean) => invoke<void>(IpcEvents.SET_SHARE_CONSENT, consent),
         register: (id: string) => invoke<void>(IpcEvents.SHARE_REGISTER, id),
+        unregister: (id: string) => invoke<void>(IpcEvents.SHARE_UNREGISTER, id),
         friendsCheck: (ids: string[]) => invoke<string[]>(IpcEvents.SHARE_FRIENDS_CHECK, ids),
     },
 
