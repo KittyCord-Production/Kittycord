@@ -6,7 +6,6 @@
 
 import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
-import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { updateMessage } from "@api/MessageUpdater";
 import { Flex } from "@components/Flex";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
@@ -135,20 +134,12 @@ function TagsModal({ rootProps }: { rootProps: any; }) {
     );
 }
 
-function TagIcon({ width = 20, height = 20 }: { width?: number; height?: number; }) {
-    return (
-        <svg width={width} height={height} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21.41 11.58 12.41 2.58A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .59 1.42l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.84ZM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8Z" />
-        </svg>
-    );
-}
-
 export default definePlugin({
     name: "MessageTags",
-    description: "Tag messages with private local labels (TODO, Important, ...), see them as chips, and browse/jump to them from a button in the toolbar.",
+    description: "Tag messages with private local labels (TODO, Important, ...), see them as chips, and browse/jump to them from the Kittycord menu in the header.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility", "Organisation"],
-    dependencies: ["ContextMenuAPI", "HeaderBarAPI", "MessageAccessoriesAPI", "MessageUpdaterAPI"],
+    dependencies: ["ContextMenuAPI", "MessageAccessoriesAPI", "MessageUpdaterAPI"],
 
     contextMenus: {
         "message"(children, { message }: { message: Message; }) {
@@ -191,17 +182,9 @@ export default definePlugin({
 
     async start() {
         await load();
-        addHeaderBarButton("kittycord-message-tags", () => (
-            <HeaderBarButton
-                icon={TagIcon}
-                tooltip="Tagged messages"
-                onClick={() => openModal(props => <TagsModal rootProps={props} />)}
-            />
-        ), 8);
     },
 
     stop() {
-        removeHeaderBarButton("kittycord-message-tags");
         store = {};
     }
 });

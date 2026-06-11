@@ -99,7 +99,7 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
                 ))}
 
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "12px 0" }}>
-                    Tip: open the toolbox above the chat bar for Modes and “Share setup with a friend”.
+                    Tip: click the Kittycord button in the channel header for Modes, bookmarks, tags and “Share setup with a friend”.
                 </Text>
 
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>

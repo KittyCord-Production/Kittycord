@@ -5,7 +5,6 @@
  */
 
 import { get, set } from "@api/DataStore";
-import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { updateMessage } from "@api/MessageUpdater";
 import { Flex } from "@components/Flex";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
@@ -136,10 +135,10 @@ function openBookmarks() {
 
 export default definePlugin({
     name: "Bookmarks",
-    description: "Privately bookmark messages (beyond Discord's 50-pin limit) with a hover button, then view and jump to them from a button in the toolbar.",
+    description: "Privately bookmark messages (beyond Discord's 50-pin limit) with a hover button, then view and jump to them from the Kittycord menu in the header.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility", "Chat"],
-    dependencies: ["HeaderBarAPI", "MessagePopoverAPI", "MessageUpdaterAPI"],
+    dependencies: ["MessagePopoverAPI", "MessageUpdaterAPI"],
 
     messagePopoverButton: {
         icon: BookmarkIcon,
@@ -162,17 +161,9 @@ export default definePlugin({
 
     async start() {
         await load();
-        addHeaderBarButton("kittycord-bookmarks", () => (
-            <HeaderBarButton
-                icon={({ width = 20, height = 20 }) => <BookmarkIcon width={width} height={height} />}
-                tooltip="Bookmarks"
-                onClick={openBookmarks}
-            />
-        ), 7);
     },
 
     stop() {
-        removeHeaderBarButton("kittycord-bookmarks");
         bookmarks = [];
         ids.clear();
     }
