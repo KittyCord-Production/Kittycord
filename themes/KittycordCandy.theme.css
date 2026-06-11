@@ -1,0 +1,165 @@
+/**
+ * @name Kittycord Candy
+ * @author Kittycord
+ * @description The Kittycord installer look for your whole Discord — deep plum, candy pink, rounded everything.
+ * @version 1.0.0
+ * @website https://kittycord.dev
+ * @source https://github.com/CenturyRV/Kittycord
+*/
+
+:root {
+    --kc-bg-0: #0d0709;
+    --kc-bg-1: #110a0e;
+    --kc-bg-2: #190f15;
+    --kc-bg-3: #1f1319;
+    --kc-bg-4: #271721;
+    --kc-bg-5: #301e28;
+    --kc-line: #402835;
+    --kc-pink: #ff5fa6;
+    --kc-pink-strong: #f0509b;
+    --kc-pink-hi: #ff8ac4;
+    --kc-blush: #d6a4c0;
+    --kc-faint: #9a7389;
+}
+
+.theme-dark,
+.theme-darker,
+.theme-midnight,
+.visual-refresh.theme-dark,
+.visual-refresh .theme-dark {
+    /* classic tokens */
+    --background-primary: var(--kc-bg-3);
+    --background-secondary: var(--kc-bg-2);
+    --background-secondary-alt: var(--kc-bg-2);
+    --background-tertiary: var(--kc-bg-1);
+    --background-floating: var(--kc-bg-2);
+    --background-nested-floating: var(--kc-bg-2);
+    --background-mobile-primary: var(--kc-bg-3);
+    --background-mobile-secondary: var(--kc-bg-2);
+    --background-accent: var(--kc-bg-5);
+    --background-modifier-hover: rgb(255 95 166 / 7%);
+    --background-modifier-active: rgb(255 95 166 / 10%);
+    --background-modifier-selected: rgb(255 95 166 / 13%);
+    --background-modifier-accent: var(--kc-line);
+    --channeltextarea-background: var(--kc-bg-4);
+    --activity-card-background: var(--kc-bg-2);
+    --background-message-hover: rgb(255 95 166 / 4%);
+    --background-message-highlight: rgb(255 138 196 / 9%);
+
+    /* visual refresh tokens */
+    --background-base-lowest: var(--kc-bg-0);
+    --background-base-lower: var(--kc-bg-1);
+    --background-base-low: var(--kc-bg-2);
+    --background-surface-high: var(--kc-bg-4);
+    --background-surface-higher: var(--kc-bg-5);
+    --background-surface-highest: #382330;
+    --bg-overlay-chat: var(--kc-bg-3);
+    --bg-base-primary: var(--kc-bg-3);
+    --bg-base-secondary: var(--kc-bg-2);
+    --bg-base-tertiary: var(--kc-bg-1);
+    --bg-surface-raised: var(--kc-bg-2);
+    --bg-surface-overlay: var(--kc-bg-2);
+    --border-subtle: var(--kc-line);
+    --border-faint: rgb(64 40 53 / 60%);
+
+    /* text */
+    --header-primary: #fff;
+    --header-secondary: var(--kc-blush);
+    --text-normal: #f3e6ee;
+    --text-muted: var(--kc-faint);
+    --text-link: var(--kc-pink-hi);
+    --text-positive: #a6ffc9;
+    --channels-default: var(--kc-faint);
+    --channel-icon: var(--kc-faint);
+    --interactive-normal: var(--kc-blush);
+    --interactive-hover: #fff;
+    --interactive-active: #fff;
+    --interactive-muted: #6b4d5e;
+
+    /* pink brand */
+    --brand-experiment: var(--kc-pink);
+    --brand-experiment-360: var(--kc-pink-hi);
+    --brand-experiment-500: var(--kc-pink);
+    --brand-experiment-560: var(--kc-pink-strong);
+    --brand-experiment-600: #de4790;
+    --brand-260: #ffc7e2;
+    --brand-360: var(--kc-pink-hi);
+    --brand-500: var(--kc-pink);
+    --brand-560: var(--kc-pink-strong);
+    --brand-600: #de4790;
+    --mention-foreground: var(--kc-pink-hi);
+    --mention-background: rgb(255 95 166 / 14%);
+    --info-help-foreground: var(--kc-pink-hi);
+    --control-brand-foreground: var(--kc-pink);
+    --control-brand-foreground-new: var(--kc-pink);
+    --focus-primary: var(--kc-pink);
+
+    /* scrollbars */
+    --scrollbar-auto-thumb: var(--kc-bg-5);
+    --scrollbar-auto-track: transparent;
+    --scrollbar-thin-thumb: var(--kc-bg-5);
+    --scrollbar-thin-track: transparent;
+    --scrollbar-auto-scrollbar-color-thumb: var(--kc-bg-5);
+    --scrollbar-auto-scrollbar-color-track: transparent;
+}
+
+/* The message box paints its own inner background, so variables alone don't reach it. */
+[class*="channelTextArea"] [class*="themedBackground"],
+[class*="channelTextArea"] [class*="scrollableContainer"] {
+    background: var(--kc-bg-4);
+}
+
+[class*="channelTextArea"] [class*="scrollableContainer"] {
+    border: 1px solid var(--kc-line);
+    border-radius: 14px;
+}
+
+/* selected channel / member rows get the candy pill */
+[class*="containerDefault"] [class*="modeSelected"] [class*="link"],
+[class*="containerDefault"] [class*="modeSelected"] [class*="name_"] {
+    color: #fff;
+}
+
+/* pink unread pills on the server rail */
+[class*="sidebar"] [class*="unreadMentionsIndicator"] span,
+span[class*="unread_"] {
+    background: var(--kc-pink) !important;
+}
+
+/* embeds, cards and popouts pick up the plum panel + soft border */
+[class*="embedFull"],
+[class*="wrapper"][class*="standardEmbed"] {
+    background: var(--kc-bg-2);
+    border-color: var(--kc-line);
+    border-radius: 12px;
+}
+
+[class*="codeContainer"] code,
+code[class*="inline"] {
+    background: var(--kc-bg-1);
+    border-color: var(--kc-line);
+}
+
+/* tooltips stay plum */
+[class*="tooltipPrimary"] {
+    background-color: var(--kc-bg-5);
+    color: #fff;
+}
+
+/* calls/no-mic banner and friendly notices keep readable contrast */
+[class*="notice"][class*="colorDefault"] {
+    background: var(--kc-bg-5);
+}
+
+/* No backdrop-filter anywhere on purpose: blur on menu/popout layers turns them into
+   containing blocks for position:fixed and teleports Discord's submenus across the screen. */
+
+/* Optional: pixel headlines like the installer. Remove the comment markers to enable.
+@import url("https://fonts.googleapis.com/css2?family=Jersey+15&display=swap");
+
+[class*="guildHeader"] [class*="name_"] {
+    font-family: "Jersey 15", var(--font-display), sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+}
+*/
