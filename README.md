@@ -4,7 +4,7 @@
   </a>
   <p><b>The cutest Discord client mod — plugins, themes and a whole lot of pink.</b></p>
   <p>
-    <a href="https://github.com/CenturyRV/Kittycord/releases/latest"><img src="https://img.shields.io/github/downloads/CenturyRV/Kittycord/total?style=for-the-badge&logo=github&label=downloads&color=FF5FA6&labelColor=1f141b" alt="Downloads"></a>
+    <a href="https://github.com/CenturyRV/Kittycord/stargazers"><img src="https://img.shields.io/github/stars/CenturyRV/Kittycord?style=for-the-badge&logo=github&label=stars&color=FF5FA6&labelColor=1f141b" alt="Stars"></a>
     <a href="https://github.com/CenturyRV/Kittycord/commits/main"><img src="https://img.shields.io/github/last-commit/CenturyRV/Kittycord?style=for-the-badge&label=updated&color=FF8AC4&labelColor=1f141b" alt="Last commit"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/CenturyRV/Kittycord?style=for-the-badge&color=FF8AC4&labelColor=1f141b" alt="License"></a>
   </p>
