@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
@@ -19,7 +18,6 @@ import type { Message, MessageAttachment, User } from "@vencord/discord-types";
 import { Alerts, Button, Forms, IconUtils, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { BRAND_ICON } from "../../branding";
 import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
 import { applyShare, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
 
@@ -36,29 +34,10 @@ const SCOPE_OPTIONS: { label: string; value: ShareScope; }[] = [
 ];
 const scopeLabel = (s: ShareScope) => SCOPE_OPTIONS.find(o => o.value === s)?.label ?? s;
 
-const kittycordFriends = new Set<string>();
-
-const UsesKittycordBadge: ProfileBadge = {
-    id: "kittycord-user",
-    description: "Uses Kittycord",
-    iconSrc: BRAND_ICON,
-    position: BadgePosition.END,
-    shouldShow: ({ userId }) => kittycordFriends.has(userId)
-};
-
-async function refreshKittycordFriends() {
-    const ids = await getKittycordFriendIds();
-    kittycordFriends.clear();
-    for (const id of ids) kittycordFriends.add(id);
-}
-
-let refreshTimer: ReturnType<typeof setInterval> | null = null;
-
 const logger = new Logger("ShareSetup");
 
 async function enableFriendDiscovery() {
     await registerSelf();
-    await refreshKittycordFriends();
 }
 
 function FriendDiscoveryToggle() {
@@ -75,10 +54,7 @@ function FriendDiscoveryToggle() {
         setConsent(value);
         await setShareConsent(value);
         if (value) await enableFriendDiscovery();
-        else {
-            kittycordFriends.clear();
-            await unregisterSelf();
-        }
+        else await unregisterSelf();
     }
 
     return (
@@ -327,7 +303,7 @@ export default definePlugin({
     description: "Send your Kittycord plugins, themes and settings to a friend in one click. They get a one-tap import card right in the DM.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility"],
-    dependencies: ["MessageAccessoriesAPI", "ContextMenuAPI", "BadgeAPI"],
+    dependencies: ["MessageAccessoriesAPI", "ContextMenuAPI"],
     settings,
 
     toolboxActions: {
@@ -357,23 +333,11 @@ export default definePlugin({
     },
 
     async start() {
-        addProfileBadge(UsesKittycordBadge);
-        refreshTimer = setInterval(refreshKittycordFriends, 10 * 60 * 1000);
-
         try {
             const { consent } = await getShareConsent();
             if (consent !== false) await enableFriendDiscovery();
         } catch (e) {
             logger.error("friend discovery init failed", e);
         }
-    },
-
-    stop() {
-        removeProfileBadge(UsesKittycordBadge);
-        if (refreshTimer) {
-            clearInterval(refreshTimer);
-            refreshTimer = null;
-        }
-        kittycordFriends.clear();
     }
 });
