@@ -54,8 +54,8 @@ export default definePlugin({
         return (
             <img
                 src={BRAND_ICON}
-                width={30}
-                height={30}
+                width={36}
+                height={36}
                 style={{ borderRadius: "30%", objectFit: "contain" }}
                 draggable={false}
                 alt=""
@@ -68,7 +68,7 @@ export default definePlugin({
             find: "#{intl::DISCODO_DISABLED}",
             replacement: {
                 match: /(\(0,\i.jsxs?\)\(\i,{}\))/,
-                replace: "arguments[0].user == null ? null : $self.KittyIcon()"
+                replace: "arguments[0].user == null ? $self.KittyIcon() : $1"
             }
         }
     ],
