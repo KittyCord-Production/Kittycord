@@ -251,6 +251,124 @@ function drawFooter(ctx: CanvasRenderingContext2D, cat: HTMLImageElement, snap: 
     ctx.fillText(label, startX + size + 14, y);
 }
 
+const SHARE_W = 1200;
+const SHARE_H = 630;
+
+function drawShareBackground(ctx: CanvasRenderingContext2D) {
+    const bg = ctx.createLinearGradient(0, 0, 0, SHARE_H);
+    bg.addColorStop(0, "#1b1018");
+    bg.addColorStop(0.55, "#130b11");
+    bg.addColorStop(1, "#0b0608");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+
+    drawGlow(ctx, 90, 60, 420, "255, 95, 166", 0.22);
+    drawGlow(ctx, SHARE_W - 60, SHARE_H - 50, 480, "240, 80, 155", 0.18);
+    drawDiamond(ctx, SHARE_W - 80, 90, 130, "rgba(255, 95, 166, 0.08)");
+    drawDiamond(ctx, 50, SHARE_H - 70, 110, "rgba(255, 138, 196, 0.05)");
+
+    const sparkles: [number, number, number, number][] = [
+        [200, 150, 8, 0.7], [1010, 200, 7, 0.55], [260, 480, 6, 0.5],
+        [950, 500, 10, 0.6], [620, 80, 6, 0.4]
+    ];
+    for (const [x, y, s, a] of sparkles) drawSparkle(ctx, x, y, s, a);
+
+    roundRectPath(ctx, 16, 16, SHARE_W - 32, SHARE_H - 32, 44);
+    ctx.strokeStyle = "rgba(255, 138, 196, 0.18)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+export async function renderShareCard(snap: WrappedSnapshot): Promise<Blob> {
+    if (document.fonts?.ready) await document.fonts.ready;
+
+    const cat = await loadImage(BRAND_ICON);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = SHARE_W;
+    canvas.height = SHARE_H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Failed to get 2D rendering context");
+
+    ctx.textBaseline = "alphabetic";
+    drawShareBackground(ctx);
+
+    const headerSize = 48;
+    ctx.save();
+    roundRectPath(ctx, 64, 52, headerSize, headerSize, 14);
+    ctx.clip();
+    ctx.drawImage(cat, 64, 52, headerSize, headerSize);
+    ctx.restore();
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = COL.white;
+    ctx.font = `700 32px ${FONT}`;
+    ctx.fillText("Kittycord", 64 + headerSize + 16, 78);
+    ctx.fillStyle = COL.pinkHi;
+    ctx.fillText(" Wrapped", 64 + headerSize + 16 + ctx.measureText("Kittycord").width, 78);
+    ctx.fillStyle = COL.faint;
+    ctx.font = `500 20px ${FONT}`;
+    ctx.fillText("my year on Discord", 64 + headerSize + 16, 102);
+
+    const leftX = 300;
+    ctx.textAlign = "center";
+    ctx.font = `400 110px ${FONT}`;
+    ctx.fillText(snap.vibe.emoji, leftX, 280);
+    ctx.fillStyle = COL.faint;
+    ctx.font = `600 22px ${FONT}`;
+    ctx.fillText("MY VIBE", leftX, 326);
+    ctx.fillStyle = COL.white;
+    ctx.font = `800 60px ${FONT}`;
+    ctx.fillText(snap.vibe.label, leftX, 388);
+
+    ctx.fillStyle = COL.blush;
+    ctx.font = `400 24px ${FONT}`;
+    const lines = wrapText(ctx, snap.vibe.line, 440);
+    let ly = 428;
+    for (const line of lines) {
+        ctx.fillText(line, leftX, ly);
+        ly += 32;
+    }
+
+    const rightX = 850;
+    ctx.fillStyle = COL.pinkHi;
+    ctx.font = `800 120px ${FONT}`;
+    ctx.fillText(snap.messages.toLocaleString(), rightX, 300);
+    ctx.fillStyle = COL.white;
+    ctx.font = `600 30px ${FONT}`;
+    ctx.fillText("messages sent", rightX, 344);
+
+    ctx.fillStyle = COL.blush;
+    ctx.font = `500 24px ${FONT}`;
+    ctx.fillText(`since ${snap.accountYear} on Discord · ${snap.guildCount.toLocaleString()} servers · ${snap.activeDays.toLocaleString()} active days`, rightX, 400);
+
+    const since = new Date(snap.startedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    ctx.fillStyle = COL.faint;
+    ctx.font = `400 20px ${FONT}`;
+    ctx.fillText(`measuring since ${since}`, rightX, 434);
+
+    const label = "kittycord.dev";
+    ctx.font = `700 28px ${FONT}`;
+    const labelW = ctx.measureText(label).width;
+    const catSize = 36;
+    const totalW = catSize + 12 + labelW;
+    const startX = SHARE_W / 2 - totalW / 2;
+    const footY = SHARE_H - 64;
+
+    ctx.save();
+    roundRectPath(ctx, startX, footY - catSize + 8, catSize, catSize, 10);
+    ctx.clip();
+    ctx.drawImage(cat, startX, footY - catSize + 8, catSize, catSize);
+    ctx.restore();
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = COL.white;
+    ctx.font = `700 28px ${FONT}`;
+    ctx.fillText(label, startX + catSize + 12, footY);
+
+    return canvasToBlob(canvas);
+}
+
 export async function renderCard(snap: WrappedSnapshot): Promise<Blob> {
     if (document.fonts?.ready) await document.fonts.ready;
 

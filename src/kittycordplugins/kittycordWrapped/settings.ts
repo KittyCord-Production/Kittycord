@@ -30,5 +30,11 @@ export const settings = definePluginSettings({
         description: "internal",
         default: "",
         hidden: true
+    },
+    lastYearEndNudge: {
+        type: OptionType.NUMBER,
+        description: "internal",
+        default: 0,
+        hidden: true
     }
 });

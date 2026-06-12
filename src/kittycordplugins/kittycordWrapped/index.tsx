@@ -5,7 +5,7 @@
  */
 
 import { ApplicationCommandInputType } from "@api/Commands";
-import { addMessagePreSendListener, removeMessagePreSendListener, type MessageSendListener } from "@api/MessageEvents";
+import { addMessagePreSendListener, type MessageSendListener,removeMessagePreSendListener } from "@api/MessageEvents";
 import { showNotification } from "@api/Notifications";
 import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
@@ -73,6 +73,17 @@ export default definePlugin({
             showNotification({
                 title: "Kittycord Wrapped is on 🐱",
                 body: "Your stats stay 100% on your device. Open your card anytime with /wrapped.",
+                onClick: () => openWrappedModal()
+            });
+            return;
+        }
+
+        const now = new Date();
+        if (settings.store.nudges && now.getMonth() === 11 && settings.store.lastYearEndNudge < now.getFullYear()) {
+            settings.store.lastYearEndNudge = now.getFullYear();
+            showNotification({
+                title: "Your Kittycord Wrapped is ready 🎁",
+                body: `${now.getFullYear()} is wrapping up — open your card and see your year on Discord.`,
                 onClick: () => openWrappedModal()
             });
         }

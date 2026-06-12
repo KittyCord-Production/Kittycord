@@ -6,14 +6,14 @@
 
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
-import { getCurrentChannel } from "@utils/discord";
+import { getCurrentChannel, insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
-import { Alerts, Button, DraftType, React, Text, Toasts, showToast, UploadHandler } from "@webpack/common";
+import { Alerts, Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { renderCard } from "./card";
+import { renderCard, renderShareCard } from "./card";
 import { settings } from "./settings";
 import { buildSnapshot, resetData } from "./storage";
 
@@ -29,8 +29,11 @@ function fileFromBlob(blob: Blob) {
     return new File([blob], "kittycord-wrapped.png", { type: "image/png" });
 }
 
+const SHARE_CAPTION = "my year on Discord, by Kittycord 🐱 https://kittycord.dev";
+
 function WrappedModal({ rootProps }: { rootProps: any; }) {
     const [showNames, setShowNames] = React.useState(settings.store.showServerNames);
+    const [landscape, setLandscape] = React.useState(false);
     const [blob, setBlob] = React.useState<Blob | null>(null);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [busy, setBusy] = React.useState(false);
@@ -41,7 +44,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
         (async () => {
             try {
                 const snap = buildSnapshot(showNames);
-                const result = await renderCard(snap);
+                const result = await (landscape ? renderShareCard(snap) : renderCard(snap));
                 if (cancelled) return;
                 url = URL.createObjectURL(result);
                 setBlob(result);
@@ -55,7 +58,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
             cancelled = true;
             if (url) URL.revokeObjectURL(url);
         };
-    }, [showNames]);
+    }, [showNames, landscape]);
 
     function onToggleNames(value: boolean) {
         settings.store.showServerNames = value;
@@ -72,6 +75,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
         if (!blob) return;
         const channel = getCurrentChannel();
         if (!channel) return showToast("Open a chat first to send it there.", Toasts.Type.FAILURE);
+        insertTextIntoChatInputBox(SHARE_CAPTION);
         UploadHandler.promptToUpload([fileFromBlob(blob)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
     }
@@ -99,7 +103,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
                 try {
                     await resetData();
                     const snap = buildSnapshot(showNames);
-                    const result = await renderCard(snap);
+                    const result = await (landscape ? renderShareCard(snap) : renderCard(snap));
                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                     setBlob(result);
                     setPreviewUrl(URL.createObjectURL(result));
@@ -122,7 +126,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
             <ModalContent>
                 <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
                     {previewUrl
-                        ? <img src={previewUrl} alt="Your Kittycord Wrapped card" style={{ width: "60%", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
+                        ? <img src={previewUrl} alt="Your Kittycord Wrapped card" style={{ width: landscape ? "100%" : "60%", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
                         : <Text variant="text-md/normal" style={{ padding: "48px 0", opacity: 0.7 }}>Rendering your card…</Text>}
                 </div>
 
@@ -131,6 +135,13 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
                     description="Off by default — your servers appear as “Server 1/2/3”. Turn on only if you're happy to share their names."
                     value={showNames}
                     onChange={onToggleNames}
+                />
+
+                <FormSwitch
+                    title="Wide format"
+                    description="A compact landscape card that previews nicely when posted in chat."
+                    value={landscape}
+                    onChange={setLandscape}
                 />
 
                 <Text variant="text-xs/normal" style={{ opacity: 0.6, margin: "8px 0 16px" }}>
