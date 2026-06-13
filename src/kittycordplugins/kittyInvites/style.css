@@ -6,7 +6,7 @@
 
 .kc-inv-card {
     background: var(--background-secondary);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 16px;
 }
 
@@ -23,41 +23,57 @@
 .kc-inv-board {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .kc-inv-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border-radius: 8px;
+    gap: 14px;
+    padding: 10px 16px;
+    border-radius: 12px;
     background: var(--background-secondary);
+    transition: transform .12s ease, background .12s ease;
 }
 
-.kc-inv-me {
-    background: var(--brand-experiment-360, rgba(255, 95, 166, 0.18));
-    outline: 1px solid var(--brand-experiment, #ff5fa6);
+.kc-inv-row:hover {
+    background: var(--background-modifier-hover, var(--background-secondary-alt));
+    transform: translateX(2px);
 }
 
+/* Rank: a plain muted number, except the top 3 which become little medal "coins". */
 .kc-inv-rank {
-    width: 24px;
-    text-align: center;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    font-weight: 800;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
     color: var(--text-muted);
+    border-radius: 50%;
 }
 
-.kc-inv-rank.kc-inv-top {
-    color: #ffd46b;
-}
+.kc-inv-board .kc-inv-row:nth-child(-n+3) .kc-inv-rank { color: #3a2230; }
+.kc-inv-board .kc-inv-row:nth-child(1) .kc-inv-rank { background: linear-gradient(135deg, #ffe28c, #f6b748); box-shadow: 0 2px 7px rgba(246, 183, 72, .45); }
+.kc-inv-board .kc-inv-row:nth-child(2) .kc-inv-rank { background: linear-gradient(135deg, #eef1f7, #c0c7d4); }
+.kc-inv-board .kc-inv-row:nth-child(3) .kc-inv-rank { background: linear-gradient(135deg, #f1b888, #d1824d); }
 
 .kc-inv-av {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--background-tertiary);
+    object-fit: cover;
     flex-shrink: 0;
+    background: var(--background-tertiary);
 }
+
+/* Medal-coloured rings on the top 3 avatars. */
+.kc-inv-board .kc-inv-row:nth-child(1) .kc-inv-av { box-shadow: 0 0 0 2px #f6b748; }
+.kc-inv-board .kc-inv-row:nth-child(2) .kc-inv-av { box-shadow: 0 0 0 2px #c0c7d4; }
+.kc-inv-board .kc-inv-row:nth-child(3) .kc-inv-av { box-shadow: 0 0 0 2px #d1824d; }
 
 .kc-inv-name {
     flex: 1;
@@ -68,7 +84,37 @@
     white-space: nowrap;
 }
 
+/* A crown for the leader. */
+.kc-inv-board .kc-inv-row:nth-child(1) .kc-inv-name::before {
+    content: "👑 ";
+}
+
+/* Invite count: a soft pill with a pink number; the leader gets the full gradient pill. */
 .kc-inv-count {
-    font-weight: 700;
-    color: var(--brand-experiment, #ff5fa6);
+    flex-shrink: 0;
+    font-weight: 800;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: #ff8ac4;
+    background: var(--background-tertiary);
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+.kc-inv-board .kc-inv-row:nth-child(1) .kc-inv-count {
+    color: #fff;
+    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
+    box-shadow: 0 2px 8px rgba(255, 95, 166, .38);
+}
+
+/* The #1 row gets a soft "throne" tint; your own row gets a subtle highlight + accent stripe.
+   Both use controlled Kittycord pink (not theme brand vars, which some themes turn into a loud fill). */
+.kc-inv-board .kc-inv-row:nth-child(1) {
+    background: linear-gradient(90deg, rgba(255, 95, 166, .16), var(--background-secondary) 62%);
+}
+
+.kc-inv-me,
+.kc-inv-me:hover {
+    background: var(--background-modifier-selected);
+    box-shadow: inset 3px 0 0 0 #ff5fa6;
 }
