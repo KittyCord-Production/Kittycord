@@ -27,9 +27,15 @@ const logger = new Logger("InviteFriend");
 
 const DEFAULT_MESSAGE = "Come join me on Kittycord — the cutest way to use Discord! 🐱 https://kittycord.dev";
 
+function withCodeMessage(code: string) {
+    return `${DEFAULT_MESSAGE} — enter my creator code "${code}" in the installer (or Settings → Invites) so it counts for me 💖`;
+}
+
 function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }) {
     const [target, setTarget] = React.useState<User | null>(user);
     const [note, setNote] = React.useState(DEFAULT_MESSAGE);
+    const [myCode, setMyCode] = React.useState<string | null>(null);
+    const autoMsgRef = React.useRef(DEFAULT_MESSAGE);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [blob, setBlob] = React.useState<Blob | null>(null);
     const [busy, setBusy] = React.useState(false);
@@ -65,6 +71,25 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
             cancelled = true;
             if (url) URL.revokeObjectURL(url);
         };
+    }, []);
+
+    React.useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const me = UserStore.getCurrentUser();
+                const Native = (VencordNative as any)?.pluginHelpers?.KittyInvites;
+                if (!me || !Native?.getMe) return;
+                const mine = await Native.getMe(me.id);
+                const code: string | null = mine?.code ?? null;
+                if (cancelled || !code) return;
+                setMyCode(code);
+                const msg = withCodeMessage(code);
+                setNote(prev => (prev === autoMsgRef.current ? msg : prev));
+                autoMsgRef.current = msg;
+            } catch { /* best effort */ }
+        })();
+        return () => { cancelled = true; };
     }, []);
 
     async function send() {
@@ -115,6 +140,13 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
 
                 <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />
+                {myCode
+                    ? <Text variant="text-sm/normal" style={{ marginTop: 6, opacity: 0.8 }}>
+                        Your creator code <span style={{ color: "var(--brand-500)", fontWeight: 600 }}>{myCode}</span> is included — your friend enters it in the installer (or Settings → Invites) to credit you. 💖
+                    </Text>
+                    : <Text variant="text-sm/normal" style={{ marginTop: 6, opacity: 0.6 }}>
+                        Tip: set a creator code in Settings → Invites so the friends you invite count toward you.
+                    </Text>}
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
                     <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
