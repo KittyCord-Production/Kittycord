@@ -34,4 +34,5 @@ export const CATALOG: Deko[] = [
 
 export const byId = new Map(CATALOG.map(d => [d.id, d]));
 
-export const assetUrl = (deco: string) => `${DEKO_CDN}/${byId.get(deco)?.file ?? deco}`;
+const ASSET_VERSION = "2";
+export const assetUrl = (deco: string) => `${DEKO_CDN}/${byId.get(deco)?.file ?? deco}?v=${ASSET_VERSION}`;
