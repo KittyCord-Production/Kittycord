@@ -4,23 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
-import definePlugin, { OptionType, type PluginNative } from "@utils/types";
+import { PaintbrushIcon } from "@components/Icons";
+import SettingsPlugin from "@plugins/_core/settings";
+import { removeFromArray } from "@utils/misc";
+import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
 import { assetUrl, CATALOG, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const Native = VencordNative?.pluginHelpers?.KittyDeko as PluginNative<typeof import("./native")> | undefined;
 
@@ -126,32 +119,16 @@ function DekoShop() {
     );
 }
 
-function DekoModal({ rootProps }: { rootProps: any; }) {
+function DekoTab() {
     return (
-        <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
-            <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>KittyDeko</Text>
-                <ModalCloseButton onClick={rootProps.onClose} />
-            </ModalHeader>
-            <ModalContent>
-                <div style={{ margin: "12px 0" }}>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.8, marginBottom: 12 }}>
-                        Pick a free decoration for your avatar — everyone on Kittycord will see it.
-                    </Text>
-                    <DekoShop />
-                </div>
-            </ModalContent>
-        </ModalRoot>
+        <ErrorBoundary noop>
+            <Text variant="text-md/normal" style={{ marginBottom: 16, color: "var(--text-muted)" }}>
+                Pick a free decoration for your avatar — everyone on Kittycord will see it.
+            </Text>
+            <DekoShop />
+        </ErrorBoundary>
     );
 }
-
-const settings = definePluginSettings({
-    shop: {
-        type: OptionType.COMPONENT,
-        description: "Your avatar decoration",
-        component: () => <ErrorBoundary noop><DekoShop /></ErrorBoundary>
-    }
-});
 
 export default definePlugin({
     name: "KittyDeko",
@@ -159,7 +136,6 @@ export default definePlugin({
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Appearance", "Customisation"],
     enabledByDefault: true,
-    settings,
 
     patches: [
         {
@@ -221,19 +197,21 @@ export default definePlugin({
         }
     },
 
-    toolboxActions: {
-        "Open KittyDeko"() {
-            openModal(props => <DekoModal rootProps={props} />);
-        }
-    },
-
     async start() {
         enableStyle(style);
+        SettingsPlugin.customEntries.push({
+            key: "kittycord_deko",
+            title: "Decorations",
+            panelTitle: "Avatar Decorations",
+            Component: DekoTab,
+            Icon: PaintbrushIcon
+        });
         await refresh();
         refreshTimer = setInterval(refresh, 10 * 60 * 1000);
     },
 
     stop() {
+        removeFromArray(SettingsPlugin.customEntries, e => e.key === "kittycord_deko");
         if (refreshTimer) {
             clearInterval(refreshTimer);
             refreshTimer = null;
