@@ -36,6 +36,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
     const [note, setNote] = React.useState(DEFAULT_MESSAGE);
     const [myCode, setMyCode] = React.useState<string | null>(null);
     const autoMsgRef = React.useRef(DEFAULT_MESSAGE);
+    const codePromiseRef = React.useRef<Promise<string | null> | null>(null);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [blob, setBlob] = React.useState<Blob | null>(null);
     const [busy, setBusy] = React.useState(false);
@@ -73,22 +74,32 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
         };
     }, []);
 
+    function loadMyCode(): Promise<string | null> {
+        if (!codePromiseRef.current) {
+            codePromiseRef.current = (async () => {
+                try {
+                    const me = UserStore.getCurrentUser();
+                    const Native = (VencordNative as any)?.pluginHelpers?.KittyInvites;
+                    if (!me || !Native?.getMe) return null;
+                    const mine = await Native.getMe(me.id);
+                    return typeof mine?.code === "string" ? mine.code : null;
+                } catch {
+                    return null;
+                }
+            })();
+        }
+        return codePromiseRef.current;
+    }
+
     React.useEffect(() => {
         let cancelled = false;
-        (async () => {
-            try {
-                const me = UserStore.getCurrentUser();
-                const Native = (VencordNative as any)?.pluginHelpers?.KittyInvites;
-                if (!me || !Native?.getMe) return;
-                const mine = await Native.getMe(me.id);
-                const code: string | null = mine?.code ?? null;
-                if (cancelled || !code) return;
-                setMyCode(code);
-                const msg = withCodeMessage(code);
-                setNote(prev => (prev === autoMsgRef.current ? msg : prev));
-                autoMsgRef.current = msg;
-            } catch { /* best effort */ }
-        })();
+        loadMyCode().then(code => {
+            if (cancelled || !code) return;
+            setMyCode(code);
+            const msg = withCodeMessage(code);
+            setNote(prev => (prev === autoMsgRef.current ? msg : prev));
+            autoMsgRef.current = msg;
+        });
         return () => { cancelled = true; };
     }, []);
 
@@ -96,8 +107,10 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
         if (!blob || !target) return;
         setBusy(true);
         try {
+            const code = await loadMyCode();
+            const message = (note === autoMsgRef.current && code ? withCodeMessage(code) : note.trim()) || DEFAULT_MESSAGE;
             const file = new File([blob], INVITE_FILENAME, { type: "image/png" });
-            await sendFileToUser(target.id, file, note.trim() || DEFAULT_MESSAGE);
+            await sendFileToUser(target.id, file, message);
             showToast(`Invite sent to ${target.globalName || target.username}. 💌`, Toasts.Type.SUCCESS);
             rootProps.onClose();
         } catch (e) {
