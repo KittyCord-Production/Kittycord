@@ -13,7 +13,7 @@ import { Button, React, SelectedChannelStore, showToast, Text, Toasts, UserStore
 
 import { PetController } from "./pet";
 import { ACCESSORIES, ACCESSORY_URIS } from "./sprites";
-import { ACCESSORY_LEVELS, DAILY_MSG_XP_CAP, getSave, levelFor, loadSave, MAX_LEVEL, nextLevelXp, updateSave } from "./state";
+import { ACCESSORY_LEVELS, addXp, DAILY_MSG_XP_CAP, getSave, levelFor, loadSave, MAX_LEVEL, nextLevelXp, updateSave } from "./state";
 import style from "./style.css?managed";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -53,15 +53,11 @@ const settings = definePluginSettings({
 
 let controller: PetController | null = null;
 
-async function addXp(amount: number) {
-    const before = levelFor(getSave().xp);
-    const next = await updateSave({ xp: getSave().xp + amount });
-    const after = levelFor(next.xp);
-    if (after > before) {
-        const unlocked = Object.entries(ACCESSORY_LEVELS).find(([, l]) => l === after)?.[0];
-        const note = unlocked ? ` You unlocked the ${ACCESSORIES[unlocked].label.toLowerCase()}!` : "";
-        showToast(`Your kitty reached level ${after}!${note}`, Toasts.Type.SUCCESS);
-    }
+function notifyLevel(level: number | null) {
+    if (level === null) return;
+    const unlocked = Object.entries(ACCESSORY_LEVELS).find(([, l]) => l === level)?.[0];
+    const note = unlocked ? ` You unlocked the ${ACCESSORIES[unlocked].label.toLowerCase()}!` : "";
+    showToast(`Your kitty reached level ${level}!${note}`, Toasts.Type.SUCCESS);
 }
 
 function PetModal({ rootProps }: { rootProps: any; }) {
@@ -154,7 +150,7 @@ export default definePlugin({
                 const spent = save.msgDay === today ? save.msgXp : 0;
                 if (spent < DAILY_MSG_XP_CAP) {
                     await updateSave({ msgDay: today, msgXp: spent + 1 });
-                    await addXp(1);
+                    notifyLevel(await addXp(1));
                 }
                 return;
             }
@@ -182,7 +178,7 @@ export default definePlugin({
             }),
             onPet() {
                 updateSave({ pets: getSave().pets + 1 });
-                addXp(2);
+                addXp(2).then(notifyLevel);
             }
         });
         controller.setEquipped(save.equipped);
