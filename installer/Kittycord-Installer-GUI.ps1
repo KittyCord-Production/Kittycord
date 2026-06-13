@@ -155,6 +155,7 @@ $script:Strings = @{
         adminWarn        = "Tip: you don't need to run this as Administrator. Running as your normal user is recommended, since elevation can affect Discord's file permissions."
         adminAsk         = "Continue anyway?"
         toS              = "client mods are against Discord's ToS - use at your own risk"
+        creatorCode      = "Creator code (optional) - got a friend's code? type it here"
     }
     de = @{
         eyebrow          = "DISCORD CLIENT MOD  -  OFFIZIELLER INSTALLER"
@@ -567,7 +568,7 @@ function Get-NoInstallReasonKey {
 # ================= UI =================
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Kittycord Installer"
-$form.ClientSize = New-Object System.Drawing.Size((S 880), (S 600))
+$form.ClientSize = New-Object System.Drawing.Size((S 880), (S 660))
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "None"
 $form.MaximizeBox = $false
@@ -854,23 +855,42 @@ if ($installs.Count -eq 0) {
 
 # --- buttons ---
 $btnInstall = New-Pill "" $cPink $cPinkHi ([System.Drawing.Color]::White) $fBtn (S 12) $false
-$btnInstall.Location = New-Object System.Drawing.Point((S 28), (S 420))
+$btnInstall.Location = New-Object System.Drawing.Point((S 28), (S 480))
 $btnInstall.Size = New-Object System.Drawing.Size((S 140), (S 44))
 $form.Controls.Add($btnInstall)
 
 $btnRepair = New-Pill "" $cPanel $cPanel2 $cText $fBtn (S 12) $true
-$btnRepair.Location = New-Object System.Drawing.Point((S 178), (S 420))
+$btnRepair.Location = New-Object System.Drawing.Point((S 178), (S 480))
 $btnRepair.Size = New-Object System.Drawing.Size((S 160), (S 44))
 $form.Controls.Add($btnRepair)
 
 $btnUninstall = New-Pill "" $cPanel $cPanel2 $cRedHi $fBtn (S 12) $true
-$btnUninstall.Location = New-Object System.Drawing.Point((S 348), (S 420))
+$btnUninstall.Location = New-Object System.Drawing.Point((S 348), (S 480))
 $btnUninstall.Size = New-Object System.Drawing.Size((S 120), (S 44))
 $form.Controls.Add($btnUninstall)
 
+# --- creator code (optional referral; written to %APPDATA%\Kittycord\referral.json on install) ---
+$lblCode = New-Object System.Windows.Forms.Label
+$lblCode.AutoSize = $true
+$lblCode.BackColor = [System.Drawing.Color]::Transparent
+$lblCode.ForeColor = $cMuted
+$lblCode.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+$lblCode.Location = New-Object System.Drawing.Point((S 28), (S 420))
+$form.Controls.Add($lblCode)
+
+$txtCode = New-Object System.Windows.Forms.TextBox
+$txtCode.Location = New-Object System.Drawing.Point((S 28), (S 442))
+$txtCode.Size = New-Object System.Drawing.Size((S 440), (S 26))
+$txtCode.MaxLength = 20
+$txtCode.BackColor = $cPanel
+$txtCode.ForeColor = $cText
+$txtCode.BorderStyle = "FixedSingle"
+$txtCode.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+$form.Controls.Add($txtCode)
+
 # --- progress bar (custom painted, driven by the background worker) ---
 $progress = New-Object System.Windows.Forms.Panel
-$progress.Location = New-Object System.Drawing.Point((S 28), (S 478))
+$progress.Location = New-Object System.Drawing.Point((S 28), (S 538))
 $progress.Size = New-Object System.Drawing.Size((S 440), (S 18))
 $progress.BackColor = [System.Drawing.Color]::Transparent
 try {
@@ -920,7 +940,7 @@ $form.Controls.Add($progress)
 
 # --- status log (borderless TextBox inside a rounded card) ---
 $statusCard = New-Object System.Windows.Forms.Panel
-$statusCard.Location = New-Object System.Drawing.Point((S 28), (S 504))
+$statusCard.Location = New-Object System.Drawing.Point((S 28), (S 564))
 $statusCard.Size = New-Object System.Drawing.Size((S 440), (S 56))
 $statusCard.BackColor = [System.Drawing.Color]::Transparent
 $statusCard.Add_Paint({
@@ -953,7 +973,7 @@ $statusCard.Controls.Add($status)
 # --- artwork card (right column) ---
 $art = New-Object System.Windows.Forms.Panel
 $art.Location = New-Object System.Drawing.Point((S 496), (S 64))
-$art.Size = New-Object System.Drawing.Size((S 356), (S 496))
+$art.Size = New-Object System.Drawing.Size((S 356), (S 556))
 $art.BackColor = [System.Drawing.Color]::Transparent
 try {
     $dbProp2 = [System.Windows.Forms.Panel].GetProperty("DoubleBuffered", [System.Reflection.BindingFlags]"Instance,NonPublic")
@@ -1023,7 +1043,7 @@ $form.Controls.Add($art)
 
 # --- footer: language picker (custom pill + dark dropdown menu) + ToS note ---
 $langBtn = New-Pill "" $cPanel $cPanel2 $cText $fFoot (S 13) $true
-$langBtn.Location = New-Object System.Drawing.Point((S 28), (S 568))
+$langBtn.Location = New-Object System.Drawing.Point((S 28), (S 628))
 $langBtn.Size = New-Object System.Drawing.Size((S 118), (S 26))
 $form.Controls.Add($langBtn)
 
@@ -1052,7 +1072,7 @@ $footNote.AutoSize = $true
 $footNote.BackColor = [System.Drawing.Color]::Transparent
 $footNote.ForeColor = $cFaint
 $footNote.Font = $fFoot
-$footNote.Location = New-Object System.Drawing.Point((S 152), (S 574))
+$footNote.Location = New-Object System.Drawing.Point((S 152), (S 634))
 $form.Controls.Add($footNote)
 
 function Write-Status($msg) {
@@ -1083,6 +1103,7 @@ function Update-Language {
     $btnInstall.Tag.Text = (T "btnInstall")
     $btnRepair.Tag.Text = (T "btnRepair")
     $btnUninstall.Tag.Text = (T "btnUninstall")
+    $lblCode.Text = (T "creatorCode")
     $btnInstall.Invalidate(); $btnRepair.Invalidate(); $btnUninstall.Invalidate()
     $langBtn.Tag.Text = $script:LangNames[[array]::IndexOf($script:LangCodes, $script:Lang)] + "  " + [string][char]9662
     $langBtn.Invalidate()
@@ -1340,10 +1361,26 @@ function Start-Work($mode, $sel) {
     $script:poll.Start()
 }
 
+# Writes the optional creator code to %APPDATA%\Kittycord\referral.json (Roaming — the same data dir
+# the client reads). On the new user's first run the client claims it for the code's owner.
+function Save-CreatorCode {
+    try {
+        $code = $txtCode.Text.Trim().ToLower()
+        if ($code -match '^[a-z0-9_-]{3,20}$') {
+            $dir = Join-Path $env:APPDATA "Kittycord"
+            if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+            $ts = [int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
+            $json = '{"code":"' + $code + '","ts":' + $ts + '}'
+            Set-Content -Path (Join-Path $dir "referral.json") -Value $json -Encoding UTF8
+        }
+    } catch { }
+}
+
 $btnInstall.Add_Click({
     if (-not $btnInstall.Tag.On) { return }
     $sel = Get-Selected
     if ($sel.Count -eq 0) { Write-Status (T "selectFirst"); return }
+    Save-CreatorCode
     Set-Busy $true
     $script:doneMsg = (T "msgDoneInstall")
     Start-Work "install" $sel
