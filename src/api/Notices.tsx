@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import "./Notices.css";
+
 import ErrorBoundary from "@components/ErrorBoundary";
 import { isPrimitiveReactNode } from "@utils/react";
 import { waitFor } from "@webpack";
