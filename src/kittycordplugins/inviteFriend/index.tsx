@@ -35,7 +35,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
     const [target, setTarget] = React.useState<User | null>(user);
     const [note, setNote] = React.useState(DEFAULT_MESSAGE);
     const [myCode, setMyCode] = React.useState<string | null>(null);
-    const autoMsgRef = React.useRef(DEFAULT_MESSAGE);
+    const editedRef = React.useRef(false);
     const codePromiseRef = React.useRef<Promise<string | null> | null>(null);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [blob, setBlob] = React.useState<Blob | null>(null);
@@ -96,9 +96,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
         loadMyCode().then(code => {
             if (cancelled || !code) return;
             setMyCode(code);
-            const msg = withCodeMessage(code);
-            setNote(prev => (prev === autoMsgRef.current ? msg : prev));
-            autoMsgRef.current = msg;
+            if (!editedRef.current) setNote(withCodeMessage(code));
         });
         return () => { cancelled = true; };
     }, []);
@@ -108,7 +106,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
         setBusy(true);
         try {
             const code = await loadMyCode();
-            const message = (note === autoMsgRef.current && code ? withCodeMessage(code) : note.trim()) || DEFAULT_MESSAGE;
+            const message = (!editedRef.current && code ? withCodeMessage(code) : note.trim()) || DEFAULT_MESSAGE;
             const file = new File([blob], INVITE_FILENAME, { type: "image/png" });
             await sendFileToUser(target.id, file, message);
             showToast(`Invite sent to ${target.globalName || target.username}. 💌`, Toasts.Type.SUCCESS);
@@ -152,7 +150,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
                 )}
 
                 <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
-                <TextInput value={note} onChange={setNote} />
+                <TextInput value={note} onChange={v => { editedRef.current = true; setNote(v); }} />
                 {myCode
                     ? <Text variant="text-sm/normal" style={{ marginTop: 6, opacity: 0.8 }}>
                         Your creator code <span style={{ color: "var(--brand-500)", fontWeight: 600 }}>{myCode}</span> is included — your friend enters it in the installer (or Settings → Invites) to credit you. 💖
