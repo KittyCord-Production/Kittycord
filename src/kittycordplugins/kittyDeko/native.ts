@@ -8,7 +8,10 @@ import { IpcMainInvokeEvent } from "electron";
 
 const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
 const SNOWFLAKE_RE = /^\d{17,20}$/;
-const DEKO_IDS = new Set(["glow", "hearts", "sparkles", "stars", "ears", "crown", "bubbles"]);
+const DEKO_IDS = new Set([
+    "sakura", "galaxy", "neon", "ice", "flames", "wings", "aura", "butterfly",
+    "glow", "hearts", "sparkles", "stars", "ears", "crown", "bubbles"
+]);
 
 export interface DekoEntry {
     id: string;
