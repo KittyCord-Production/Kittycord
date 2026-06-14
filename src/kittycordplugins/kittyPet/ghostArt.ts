@@ -65,9 +65,16 @@ function toUri(viewBox: string, inner: string): string {
     return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+const uriCache = new Map<string, string>();
+
 export function buildGhostUri({ expression, accessory }: { expression: GhostExpression; accessory: string | null; }): string {
+    const key = `${expression}|${accessory ?? ""}`;
+    const cached = uriCache.get(key);
+    if (cached) return cached;
     const acc = accessory && GHOST_ACCESSORIES[accessory] ? GHOST_ACCESSORIES[accessory].svg : "";
-    return toUri("0 0 32 32", BODY + CHEEKS + eyesFor(expression) + acc);
+    const uri = toUri("0 0 32 32", BODY + CHEEKS + eyesFor(expression) + acc);
+    uriCache.set(key, uri);
+    return uri;
 }
 
 export const GHOST_ACCESSORY_THUMBS: Record<string, string> = Object.fromEntries(

@@ -40,6 +40,10 @@ export class GhostController {
     private equipped: string | null = null;
     private renderedExpr: GhostExpression | null = null;
     private renderedAcc: string | null = null;
+    private lastSize = -1;
+    private prevTX = NaN;
+    private prevTY = NaN;
+    private prevLean = "";
 
     constructor(hooks: PetHooks) {
         this.hooks = hooks;
@@ -200,10 +204,25 @@ export class GhostController {
         const targetLean = Math.max(-12, Math.min(12, dir * 0.4));
         this.lean += (targetLean - this.lean) * Math.min(1, dt * 8);
 
-        this.container.style.width = `${size}px`;
-        this.container.style.height = `${size}px`;
-        this.container.style.transform = `translate3d(${Math.round(this.x)}px, ${Math.round(this.y)}px, 0)`;
-        this.body.style.transform = `rotate(${this.lean.toFixed(1)}deg)`;
+        if (size !== this.lastSize) {
+            this.container.style.width = `${size}px`;
+            this.container.style.height = `${size}px`;
+            this.lastSize = size;
+        }
+
+        const tx = Math.round(this.x);
+        const ty = Math.round(this.y);
+        if (tx !== this.prevTX || ty !== this.prevTY) {
+            this.container.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+            this.prevTX = tx;
+            this.prevTY = ty;
+        }
+
+        const leanStr = this.lean.toFixed(1);
+        if (leanStr !== this.prevLean) {
+            this.body.style.transform = `rotate(${leanStr}deg)`;
+            this.prevLean = leanStr;
+        }
 
         const expr = this.currentExpression(performance.now());
         if (expr !== this.renderedExpr || this.equipped !== this.renderedAcc) {
