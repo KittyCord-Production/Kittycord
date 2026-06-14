@@ -32,3 +32,11 @@
     display: none !important; /* perf: nameplate backgrounds */
     background: none !important;
 }
+
+/* Ultra: maximum performance. The plugin also forces every toggle above on; this is the extra cut.
+   Note: deliberately NOT stripping `filter` globally — Discord blurs spoilers with it. */
+.kc-perf-ultra *,
+.kc-perf-ultra *::before,
+.kc-perf-ultra *::after {
+    box-shadow: none !important; /* perf: shadows cause large repaint areas */
+}

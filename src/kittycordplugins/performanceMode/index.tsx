@@ -12,14 +12,22 @@ import style from "./style.css?managed";
 
 function apply() {
     const cl = document.documentElement.classList;
-    cl.toggle("kc-perf-noanim", settings.store.noAnimations);
-    cl.toggle("kc-perf-noblur", settings.store.noBlur);
-    cl.toggle("kc-perf-nodeco", settings.store.hideAvatarDecorations);
-    cl.toggle("kc-perf-noplate", settings.store.hideNameplates);
-    cl.toggle("kc-perf-nofx", settings.store.hideProfileEffects);
+    const { ultra } = settings.store;
+    cl.toggle("kc-perf-ultra", ultra);
+    cl.toggle("kc-perf-noanim", ultra || settings.store.noAnimations);
+    cl.toggle("kc-perf-noblur", ultra || settings.store.noBlur);
+    cl.toggle("kc-perf-nodeco", ultra || settings.store.hideAvatarDecorations);
+    cl.toggle("kc-perf-noplate", ultra || settings.store.hideNameplates);
+    cl.toggle("kc-perf-nofx", ultra || settings.store.hideProfileEffects);
 }
 
 const settings = definePluginSettings({
+    ultra: {
+        type: OptionType.BOOLEAN,
+        description: "Ultra performance — turns on every optimisation below and also strips shadows for maximum FPS",
+        default: false,
+        onChange: apply
+    },
     noAnimations: {
         type: OptionType.BOOLEAN,
         description: "Turn off UI animations and transitions (big win on low-end PCs)",
@@ -54,7 +62,7 @@ const settings = definePluginSettings({
 
 export default definePlugin({
     name: "PerformanceMode",
-    description: "Make Discord lighter on low-end PCs: turn off animations, background blur and heavy per-user effects. Note: animated emoji/GIF playback is controlled by Discord's own settings.",
+    description: "Make Discord lighter on low-end PCs: turn off animations, background blur and heavy per-user effects. Flip on Ultra for maximum FPS in one click. Note: animated emoji/GIF playback is controlled by Discord's own settings.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Appearance", "Utility"],
     settings,
@@ -67,6 +75,6 @@ export default definePlugin({
     stop() {
         disableStyle(style);
         const cl = document.documentElement.classList;
-        cl.remove("kc-perf-noanim", "kc-perf-noblur", "kc-perf-nodeco", "kc-perf-noplate", "kc-perf-nofx");
+        cl.remove("kc-perf-ultra", "kc-perf-noanim", "kc-perf-noblur", "kc-perf-nodeco", "kc-perf-noplate", "kc-perf-nofx");
     }
 });
