@@ -19,7 +19,7 @@ const DeveloperBadge: ProfileBadge = {
     description: "Kittycord Developer",
     iconSrc: BRAND_ICON,
     position: BadgePosition.START,
-    link: "https://github.com/CenturyRV/Kittycord",
+    link: "https://github.com/KittyCord-Production/Kittycord",
     shouldShow: ({ userId }) => KITTYCORD_DEVELOPERS.has(userId)
 };
 

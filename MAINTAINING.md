@@ -8,7 +8,7 @@ keep getting the newest/best plugin versions automatically.
 
 | Remote     | URL                                          | Purpose                                            |
 |------------|----------------------------------------------|----------------------------------------------------|
-| `origin`   | https://github.com/CenturyRV/Kittycord.git   | Where Kittycord is published                         |
+| `origin`   | https://github.com/KittyCord-Production/Kittycord.git   | Where Kittycord is published                         |
 | `equicord` | https://github.com/Equicord/Equicord.git     | Primary upstream (already contains all of Vencord)  |
 | `vencord`  | https://github.com/Vendicated/Vencord.git    | Reference / optional direct cherry-picks            |
 

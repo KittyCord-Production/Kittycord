@@ -34,7 +34,7 @@ installed, not launched yet, Store version, or no internet).
 ![Kittycord Installer](preview.png)
 
 Download **`Kittycord-Installer.exe`** from the
-[latest release](https://github.com/CenturyRV/Kittycord/releases/latest), run it (Administrator is
+[latest release](https://github.com/KittyCord-Production/Kittycord/releases/latest), run it (Administrator is
 not needed), pick your Discord install and click **Install**, then start Discord. The graphical installer
 downloads the latest build and patches Discord (and cleanly takes over an install that another mod
 patched). It is produced automatically by [.github/workflows/release.yml](../.github/workflows/release.yml).

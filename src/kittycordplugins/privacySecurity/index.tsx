@@ -15,7 +15,7 @@ import { Button, React, Text } from "@webpack/common";
 
 import style from "./style.css?managed";
 
-const REPO = "https://github.com/CenturyRV/Kittycord";
+const REPO = "https://github.com/KittyCord-Production/Kittycord";
 const open = (url: string) => VencordNative.native.openExternal(url);
 
 interface ConsentBridge {

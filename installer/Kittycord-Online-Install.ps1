@@ -14,7 +14,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$Repo       = "CenturyRV/Kittycord"
+$Repo       = "KittyCord-Production/Kittycord"
 $AsarUrl    = "https://github.com/$Repo/releases/latest/download/desktop.asar"
 $InstallDir = Join-Path $env:LOCALAPPDATA "Kittycord"
 $AsarPath   = Join-Path $InstallDir "desktop.asar"

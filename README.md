@@ -4,12 +4,12 @@
   </a>
   <p><b>The cutest Discord client mod — plugins, themes and a whole lot of pink.</b></p>
   <p>
-    <a href="https://github.com/CenturyRV/Kittycord/stargazers"><img src="https://img.shields.io/github/stars/CenturyRV/Kittycord?style=for-the-badge&logo=github&label=stars&color=FF5FA6&labelColor=1f141b" alt="Stars"></a>
-    <a href="https://github.com/CenturyRV/Kittycord/commits/main"><img src="https://img.shields.io/github/last-commit/CenturyRV/Kittycord?style=for-the-badge&label=updated&color=FF8AC4&labelColor=1f141b" alt="Last commit"></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/github/license/CenturyRV/Kittycord?style=for-the-badge&color=FF8AC4&labelColor=1f141b" alt="License"></a>
+    <a href="https://github.com/KittyCord-Production/Kittycord/stargazers"><img src="https://img.shields.io/github/stars/KittyCord-Production/Kittycord?style=for-the-badge&logo=github&label=stars&color=FF5FA6&labelColor=1f141b" alt="Stars"></a>
+    <a href="https://github.com/KittyCord-Production/Kittycord/commits/main"><img src="https://img.shields.io/github/last-commit/KittyCord-Production/Kittycord?style=for-the-badge&label=updated&color=FF8AC4&labelColor=1f141b" alt="Last commit"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/github/license/KittyCord-Production/Kittycord?style=for-the-badge&color=FF8AC4&labelColor=1f141b" alt="License"></a>
   </p>
   <p>
-    <a href="https://github.com/CenturyRV/Kittycord/releases/latest"><b>⬇️ Download</b></a>
+    <a href="https://github.com/KittyCord-Production/Kittycord/releases/latest"><b>⬇️ Download</b></a>
     &nbsp;·&nbsp;
     <a href="https://kittycord.dev"><b>🐾 kittycord.dev</b></a>
     &nbsp;·&nbsp;
@@ -43,7 +43,7 @@ features to Discord while keeping it lightweight and privacy-friendly.
 > [discord.com](https://discord.com/download) (launched once), and an internet connection.
 > Nothing extra to install — everything the installer needs ships with Windows.
 
-1. **Download** [`Kittycord-Installer.exe`](https://github.com/CenturyRV/Kittycord/releases/latest)
+1. **Download** [`Kittycord-Installer.exe`](https://github.com/KittyCord-Production/Kittycord/releases/latest)
    from the latest release.
 2. **Run it**, pick your Discord install and click **Install**. (Windows SmartScreen may warn
    because the exe is unsigned — click **"More info" → "Run anyway"**.)
@@ -114,7 +114,7 @@ npm i -g pnpm
 Clone Kittycord:
 
 ```shell
-git clone https://github.com/CenturyRV/Kittycord
+git clone https://github.com/KittyCord-Production/Kittycord
 cd Kittycord
 ```
 

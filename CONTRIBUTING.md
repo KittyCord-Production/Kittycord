@@ -16,7 +16,7 @@ Contributions are submitted through pull requests. If you are new to Git or GitH
 
 Pull requests can be made to the `main` branch.
 
-Before working on a major change, we highly recommend opening an [issue](https://github.com/CenturyRV/Kittycord/issues) for it first, so it can be discussed before you invest time. This saves you a lot of time in case your feature is considered too niche or rejected for any other reason.
+Before working on a major change, we highly recommend opening an [issue](https://github.com/KittyCord-Production/Kittycord/issues) for it first, so it can be discussed before you invest time. This saves you a lot of time in case your feature is considered too niche or rejected for any other reason.
 
 ## Writing a Plugin
 
@@ -25,7 +25,7 @@ Developing a plugin is the primary way to contribute. Kittycord's own plugins li
 Before starting your plugin:
 
 - Consider if this plugin would be useful to a large portion of the userbase. We do not accept niche plugins.
-- Check existing pull requests and [issues](https://github.com/CenturyRV/Kittycord/issues) to see if someone is already working on a similar plugin, or if your idea was already requested or rejected.
+- Check existing pull requests and [issues](https://github.com/KittyCord-Production/Kittycord/issues) to see if someone is already working on a similar plugin, or if your idea was already requested or rejected.
 - If no request exists, open one and clearly state that you want to work on it yourself.
 - Wait for feedback before starting development, as some ideas may not be accepted or may need adjustments.
 - Familiarise yourself with the plugin rules below to ensure your plugin is not rejected.
@@ -53,10 +53,10 @@ To keep Kittycord stable, secure and maintainable, all plugins must follow these
 
 ## Improving Kittycord Itself
 
-If you want to improve Kittycord beyond plugins, such as internal features or performance improvements, you are welcome to open an [issue](https://github.com/CenturyRV/Kittycord/issues) so it can be discussed.
+If you want to improve Kittycord beyond plugins, such as internal features or performance improvements, you are welcome to open an [issue](https://github.com/KittyCord-Production/Kittycord/issues) so it can be discussed.
 
 Bug fixes, refactors, and documentation improvements are also highly appreciated!
 
 ## Helping the Community
 
-Helping out other users in the repository's [issues](https://github.com/CenturyRV/Kittycord/issues) and [discussions](https://github.com/CenturyRV/Kittycord/discussions) is always appreciated! The more, the merrier.
+Helping out other users in the repository's [issues](https://github.com/KittyCord-Production/Kittycord/issues) and [discussions](https://github.com/KittyCord-Production/Kittycord/discussions) is always appreciated! The more, the merrier.

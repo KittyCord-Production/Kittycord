@@ -2,10 +2,10 @@
 // @name            Kittycord
 // @description     A Discord client mod - Web version
 // @version         %version%
-// @author          Kittycord (https://github.com/CenturyRV)
-// @namespace       https://github.com/CenturyRV/Kittycord
-// @supportURL      https://github.com/CenturyRV/Kittycord
-// @icon            https://raw.githubusercontent.com/CenturyRV/Kittycord/refs/heads/main/browser/icon.png
+// @author          Kittycord (https://github.com/KittyCord-Production)
+// @namespace       https://github.com/KittyCord-Production/Kittycord
+// @supportURL      https://github.com/KittyCord-Production/Kittycord
+// @icon            https://raw.githubusercontent.com/KittyCord-Production/Kittycord/refs/heads/main/browser/icon.png
 // @license         GPL-3.0
 // @match           *://*.discord.com/*
 // @grant           GM_xmlhttpRequest

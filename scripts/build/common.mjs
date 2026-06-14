@@ -240,7 +240,7 @@ export const gitRemotePlugin = {
                 } catch {
                     // No `origin` configured yet (fresh Kittycord fork). Fall back so the build still succeeds;
                     // once the Kittycord repo exists, run `git remote add origin <url>` and it is picked up automatically.
-                    remote = "CenturyRV/Kittycord";
+                    remote = "KittyCord-Production/Kittycord";
                 }
             }
 
