@@ -5,24 +5,14 @@
  */
 
 import { buildGhostUri, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
+import { PetConfig, PetHooks } from "./pet";
 
-export interface GhostConfig {
-    size: number;
-    lag: number;
-    reactions: boolean;
-}
-
-export interface GhostHooks {
-    getConfig(): GhostConfig;
-    onPet(): void;
-}
-
-const SLEEP_MS = 12000;
 const BLINK_MIN = 3000;
 const BLINK_MAX = 6500;
+const SLEEP_AFTER = 18000;
 
 export class GhostController {
-    private hooks: GhostHooks;
+    private hooks: PetHooks;
     private container: HTMLDivElement;
     private bob: HTMLDivElement;
     private body: HTMLImageElement;
@@ -30,26 +20,28 @@ export class GhostController {
 
     private x = 0;
     private y = 0;
-    private cursorX = 0;
-    private cursorY = 0;
+    private targetX = 0;
+    private targetY = 0;
     private lean = 0;
     private lastFrame = 0;
-    private lastMoveAt = 0;
+    private lastMeasure = 0;
+    private state: "idle" | "fly" = "idle";
+    private idleSince = 0;
+    private nextHopAt = 0;
+    private sleeping = false;
     private nextBlinkAt = 0;
     private blinkUntil = 0;
     private temp: GhostExpression | null = null;
     private tempUntil = 0;
+    private minX = 8;
+    private maxX = 300;
+    private minY = 8;
+    private maxY = 300;
     private equipped: string | null = null;
     private renderedExpr: GhostExpression | null = null;
     private renderedAcc: string | null = null;
 
-    private onMove = (e: MouseEvent) => {
-        this.cursorX = e.clientX;
-        this.cursorY = e.clientY;
-        this.lastMoveAt = performance.now();
-    };
-
-    constructor(hooks: GhostHooks) {
+    constructor(hooks: PetHooks) {
         this.hooks = hooks;
         this.container = document.createElement("div");
         this.container.className = "kc-ghost";
@@ -60,18 +52,20 @@ export class GhostController {
         this.body.alt = "";
         this.bob.appendChild(this.body);
         this.container.appendChild(this.bob);
+        this.container.addEventListener("click", () => this.pet());
     }
 
     start() {
-        this.x = window.innerWidth / 2;
-        this.y = window.innerHeight / 2;
-        this.cursorX = this.x;
-        this.cursorY = this.y;
+        this.measure();
+        this.x = (this.minX + this.maxX) / 2;
+        this.y = (this.minY + this.maxY) / 2;
+        this.targetX = this.x;
+        this.targetY = this.y;
         const now = performance.now();
         this.lastFrame = now;
-        this.lastMoveAt = now;
+        this.idleSince = now;
+        this.nextHopAt = now + 800;
         this.nextBlinkAt = now + BLINK_MIN;
-        document.addEventListener("mousemove", this.onMove, { passive: true, capture: true });
         document.body.appendChild(this.container);
         this.loop();
     }
@@ -79,7 +73,6 @@ export class GhostController {
     stop() {
         if (this.raf !== null) cancelAnimationFrame(this.raf);
         this.raf = null;
-        document.removeEventListener("mousemove", this.onMove, { capture: true } as any);
         this.container.remove();
     }
 
@@ -89,8 +82,8 @@ export class GhostController {
 
     react(kind: "mention" | "message" | "typing") {
         if (!this.hooks.getConfig().reactions) return;
+        this.sleeping = false;
         if (kind === "mention") {
-            this.lastMoveAt = performance.now();
             this.setTemp("happy", 1500);
             this.spawnHearts();
         } else {
@@ -99,7 +92,7 @@ export class GhostController {
     }
 
     pet() {
-        this.lastMoveAt = performance.now();
+        this.sleeping = false;
         this.setTemp("happy", 1600);
         this.spawnHearts();
         this.hooks.onPet();
@@ -117,6 +110,27 @@ export class GhostController {
         } catch { /* never break the client over the ghost */ }
     };
 
+    private measure() {
+        const { size } = this.hooks.getConfig();
+        const area = document.querySelector('main[class*="chatContent"]')
+            ?? document.querySelector('[class*="channelTextArea"]')
+            ?? document.querySelector('[class*="app-"]');
+        if (area) {
+            const rect = area.getBoundingClientRect();
+            if (rect.width > size * 3 && rect.height > size * 3) {
+                this.minX = rect.left + 8;
+                this.maxX = rect.right - size - 8;
+                this.minY = rect.top + 8;
+                this.maxY = rect.bottom - size - 8;
+                return;
+            }
+        }
+        this.minX = 8;
+        this.maxX = Math.max(8, window.innerWidth - size - 8);
+        this.minY = 8;
+        this.maxY = Math.max(8, window.innerHeight - size - 8);
+    }
+
     private frame() {
         const now = performance.now();
         const dt = Math.min(0.1, (now - this.lastFrame) / 1000);
@@ -130,27 +144,68 @@ export class GhostController {
         this.container.style.display = "";
 
         const cfg = this.hooks.getConfig();
+        if (now - this.lastMeasure > 1000) {
+            this.measure();
+            this.lastMeasure = now;
+        }
+        this.advance(cfg, now, dt);
+        this.render(cfg, dt);
+    }
+
+    private advance(cfg: PetConfig, now: number, dt: number) {
+        if (this.state === "fly") {
+            const rate = 2.4 * cfg.speed;
+            const k = 1 - Math.exp(-rate * dt);
+            this.x += (this.targetX - this.x) * k;
+            this.y += (this.targetY - this.y) * k;
+            if (Math.hypot(this.targetX - this.x, this.targetY - this.y) < 3) {
+                this.x = this.targetX;
+                this.y = this.targetY;
+                this.state = "idle";
+                this.idleSince = now;
+                this.nextHopAt = now + 1200 + Math.random() * 2600;
+            }
+            return;
+        }
+
+        if (this.sleeping) {
+            if (Math.random() < dt * 0.06) {
+                this.sleeping = false;
+                this.idleSince = now;
+                this.nextHopAt = now + 600;
+            }
+            return;
+        }
+
+        if (now < this.nextHopAt) return;
+
+        const r = Math.random();
+        if (cfg.sleepWhenIdle && now - this.idleSince > SLEEP_AFTER && r < 0.3) {
+            this.sleeping = true;
+        } else if (r < 0.85) {
+            this.targetX = this.minX + Math.random() * Math.max(0, this.maxX - this.minX);
+            this.targetY = this.minY + Math.random() * Math.max(0, this.maxY - this.minY);
+            this.state = "fly";
+        } else {
+            this.nextHopAt = now + 1000 + Math.random() * 2000;
+        }
+    }
+
+    private render(cfg: PetConfig, dt: number) {
         const { size } = cfg;
-        const rate = 14 / Math.max(0.5, cfg.lag);
-        const k = 1 - Math.exp(-rate * dt);
+        this.x = Math.min(Math.max(this.x, this.minX), this.maxX);
+        this.y = Math.min(Math.max(this.y, this.minY), this.maxY);
 
-        const targetX = this.cursorX - size / 2;
-        const targetY = this.cursorY - size / 2 - 6;
-        const prevX = this.x;
-        this.x += (targetX - this.x) * k;
-        this.y += (targetY - this.y) * k;
-        this.x = Math.min(Math.max(this.x, 0), window.innerWidth - size);
-        this.y = Math.min(Math.max(this.y, 0), window.innerHeight - size);
-
-        const targetLean = Math.max(-12, Math.min(12, (this.x - prevX) * 1.6));
-        this.lean += (targetLean - this.lean) * Math.min(1, dt * 10);
+        const dir = this.state === "fly" ? this.targetX - this.x : 0;
+        const targetLean = Math.max(-12, Math.min(12, dir * 0.4));
+        this.lean += (targetLean - this.lean) * Math.min(1, dt * 8);
 
         this.container.style.width = `${size}px`;
         this.container.style.height = `${size}px`;
         this.container.style.transform = `translate3d(${Math.round(this.x)}px, ${Math.round(this.y)}px, 0)`;
         this.body.style.transform = `rotate(${this.lean.toFixed(1)}deg)`;
 
-        const expr = this.currentExpression(now);
+        const expr = this.currentExpression(performance.now());
         if (expr !== this.renderedExpr || this.equipped !== this.renderedAcc) {
             this.body.src = buildGhostUri({ expression: expr, accessory: this.equipped });
             this.renderedExpr = expr;
@@ -161,7 +216,7 @@ export class GhostController {
     private currentExpression(now: number): GhostExpression {
         if (this.temp && now < this.tempUntil) return this.temp;
         this.temp = null;
-        if (now - this.lastMoveAt > SLEEP_MS) return "sleep";
+        if (this.sleeping) return "sleep";
         if (now >= this.nextBlinkAt) {
             this.blinkUntil = now + 130;
             this.nextBlinkAt = now + BLINK_MIN + Math.random() * (BLINK_MAX - BLINK_MIN);

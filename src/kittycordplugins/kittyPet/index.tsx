@@ -45,16 +45,9 @@ const settings = definePluginSettings({
     },
     speed: {
         type: OptionType.SLIDER,
-        description: "How fast the cat walks (cat style)",
+        description: "How fast your pet moves around",
         markers: [0.5, 1, 1.5, 2, 3],
         default: 1,
-        stickToMarkers: true
-    },
-    lag: {
-        type: OptionType.SLIDER,
-        description: "How lazily the ghost trails your cursor (ghost style)",
-        markers: [1, 2, 3, 4, 5],
-        default: 3,
         stickToMarkers: true
     },
     reactions: {
@@ -77,25 +70,15 @@ function onPet() {
 }
 
 function buildController(): PetController | GhostController {
-    if (settings.store.style === "ghost") {
-        return new GhostController({
-            getConfig: () => ({
-                size: settings.store.size,
-                lag: settings.store.lag,
-                reactions: settings.store.reactions
-            }),
-            onPet
-        });
-    }
-    return new PetController({
-        getConfig: () => ({
-            size: settings.store.size,
-            speed: settings.store.speed,
-            reactions: settings.store.reactions,
-            sleepWhenIdle: settings.store.sleepWhenIdle
-        }),
-        onPet
+    const getConfig = () => ({
+        size: settings.store.size,
+        speed: settings.store.speed,
+        reactions: settings.store.reactions,
+        sleepWhenIdle: settings.store.sleepWhenIdle
     });
+    return settings.store.style === "ghost"
+        ? new GhostController({ getConfig, onPet })
+        : new PetController({ getConfig, onPet });
 }
 
 function startController() {
@@ -132,11 +115,6 @@ function PetModal({ rootProps }: { rootProps: any; }) {
         forceUpdate();
     }
 
-    function pet() {
-        controller?.pet();
-        forceUpdate();
-    }
-
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
@@ -150,17 +128,11 @@ function PetModal({ rootProps }: { rootProps: any; }) {
                         <div style={{ height: "100%", width: `${Math.round(progress * 100)}%`, borderRadius: 999, background: "linear-gradient(90deg, #ff5fa6, #ff8ac4)" }} />
                     </div>
                     <Text variant="text-sm/normal" style={{ opacity: 0.8 }}>
-                        {next === null ? "Fully grown — what a good kitty." : `${save.xp} / ${next} XP — pet your kitty and chat to level up.`}
+                        {next === null ? "Fully grown — what a good kitty." : `${save.xp} / ${next} XP — click your pet and chat to level up.`}
                     </Text>
                     <Text variant="text-sm/normal" style={{ opacity: 0.8, marginTop: 4 }}>
                         Petted {save.pets} time{save.pets === 1 ? "" : "s"}.
                     </Text>
-
-                    {isGhost && (
-                        <Flex style={{ marginTop: 12 }}>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={pet}>Pet the ghost</Button>
-                        </Flex>
-                    )}
 
                     <Text variant="heading-md/semibold" style={{ marginTop: 16, marginBottom: 8 }}>Accessories</Text>
                     <Flex style={{ gap: 8, flexWrap: "wrap" }}>
@@ -198,7 +170,7 @@ function PetModal({ rootProps }: { rootProps: any; }) {
 
 export default definePlugin({
     name: "KittyPet",
-    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost that floats along and follows your cursor. It reacts to pings, can be petted, and levels up to unlock accessories.",
+    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost that drifts around the screen on its own. It reacts to pings, can be petted, and levels up to unlock accessories.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Fun", "Customisation"],
     settings,
