@@ -27,6 +27,7 @@ const FEATURES: Feature[] = [
     { plugin: "KittyPet", action: "Open KittyPet", label: "KittyPet" },
     { plugin: "MiniGames", action: "Start a game", label: "Play a game" },
     { plugin: "KittycordWrapped", action: "Open Kittycord Wrapped", label: "Wrapped" },
+    { plugin: "ShareSetup", action: "Open Kittycord friends", label: "Kittycord friends" },
     { plugin: "ShareSetup", action: "Share setup with a friend", label: "Share setup" },
     { plugin: "InviteFriend", action: "Invite a friend", label: "Invite a friend" },
     { plugin: "Onboarding", action: "Run setup wizard", label: "Setup wizard" }

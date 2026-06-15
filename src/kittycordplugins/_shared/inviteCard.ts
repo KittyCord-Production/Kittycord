@@ -5,7 +5,7 @@
  */
 
 import { BRAND_ICON } from "../../branding";
-import { canvasToBlob, COL, drawDiamond, drawGlow, drawSparkle, FONT, loadImage, roundRectPath, wrapText } from "../_shared/canvasKit";
+import { canvasToBlob, COL, drawDiamond, drawGlow, drawSparkle, FONT, loadImage, roundRectPath, wrapText } from "./canvasKit";
 
 const WIDTH = 1200;
 const HEIGHT = 630;

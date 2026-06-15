@@ -1,0 +1,220 @@
+/*
+ * Kittycord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/* Controlled Kittycord pink everywhere (not theme brand vars, which some themes turn into a loud fill). */
+
+.kc-fr-modalbody {
+    padding: 14px 0 2px;
+}
+
+.kc-fr-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    border: 1px solid #402835;
+    background:
+        radial-gradient(120% 160% at 0% 0%, rgb(255 95 166 / 22%), transparent 58%),
+        linear-gradient(135deg, #301e28, #21151c);
+}
+
+.kc-fr-hero::after {
+    content: "";
+    position: absolute;
+    right: -34px;
+    top: -34px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 138 196 / 20%), transparent 70%);
+    pointer-events: none;
+}
+
+.kc-fr-hero-cat {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgb(255 95 166 / 40%);
+}
+
+.kc-fr-hero-title {
+    font-weight: 800;
+    font-size: 21px;
+    line-height: 1.1;
+    color: #ff8ac4;
+}
+
+.kc-fr-hero-sub {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+.kc-fr-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 4px 8px;
+}
+
+.kc-fr-section-title {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.kc-fr-pill-count {
+    font-weight: 800;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: #ff8ac4;
+    background: var(--background-tertiary);
+    padding: 2px 10px;
+    border-radius: 999px;
+}
+
+.kc-fr-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 2px;
+}
+
+.kc-fr-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--background-secondary);
+    transition: transform .12s ease, background .12s ease;
+}
+
+.kc-fr-row:hover {
+    background: var(--background-modifier-hover, var(--background-secondary-alt));
+    transform: translateX(2px);
+}
+
+.kc-fr-row-online {
+    background: linear-gradient(90deg, rgb(255 95 166 / 12%), var(--background-secondary) 58%);
+}
+
+.kc-fr-av {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+.kc-fr-av img {
+    display: block;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--background-tertiary);
+}
+
+.kc-fr-av-online img { box-shadow: 0 0 0 2px #23a55a; }
+.kc-fr-av-idle img { box-shadow: 0 0 0 2px #f0b232; }
+.kc-fr-av-dnd img { box-shadow: 0 0 0 2px #f23f43; }
+.kc-fr-av-streaming img { box-shadow: 0 0 0 2px #593695; }
+
+.kc-fr-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.kc-fr-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--header-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kc-fr-status {
+    margin-top: 1px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.kc-fr-acts {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.kc-fr-btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    transition: background .12s ease, transform .1s ease, box-shadow .12s ease, color .12s ease;
+}
+
+.kc-fr-btn:active {
+    transform: translateY(1px);
+}
+
+.kc-fr-btn-ghost {
+    background: var(--background-tertiary);
+    color: var(--text-normal);
+}
+
+.kc-fr-btn-ghost:hover {
+    background: rgb(255 95 166 / 16%);
+    color: #ff8ac4;
+}
+
+.kc-fr-btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
+    box-shadow: 0 2px 8px rgb(255 95 166 / 35%);
+}
+
+.kc-fr-btn-primary:hover {
+    box-shadow: 0 4px 14px rgb(255 95 166 / 50%);
+}
+
+.kc-fr-link {
+    margin-top: 12px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.kc-fr-link:hover {
+    color: #ff8ac4;
+    text-decoration: underline;
+}
+
+.kc-fr-empty,
+.kc-fr-consent {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--background-secondary);
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.kc-fr-empty {
+    text-align: center;
+}

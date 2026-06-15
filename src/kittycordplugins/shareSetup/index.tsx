@@ -6,19 +6,25 @@
 
 import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
+import { disableStyle, enableStyle } from "@api/Styles";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
+import { UserIcon } from "@components/Icons";
 import { ErrorBoundary } from "@components/index";
+import SettingsPlugin from "@plugins/_core/settings";
 import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
+import { removeFromArray } from "@utils/misc";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Message, MessageAttachment, User } from "@vencord/discord-types";
-import { Alerts, Button, Forms, IconUtils, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, Forms, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
+import { FriendsListModal, KittycordFriendsRoster, KittycordFriendsTab, useKittycordFriends } from "./friends";
+import { getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
+import style from "./style.css?managed";
 import { applyShare, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -185,51 +191,15 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
 
 const ImportCard = ErrorBoundary.wrap(ImportCardInner, { noop: true });
 
-type FriendsPhase = "loading" | "needConsent" | "disabled" | "ready";
-
 function FriendsModal({ rootProps }: { rootProps: any; }) {
-    const [phase, setPhase] = React.useState<FriendsPhase>("loading");
-    const [friends, setFriends] = React.useState<User[]>([]);
+    const { phase, friends, reload, setPhase, setFriends } = useKittycordFriends();
     const [scope, setScope] = React.useState<ShareScope>("plugins");
     const [note, setNote] = React.useState("Here's my Kittycord setup — open it in Kittycord to import.");
 
-    async function loadFriends() {
-        setPhase("loading");
-        await registerSelf();
-        const ids = await getKittycordFriendIds();
-        setFriends(ids.map(id => UserStore.getUser(id)).filter((u): u is User => Boolean(u)));
-        setPhase("ready");
-    }
-
-    React.useEffect(() => {
-        (async () => {
-            const { consent, endpointConfigured } = await getShareConsent();
-            if (!endpointConfigured) return setPhase("disabled");
-            if (consent !== false) return loadFriends();
-            setPhase("needConsent");
-        })();
-    }, []);
-
-    function askConsent() {
-        Alerts.show({
-            title: "Find friends who use Kittycord?",
-            body: (
-                <div style={{ textAlign: "left" }}>
-                    <Text variant="text-md/normal">
-                        To show which of your friends use Kittycord, your friend list is sent to the Kittycord server, which replies with the ones that have it.
-                    </Text>
-                    <Text variant="text-sm/normal" style={{ marginTop: 8, opacity: 0.8 }}>
-                        The server only ever stores a salted hash of each opted-in user's id — never your friend list, your token, or any messages. You can turn this off anytime.
-                    </Text>
-                </div>
-            ),
-            confirmText: "Enable & find friends",
-            cancelText: "Not now",
-            onConfirm: async () => {
-                await setShareConsent(true);
-                await loadFriends();
-            }
-        });
+    async function stopDiscoverable() {
+        await setShareConsent(false);
+        setFriends([]);
+        setPhase("needConsent");
     }
 
     async function sendTo(user: User) {
@@ -254,45 +224,15 @@ function FriendsModal({ rootProps }: { rootProps: any; }) {
                 <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 4px" }}>Your Kittycord friends</Text>
-                {phase === "loading" && <Text variant="text-sm/normal" style={{ opacity: 0.7 }}>Looking…</Text>}
-                {phase === "disabled" && (
-                    <Text variant="text-sm/normal" style={{ opacity: 0.7 }}>
-                        Friend discovery isn't available here. You can still right-click any friend and choose “Send my Kittycord setup”.
-                    </Text>
-                )}
-                {phase === "needConsent" && (
-                    <>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.8, marginBottom: 8 }}>
-                            See which of your friends use Kittycord and send to them in one click.
-                        </Text>
-                        <Button color={Button.Colors.BRAND} onClick={askConsent}>Find my Kittycord friends</Button>
-                    </>
-                )}
-                {phase === "ready" && friends.length === 0 && (
-                    <Text variant="text-sm/normal" style={{ opacity: 0.7 }}>
-                        None of your friends are registered yet. Tell them to enable this in Kittycord!
-                    </Text>
-                )}
-                {phase === "ready" && friends.map(user => (
-                    <Flex key={user.id} style={{ alignItems: "center", gap: 10, padding: "6px 0" }}>
-                        <img src={IconUtils.getUserAvatarURL(user)} width={28} height={28} style={{ borderRadius: "50%" }} alt="" />
-                        <Text variant="text-md/normal" style={{ flex: 1 }}>{user.globalName || user.username}</Text>
-                        <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={() => sendTo(user)}>Send</Button>
-                    </Flex>
-                ))}
-                {phase === "ready" && (
-                    <div style={{ marginTop: 12 }}>
-                        <Button
-                            size={Button.Sizes.SMALL}
-                            look={Button.Looks.LINK}
-                            color={Button.Colors.PRIMARY}
-                            onClick={async () => { await setShareConsent(false); setFriends([]); setPhase("needConsent"); }}
-                        >
-                            Stop being discoverable
-                        </Button>
-                    </div>
-                )}
+                <KittycordFriendsRoster
+                    phase={phase}
+                    friends={friends}
+                    reload={reload}
+                    onStopDiscoverable={stopDiscoverable}
+                    renderActions={user => (
+                        <button className="kc-fr-btn kc-fr-btn-primary" onClick={() => sendTo(user)}>Send</button>
+                    )}
+                />
             </ModalContent>
         </ModalRoot>
     );
@@ -309,6 +249,9 @@ export default definePlugin({
     toolboxActions: {
         "Share setup with a friend"() {
             openModal(props => <FriendsModal rootProps={props} />);
+        },
+        "Open Kittycord friends"() {
+            openModal(props => <FriendsListModal rootProps={props} />);
         }
     },
 
@@ -333,11 +276,24 @@ export default definePlugin({
     },
 
     async start() {
+        enableStyle(style);
+        SettingsPlugin.customEntries.push({
+            key: "kittycord_friends",
+            title: "Kittycord Friends",
+            panelTitle: "Kittycord Friends",
+            Component: KittycordFriendsTab,
+            Icon: UserIcon
+        });
         try {
             const { consent } = await getShareConsent();
             if (consent !== false) await enableFriendDiscovery();
         } catch (e) {
             logger.error("friend discovery init failed", e);
         }
+    },
+
+    stop() {
+        removeFromArray(SettingsPlugin.customEntries, e => e.key === "kittycord_friends");
+        disableStyle(style);
     }
 });
