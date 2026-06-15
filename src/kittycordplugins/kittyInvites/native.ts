@@ -33,16 +33,7 @@ function referralPaths(): string[] {
     return paths;
 }
 
-function hasTelemetryConsent(): boolean {
-    try {
-        return JSON.parse(readFileSync(join(DATA_DIR, "telemetry.json"), "utf-8"))?.consent === true;
-    } catch {
-        return false;
-    }
-}
-
 export async function consumeReferralCode(_: IpcMainInvokeEvent): Promise<string | null> {
-    if (!hasTelemetryConsent()) return null;
     for (const path of referralPaths()) {
         try {
             const code = JSON.parse(readFileSync(path, "utf-8"))?.code;
