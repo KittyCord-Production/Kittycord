@@ -18,13 +18,13 @@ import {
 } from "@components/settings";
 import { gitHashShort } from "@shared/vencordUserAgent";
 import { Devs } from "@utils/constants";
-
-import { BRAND_NAME } from "../../branding";
 import { isTruthy } from "@utils/guards";
 import definePlugin, { IconProps, OptionType } from "@utils/types";
 import { waitFor } from "@webpack";
 import { React } from "@webpack/common";
 import type { ComponentType, PropsWithChildren, ReactNode } from "react";
+
+import { BRAND_NAME } from "../../branding";
 
 const enum LayoutType {
     ROOT = 0,
@@ -90,6 +90,7 @@ interface EntryOptions {
     panelTitle?: string;
     Component: ComponentType<{}>;
     Icon: ComponentType<IconProps>;
+    pinned?: boolean;
 }
 
 interface SettingsLayoutBuilder {
@@ -191,6 +192,9 @@ export default definePlugin({
 
         const { buildEntry } = this;
 
+        const pinnedEntries = this.customEntries.filter(e => e.pinned);
+        const restEntries = this.customEntries.filter(e => !e.pinned);
+
         const equicordEntries: SettingsLayoutNode[] = [
             buildEntry({
                 key: "equicord_main",
@@ -199,6 +203,7 @@ export default definePlugin({
                 Component: VencordTab,
                 Icon: MainSettingsIcon
             }),
+            ...pinnedEntries.map(buildEntry),
             buildEntry({
                 key: "equicord_plugins",
                 title: "Plugins",
@@ -243,7 +248,7 @@ export default definePlugin({
                 Component: PatchHelperTab,
                 Icon: PatchHelperIcon
             }),
-            ...this.customEntries.map(buildEntry)
+            ...restEntries.map(buildEntry)
         ].filter(isTruthy);
 
         const equicordSection: SettingsLayoutNode = {

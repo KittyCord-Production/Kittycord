@@ -99,7 +99,8 @@ export default definePlugin({
             title: "Privacy & Security",
             panelTitle: "Privacy & Security",
             Component: PrivacyTab,
-            Icon: ShieldIcon
+            Icon: ShieldIcon,
+            pinned: true
         });
     },
 
