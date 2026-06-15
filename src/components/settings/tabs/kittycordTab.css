@@ -1,0 +1,93 @@
+/*
+ * Kittycord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/* Kittycord settings skin — clean and premium with restrained pink accents.
+   Scoped to .vc-settings-tab so it never touches Discord's own settings pages,
+   and only uses our own stable vc-* classes (no fragile hashed Discord selectors). */
+
+.vc-settings-tab .vc-addon-card {
+    min-width: 0;
+    border-radius: 11px;
+    border: 1px solid rgb(255 95 166 / 11%);
+    background:
+        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
+        var(--background-base-lower-alt, var(--card-background-default));
+}
+
+.vc-settings-tab .vc-addon-card:hover {
+    border-color: rgb(255 95 166 / 28%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 28%);
+}
+
+section.vc-settings-tab .vc-plugins-info-card,
+section.vc-settings-tab .vc-plugin-stats {
+    border-radius: 13px !important;
+    border: 1px solid rgb(255 95 166 / 11%) !important;
+    background:
+        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
+        var(--background-base-lower-alt, var(--background-secondary)) !important;
+}
+
+section.vc-settings-tab .vc-plugin-stats {
+    position: relative;
+}
+
+section.vc-settings-tab .vc-plugin-stats::before {
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 14px;
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #ff5fa6, transparent);
+}
+
+section.vc-settings-tab .vc-plugin-stats-card-divider {
+    border-left-color: rgb(255 95 166 / 18%);
+}
+
+section.vc-settings-tab .vc-plugins-info-card:hover,
+section.vc-settings-tab .vc-plugin-stats:hover {
+    border-color: rgb(255 95 166 / 24%) !important;
+    background:
+        linear-gradient(160deg, rgb(255 95 166 / 9%), rgb(255 95 166 / 3%)),
+        linear-gradient(0deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 12%)),
+        var(--background-base-low, var(--background-secondary)) !important;
+}
+
+section.vc-settings-tab .vc-plugin-ui-elements-button {
+    margin-top: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgb(255 95 166 / 11%);
+    background:
+        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
+        var(--background-base-lower-alt, var(--background-secondary));
+}
+
+section.vc-settings-tab .vc-plugin-ui-elements-button:hover {
+    border-color: rgb(255 95 166 / 28%);
+    background:
+        linear-gradient(160deg, rgb(255 95 166 / 9%), rgb(255 95 166 / 3%)),
+        linear-gradient(0deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 12%)),
+        var(--background-base-low, var(--background-secondary));
+}
+
+/* The signature pop: enabled plugin toggles turn Kittycord pink. */
+.vc-settings-tab .vc-switch-checked .vc-switch-indicator {
+    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
+    border-color: #ff5fa6;
+}
+
+.vc-settings-tab .vc-switch-checked:hover .vc-switch-indicator {
+    background: linear-gradient(135deg, #ff4f9c, #ff7ab8);
+    border-color: #ff8ac4;
+}
