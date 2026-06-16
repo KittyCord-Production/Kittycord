@@ -23,10 +23,10 @@ const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("InviteFriend");
 
-const DEFAULT_MESSAGE = "Come join me on Kittycord — the cutest way to use Discord! 🐱 https://kittycord.dev";
+const DEFAULT_MESSAGE = "Come join me on Kittycord — it makes Discord way cuter & comfier 🐱 https://kittycord.dev";
 
 function withCodeMessage(code: string) {
-    return `${DEFAULT_MESSAGE} — enter my creator code "${code}" in the installer (or Settings → Invites) so it counts for me 💖`;
+    return `${DEFAULT_MESSAGE}\n(optional: my creator code "${code}" — pop it into the installer when you set it up, it just credits me 💖)`;
 }
 
 function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }) {
