@@ -485,7 +485,7 @@ interface UnifiedTheme {
 }
 
 function ThemesTab() {
-    const settings = useSettings(["themeLinks", "enabledThemeLinks", "enabledThemes", "enableOnlineThemes", "pinnedThemes", "themeActivationModes.*"]);
+    const settings = useSettings(["themeLinks", "enabledThemeLinks", "enabledThemes", "enableOnlineThemes", "singleThemeMode", "pinnedThemes", "themeActivationModes.*"]);
 
     const fileInputRef = useState<HTMLInputElement | null>(null)[1];
     const [currentThemeLink, setCurrentThemeLink] = useState("");
@@ -575,10 +575,26 @@ function ThemesTab() {
 
     function onLocalThemeChange(fileName: string, value: boolean) {
         if (value) {
+            if (settings.singleThemeMode) {
+                settings.enabledThemeLinks = [];
+                settings.enabledThemes = [fileName];
+                return;
+            }
             if (settings.enabledThemes.includes(fileName)) return;
             settings.enabledThemes = [...settings.enabledThemes, fileName];
         } else {
             settings.enabledThemes = settings.enabledThemes.filter(f => f !== fileName);
+        }
+    }
+
+    function onSingleThemeModeChange(value: boolean) {
+        settings.singleThemeMode = value;
+        if (!value) return;
+        if (settings.enabledThemes.length > 0) {
+            settings.enabledThemes = [settings.enabledThemes[0]];
+            settings.enabledThemeLinks = [];
+        } else if (settings.enabledThemeLinks.length > 0) {
+            settings.enabledThemeLinks = [settings.enabledThemeLinks[0]];
         }
     }
 
@@ -636,6 +652,11 @@ function ThemesTab() {
 
     function onThemeLinkEnabledChange(link: string, enabled: boolean) {
         if (enabled) {
+            if (settings.singleThemeMode) {
+                settings.enabledThemes = [];
+                settings.enabledThemeLinks = [link];
+                return;
+            }
             if (settings.enabledThemeLinks.includes(link)) return;
             settings.enabledThemeLinks = [...settings.enabledThemeLinks, link];
         } else {
@@ -904,6 +925,13 @@ function ThemesTab() {
             <Paragraph color="text-subtle" className={Margins.bottom16}>
                 {allThemes.length} theme{allThemes.length !== 1 ? "s" : ""} installed ({localCount} local, {onlineCount} online) · {enabledCount} enabled
             </Paragraph>
+
+            <FormSwitch
+                title="Single theme mode"
+                description="Keep one theme active at a time — turning on a theme automatically turns off the others. Switch this off to layer multiple themes."
+                value={settings.singleThemeMode ?? true}
+                onChange={onSingleThemeModeChange}
+            />
 
             <div className={cl("filter-row")}>
                 <TextInput

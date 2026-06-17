@@ -47,6 +47,7 @@ export interface Settings {
     enabledThemes: string[];
     enabledThemeLinks: string[];
     enableOnlineThemes: boolean;
+    singleThemeMode: boolean;
     pinnedThemes: string[];
     themeNames: Record<string, string>;
     themeActivationModes: Partial<Record<string, ThemeActivationMode>>;
@@ -118,6 +119,7 @@ const DefaultSettings: Settings = {
     enabledThemes: [],
     enabledThemeLinks: [],
     enableOnlineThemes: true,
+    singleThemeMode: true,
     pinnedThemes: [],
     themeNames: {},
     themeActivationModes: {},
