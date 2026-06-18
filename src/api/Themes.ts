@@ -26,12 +26,16 @@ import { coreStyleRootNode, managedStyleRootNode, userStyleRootNode, vencordRoot
 let style: HTMLStyleElement;
 let themesStyle: HTMLStyleElement;
 
-function isOverlayWindow() {
+function isOverlayContext(win: Window | undefined) {
     try {
-        return Boolean((window as any).__OVERLAY__) || /\/overlay/i.test(location.href);
+        return Boolean((win as any)?.__OVERLAY__) || /\/overlay/i.test(win?.location?.href ?? "");
     } catch {
         return false;
     }
+}
+
+function isOverlayWindow() {
+    return isOverlayContext(window);
 }
 
 function getThemeActivationMode(themeId: string) {
@@ -124,7 +128,7 @@ function applyToPopout(popoutWindow: Window | undefined, key: string) {
         managedStyleRootNode.cloneNode(true)
     );
 
-    if (!/overlay/i.test(key)) {
+    if (!/overlay/i.test(key) && !isOverlayContext(popoutWindow)) {
         clonedRoot.append(userStyleRootNode.cloneNode(true));
     }
 
