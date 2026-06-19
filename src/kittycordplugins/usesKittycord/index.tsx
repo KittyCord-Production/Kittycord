@@ -9,7 +9,7 @@ import { Logger } from "@utils/Logger";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { UserStore } from "@webpack/common";
 
-import { BRAND_ICON } from "../../branding";
+import { BRAND_BADGE_ICON } from "../../branding";
 
 const Native = VencordNative?.pluginHelpers?.UsesKittycord as PluginNative<typeof import("./native")> | undefined;
 const logger = new Logger("UsesKittycord");
@@ -20,7 +20,7 @@ let refreshTimer: ReturnType<typeof setInterval> | null = null;
 const UsesKittycordBadge: ProfileBadge = {
     id: "uses-kittycord",
     description: "Uses Kittycord",
-    iconSrc: BRAND_ICON,
+    iconSrc: BRAND_BADGE_ICON,
     position: BadgePosition.END,
     shouldShow: ({ userId }) => kittycordUsers.has(userId)
 };

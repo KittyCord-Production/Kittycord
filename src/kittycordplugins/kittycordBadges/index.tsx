@@ -7,7 +7,7 @@
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import definePlugin from "@utils/types";
 
-import { BRAND_ICON } from "../../branding";
+import { BRAND_BADGE_ICON } from "../../branding";
 
 // Discord user IDs of Kittycord developers. Add more here as the team grows.
 const KITTYCORD_DEVELOPERS = new Set<string>([
@@ -17,7 +17,7 @@ const KITTYCORD_DEVELOPERS = new Set<string>([
 const DeveloperBadge: ProfileBadge = {
     id: "kittycord-developer",
     description: "Kittycord Developer",
-    iconSrc: BRAND_ICON,
+    iconSrc: BRAND_BADGE_ICON,
     position: BadgePosition.START,
     link: "https://github.com/KittyCord-Production/Kittycord",
     shouldShow: ({ userId }) => KITTYCORD_DEVELOPERS.has(userId)
