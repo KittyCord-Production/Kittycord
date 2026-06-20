@@ -17,7 +17,6 @@ import { findByPropsLazy } from "@webpack";
 import { React, UserStore,useState, useStateFromStores } from "@webpack/common";
 
 const StreamStore = findByPropsLazy("getActiveStreamForUser", "getAllActiveStreams");
-const RTCConnectionStore = findByPropsLazy("getMediaSessionId");
 const StreamerModeStore = findByPropsLazy("hidePersonalInformation");
 
 const settings = definePluginSettings({
@@ -35,6 +34,7 @@ const settings = definePluginSettings({
 
 let clickHandler: ((e: MouseEvent) => void) | null = null;
 let streamProofActive = false;
+let wasStreaming = false;
 
 function isStreaming(): boolean {
     try {
@@ -48,11 +48,6 @@ function isStreaming(): boolean {
         const allStreams = StreamStore?.getAllActiveStreams?.();
         if (allStreams?.some((s: any) => s.ownerId === currentUser.id)) return true;
 
-        if (RTCConnectionStore?.getMediaSessionId?.()) {
-            const state = RTCConnectionStore?.getState?.();
-            if (state?.context === "stream") return true;
-        }
-
         return false;
     } catch {
         return false;
@@ -60,9 +55,14 @@ function isStreaming(): boolean {
 }
 
 function handleStreamChange() {
-    if (!settings.store.autoStreamProof) return;
-    if (isStreaming()) enableStreamProof();
-    else disableStreamProof();
+    const streaming = isStreaming();
+    if (streaming === wasStreaming) return;
+    wasStreaming = streaming;
+    if (streaming) {
+        if (settings.store.autoStreamProof) enableStreamProof();
+    } else {
+        disableStreamProof();
+    }
 }
 
 function enableStreamProof() {
@@ -112,7 +112,7 @@ function EyeSlashIcon({ height = 20, width = 20 }: { height?: string | number; w
 }
 
 const StreamProofButton: ChatBarButtonFactory = ({ isMainChat }) => {
-    useStateFromStores([StreamerModeStore, StreamStore, RTCConnectionStore], () => isStreaming());
+    useStateFromStores([StreamerModeStore, StreamStore], () => isStreaming());
     const [, forceUpdate] = useState({});
 
     if (!isMainChat) return null;
@@ -157,9 +157,11 @@ export default definePlugin({
     },
 
     start() {
-        if (settings.store.autoStreamProof && isStreaming()) enableStreamProof();
+        wasStreaming = isStreaming();
+        if (settings.store.autoStreamProof && wasStreaming) enableStreamProof();
     },
     stop() {
         disableStreamProof();
+        wasStreaming = false;
     }
 });
