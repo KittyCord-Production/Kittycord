@@ -12,10 +12,11 @@ import { removeFromArray } from "@utils/misc";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
 
-import { assetUrl, CATALOG, KITTY_DEKO_SKU } from "./catalog";
+import { assetUrl, byId, CATALOG, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
 
 const Native = VencordNative?.pluginHelpers?.KittyDeko as PluginNative<typeof import("./native")> | undefined;
+const InvitesNative = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeof import("../kittyInvites/native")> | undefined;
 
 const deko = new Map<string, string>();
 const listeners = new Set<() => void>();
@@ -52,12 +53,23 @@ function avatarUrl(): string {
 function DekoShop() {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const [saving, setSaving] = React.useState<string | null>(null);
+    const [invites, setInvites] = React.useState(0);
     const me = UserStore.getCurrentUser();
     const equipped = me ? deko.get(me.id) : undefined;
     const avatar = avatarUrl();
 
+    React.useEffect(() => {
+        if (InvitesNative && me) InvitesNative.getMe(me.id).then(m => setInvites(m.invites)).catch(() => { });
+    }, []);
+
+    const lockedBy = (id: string) => Math.max(0, (byId.get(id)?.minInvites ?? 0) - invites);
+
     async function equip(id: string | null) {
         if (!Native || !me) return;
+        if (id && lockedBy(id) > 0) {
+            showToast(`Invite ${byId.get(id)!.minInvites} friends to unlock this frame.`, Toasts.Type.FAILURE);
+            return;
+        }
         setSaving(id ?? "none");
         try {
             if (id === null) {
@@ -99,22 +111,25 @@ function DekoShop() {
                     None
                 </Button>
             </div>
-            {CATALOG.map(d => (
-                <div className="kc-deko-tile" key={d.id}>
-                    <div className="kc-deko-preview">
-                        <img className="kc-deko-avatar" src={avatar} alt="" />
-                        <img className="kc-deko-frame" src={assetUrl(d.id)} alt="" />
+            {CATALOG.map(d => {
+                const locked = lockedBy(d.id) > 0;
+                return (
+                    <div className="kc-deko-tile" key={d.id}>
+                        <div className="kc-deko-preview">
+                            <img className="kc-deko-avatar" src={avatar} alt="" />
+                            <img className="kc-deko-frame" src={assetUrl(d.id)} alt="" />
+                        </div>
+                        <Button
+                            size={Button.Sizes.SMALL}
+                            color={equipped === d.id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                            disabled={saving != null || locked}
+                            onClick={() => equip(d.id)}
+                        >
+                            {equipped === d.id ? "Equipped" : locked ? `🔒 ${d.minInvites} invites` : d.label}
+                        </Button>
                     </div>
-                    <Button
-                        size={Button.Sizes.SMALL}
-                        color={equipped === d.id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
-                        disabled={saving != null}
-                        onClick={() => equip(d.id)}
-                    >
-                        {equipped === d.id ? "Equipped" : d.label}
-                    </Button>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 }
@@ -123,7 +138,7 @@ function DekoTab() {
     return (
         <ErrorBoundary noop>
             <Text variant="text-md/normal" style={{ marginBottom: 16, color: "var(--text-muted)" }}>
-                Pick a free decoration for your avatar — everyone on Kittycord will see it.
+                Pick a free decoration for your avatar — everyone on Kittycord will see it. A few special frames unlock as you invite friends with your creator code.
             </Text>
             <DekoShop />
         </ErrorBoundary>
