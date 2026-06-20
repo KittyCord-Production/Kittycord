@@ -12,8 +12,8 @@ import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
-import definePlugin from "@utils/types";
-import { Button, React, showToast, Text, Toasts } from "@webpack/common";
+import definePlugin, { type PluginNative } from "@utils/types";
+import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
 import { BRAND_WEBSITE } from "../../branding";
@@ -25,6 +25,8 @@ const ModalContent = ModalContentRaw as ComponentType<any>;
 const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const SEEN_KEY = "Kittycord_OnboardingSeen";
+
+const InvitesNative = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeof import("../kittyInvites/native")> | undefined;
 
 interface Pack {
     id: string;
@@ -60,6 +62,17 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
     const [chosen, setChosen] = React.useState<Record<string, boolean>>(
         Object.fromEntries(PACKS.map(p => [p.id, p.default] as [string, boolean]))
     );
+    const [refCode, setRefCode] = React.useState("");
+    const [refState, setRefState] = React.useState<"idle" | "saving" | "done" | "fail">("idle");
+
+    async function claimReferral() {
+        const me = UserStore.getCurrentUser();
+        if (!InvitesNative || !me || !refCode.trim()) return;
+        setRefState("saving");
+        const status = await InvitesNative.claim(me.id, refCode.trim());
+        setRefState(status === "ok" ? "done" : "fail");
+        if (status === "ok") showToast("Thanks — your inviter just got the credit! 🐱", Toasts.Type.SUCCESS);
+    }
 
     function finish(apply: boolean) {
         set(SEEN_KEY, true);
@@ -101,6 +114,28 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "12px 0" }}>
                     Tip: click the Kittycord button in the channel header for Modes, bookmarks, tags and “Share setup with a friend”.
                 </Text>
+
+                {InvitesNative && (
+                    <div style={{ margin: "4px 0 12px" }}>
+                        <Text variant="text-md/semibold">Were you invited?</Text>
+                        <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+                            Enter a friend's creator code so it counts for them.
+                        </Text>
+                        {refState === "done" ? (
+                            <Text variant="text-sm/normal" style={{ color: "var(--text-positive)" }}>Counted — thanks! 🐱</Text>
+                        ) : (
+                            <Flex style={{ gap: 8 }}>
+                                <div style={{ flexGrow: 1 }}>
+                                    <TextInput value={refCode} onChange={setRefCode} placeholder="their creator code" maxLength={20} />
+                                </div>
+                                <Button color={Button.Colors.BRAND} disabled={refState === "saving" || !refCode.trim()} onClick={claimReferral}>Claim</Button>
+                            </Flex>
+                        )}
+                        {refState === "fail" && (
+                            <Text variant="text-sm/normal" style={{ color: "var(--text-danger)", marginTop: 4 }}>Couldn't count that — check the code and try again.</Text>
+                        )}
+                    </div>
+                )}
 
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
                     New here? Find guides and more at{" "}
