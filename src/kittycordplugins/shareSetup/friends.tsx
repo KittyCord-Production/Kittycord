@@ -6,13 +6,16 @@
 
 import { ErrorBoundary } from "@components/index";
 import { openPrivateChannel, openUserProfile } from "@utils/discord";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize } from "@utils/modal";
+import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import type { User } from "@vencord/discord-types";
 import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, Toasts, UserStore, useStateFromStores } from "@webpack/common";
 import type { ComponentType, ReactNode } from "react";
 
 import { BRAND_ICON } from "../../branding";
+import { sendFileToUser } from "../_shared/dm";
 import { openInvite } from "../_shared/inviteModal";
+import { buildModeFile } from "../modes/share";
+import { getModes, loadModes, type Mode } from "../modes/utils";
 import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent } from "./registry";
 import { sendShare } from "./utils";
 
@@ -192,6 +195,57 @@ export function InviteMoreSection({ excludeIds }: { excludeIds: Set<string>; }) 
     );
 }
 
+function SendModeModal({ rootProps, user }: { rootProps: any; user: User; }) {
+    const [modes, setModes] = React.useState<Mode[]>(getModes());
+    const [busy, setBusy] = React.useState(false);
+
+    React.useEffect(() => {
+        if (modes.length === 0) loadModes().then(() => setModes([...getModes()])).catch(() => { });
+    }, []);
+
+    async function send(mode: Mode) {
+        setBusy(true);
+        try {
+            await sendFileToUser(user.id, buildModeFile(mode), `Here's my "${mode.name}" mode — open it in Kittycord to use it.`);
+            showToast(`Sent "${mode.name}" to ${displayName(user)}.`, Toasts.Type.SUCCESS);
+            rootProps.onClose();
+        } catch (e) {
+            showToast(String((e as Error)?.message ?? "Could not send the mode."), Toasts.Type.FAILURE);
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    return (
+        <ModalRoot {...rootProps} size={ModalSize.SMALL}>
+            <ModalHeader>
+                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Send a mode to {displayName(user)}</Text>
+                <ModalCloseButton onClick={rootProps.onClose} />
+            </ModalHeader>
+            <ModalContent>
+                {modes.length === 0 ? (
+                    <Text variant="text-sm/normal" style={{ margin: "12px 0", opacity: 0.8 }}>
+                        You haven't created any modes yet. Make one from the Kittycord menu → Modes.
+                    </Text>
+                ) : (
+                    <div className="kc-fr-list" style={{ margin: "12px 0" }}>
+                        {modes.map(mode => (
+                            <div className="kc-fr-row" key={mode.id}>
+                                <div className="kc-fr-meta">
+                                    <div className="kc-fr-name">{mode.emoji ? mode.emoji + " " : ""}{mode.name}</div>
+                                </div>
+                                <div className="kc-fr-acts">
+                                    <button className="kc-fr-btn kc-fr-btn-primary" disabled={busy} onClick={() => send(mode)}>Send</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </ModalContent>
+        </ModalRoot>
+    );
+}
+
 function FriendsListBody() {
     const { phase, friends, reload, setPhase, setFriends } = useKittycordFriends();
     const excludeIds = React.useMemo(() => new Set(friends.map(f => f.id)), [friends]);
@@ -220,6 +274,7 @@ function FriendsListBody() {
                         <button className="kc-fr-btn kc-fr-btn-ghost" onClick={() => openPrivateChannel(user.id)}>Message</button>
                         <button className="kc-fr-btn kc-fr-btn-ghost" onClick={() => { openUserProfile(user.id).catch(() => { }); }}>Profile</button>
                         <button className="kc-fr-btn kc-fr-btn-primary" onClick={() => sendSetup(user)}>Send setup</button>
+                        <button className="kc-fr-btn kc-fr-btn-ghost" onClick={() => openModal(props => <SendModeModal rootProps={props} user={user} />)}>Send mode</button>
                     </>
                 )}
             />

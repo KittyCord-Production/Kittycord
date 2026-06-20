@@ -282,7 +282,8 @@ export default definePlugin({
             title: "Kittycord Friends",
             panelTitle: "Kittycord Friends",
             Component: KittycordFriendsTab,
-            Icon: UserIcon
+            Icon: UserIcon,
+            pinned: true
         });
         try {
             const { consent } = await getShareConsent();
