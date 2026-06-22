@@ -22,6 +22,8 @@ const FEATURES: Feature[] = [
     { plugin: "Modes", action: "Open Modes", label: "Modes" },
     { plugin: "MessageTags", action: "Open Tagged Messages", label: "Tagged messages" },
     { plugin: "Bookmarks", action: "Open Bookmarks", label: "Bookmarks" },
+    { plugin: "SavedHub", action: "Open Saved", label: "Saved" },
+    { plugin: "ScheduledMessages", action: "Open Scheduler", label: "Scheduled messages" },
     { plugin: "KittycordStudio", action: "Open Studio", label: "Theme Studio" },
     { plugin: "KittycordCosmetics", action: "Style your name", label: "Name style" },
     { plugin: "KittyPet", action: "Open KittyPet", label: "KittyPet" },

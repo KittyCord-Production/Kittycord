@@ -1,0 +1,53 @@
+/*
+ * Kittycord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+.kc-safety-progress {
+    height: 8px;
+    margin-top: 10px;
+    overflow: hidden;
+    background: var(--background-secondary);
+    border-radius: 999px;
+}
+
+.kc-safety-bar {
+    height: 100%;
+    background: #ff5fa6;
+    border-radius: 999px;
+}
+
+.kc-safety-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.kc-safety-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.kc-safety-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    padding: 12px 16px;
+    background: var(--background-secondary);
+    border-left: 3px solid #ff5fa6;
+    border-radius: 8px;
+}
+
+.kc-safety-stat b {
+    font-size: 20px;
+    color: var(--text-normal);
+}
+
+.kc-safety-stat span {
+    font-size: 12px;
+    color: var(--text-muted);
+}
