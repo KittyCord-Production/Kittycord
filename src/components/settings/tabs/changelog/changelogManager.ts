@@ -35,6 +35,7 @@ const LAST_SEEN_HASH_KEY = "EquicordChangelog_LastSeenHash";
 const KNOWN_PLUGINS_KEY = "EquicordChangelog_KnownPlugins";
 const KNOWN_SETTINGS_KEY = "EquicordChangelog_KnownSettings";
 const LAST_REPO_CHECK_KEY = "EquicordChangelog_LastRepoCheck";
+const UPDATE_NOTICE_SHOWN_KEY = "EquicordChangelog_UpdateNoticeShown";
 const GITHUB_COMPARE_ENDPOINT = "https://api.github.com/repos";
 
 type KnownPluginSettingsMap = Map<string, Set<string>>;
@@ -312,6 +313,17 @@ export async function getLastSeenHash(): Promise<string | null> {
 
 export async function setLastSeenHash(hash: string): Promise<void> {
     await DataStore.set(LAST_SEEN_HASH_KEY, hash);
+}
+
+export async function shouldSurfaceUpdateNotice(): Promise<boolean> {
+    const lastSeenHash = await getLastSeenHash();
+    if (!lastSeenHash || lastSeenHash === "unknown" || lastSeenHash === gitHash) return false;
+    const shownForHash = (await DataStore.get(UPDATE_NOTICE_SHOWN_KEY)) as string | null;
+    return shownForHash !== gitHash;
+}
+
+export async function markUpdateNoticeShown(): Promise<void> {
+    await DataStore.set(UPDATE_NOTICE_SHOWN_KEY, gitHash);
 }
 
 export async function getKnownPlugins(): Promise<Set<string>> {

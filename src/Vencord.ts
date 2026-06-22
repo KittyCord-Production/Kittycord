@@ -30,7 +30,8 @@ export * as WebpackPatcher from "./webpack/patchWebpack";
 export { PlainSettings, Settings };
 
 import { coreStyleRootNode, initStyles } from "@api/Styles";
-import { openSettingsTabModal, UpdaterTab } from "@components/settings";
+import { ChangelogTab, openSettingsTabModal, UpdaterTab } from "@components/settings";
+import { markUpdateNoticeShown, shouldSurfaceUpdateNotice } from "@components/settings/tabs/changelog/changelogManager";
 import { debounce } from "@shared/debounce";
 import { IS_WINDOWS } from "@utils/constants";
 import { createAndAppendStyle } from "@utils/css";
@@ -201,6 +202,20 @@ function initTrayIpc() {
     VencordNative.tray.setUpdateState(getIsOutdated);
 }
 
+async function maybeSurfaceChangelog() {
+    try {
+        if (!await shouldSurfaceUpdateNotice()) return;
+        await markUpdateNoticeShown();
+        showNotice(
+            "You're on a new version of Kittycord!",
+            "What's New",
+            () => { if (ChangelogTab) openSettingsTabModal(ChangelogTab); }
+        );
+    } catch (err) {
+        UpdateLogger.error("Failed to surface changelog notice", err);
+    }
+}
+
 async function init() {
     await onceReady;
     startAllPlugins(StartAt.WebpackReady);
@@ -215,6 +230,8 @@ async function init() {
         // runUpdateCheck() bails out after it has notified once this session, so this never spams.
         setInterval(runUpdateCheck, 1000 * 60 * 30); // 30 minutes
     }
+
+    if (!IS_DEV) setTimeout(maybeSurfaceChangelog, 6000);
 
     if (IS_DEV) {
         const pendingPatches = patches.filter(p => !p.all && p.predicate?.() !== false);
