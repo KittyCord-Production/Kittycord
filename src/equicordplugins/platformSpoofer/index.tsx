@@ -22,6 +22,10 @@ const settings = definePluginSettings({
                 default: true,
             },
             {
+                label: "Hidden (no device icon)",
+                value: "hidden",
+            },
+            {
                 label: "Web",
                 value: "web",
             },
@@ -89,6 +93,8 @@ export default definePlugin({
 
         if (bypass || userId === UserStore.getCurrentUser().id) {
             switch (platform) {
+                case "hidden":
+                    return { browser: "" };
                 case "desktop":
                     return { browser: "Discord Client" };
                 case "web":
