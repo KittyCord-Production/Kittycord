@@ -62,10 +62,11 @@ const SPLASH_JS = `
 const LOADING_JS = `
 (function () {
     try {
-        // Discord's in-game overlay renders the full app from a normal discord.com URL (no /overlay in
-        // the path) and is marked only by window.__OVERLAY__. Never mount the loading backdrop there or
-        // it turns the transparent always-on-top overlay opaque and covers the game.
-        if (window.__OVERLAY__ || (location.href || "").indexOf("/overlay") !== -1) return;
+        // Never mount the loading backdrop in Discord's in-game overlay renderer, or it turns the
+        // transparent always-on-top overlay opaque and covers the game. Mirror Discord's own check:
+        // the __OVERLAY__ global, the sentinel node, or "overlay" anywhere in the renderer URL/path
+        // (the renderer loads from .../discord_overlay[2]/..., so match the substring, not "/overlay").
+        if (window.__OVERLAY__ || document.getElementById("__OVERLAY__SENTINEL__") || /overlay/i.test(location.href || "")) return;
         if (window.__kcLoader) return;
         window.__kcLoader = true;
 

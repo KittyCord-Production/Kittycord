@@ -6,12 +6,17 @@
 
 // Discord's in-game overlay runs the full client renderer in a separate, transparent window.
 // Kittycord must never inject themes or managed styles there, or the overlay turns opaque and
-// covers the game. `window.__OVERLAY__` is the reliable marker (Discord sets it in the overlay
-// renderer; vcNarrator/pinDms/showHiddenChannels rely on it too); the URL check is a fallback.
+// covers the game. This mirrors Discord's own overlay detection (discord_overlay2/index.js):
+// the `__OVERLAY__` global, the `__OVERLAY__SENTINEL__` node, or "overlay" in the path. The
+// substring (not `/overlay`) is what catches the renderer URLs `.../discord_overlay/...` and
+// `.../discord_overlay2/start.html`, where the global isn't set yet when styles first inject.
 
 export function isOverlayContext(win: Window | undefined) {
     try {
-        return Boolean((win as any)?.__OVERLAY__) || /\/overlay/i.test(win?.location?.href ?? "");
+        if ((win as any)?.__OVERLAY__) return true;
+        if (win?.document?.getElementById?.("__OVERLAY__SENTINEL__")) return true;
+        const { pathname = "", href = "" } = win?.location ?? {};
+        return /overlay/i.test(pathname) || /overlay/i.test(href);
     } catch {
         return false;
     }
