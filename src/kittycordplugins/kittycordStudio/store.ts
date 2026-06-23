@@ -80,10 +80,13 @@ export interface GalleryTheme {
     authorName: string;
     likes: number;
     created: number;
+    featured: boolean;
     params: StudioParams;
 }
 
-export async function browseGallery(sort: "new" | "top"): Promise<GalleryTheme[]> {
+export type GallerySort = "new" | "top" | "featured";
+
+export async function browseGallery(sort: GallerySort): Promise<GalleryTheme[]> {
     if (!Native) return [];
     const raw = await Native.listGallery(sort);
     const out: GalleryTheme[] = [];
@@ -95,6 +98,7 @@ export async function browseGallery(sort: "new" | "top"): Promise<GalleryTheme[]
                 authorName: String(t.authorName),
                 likes: Number(t.likes) || 0,
                 created: Number(t.created) || 0,
+                featured: Boolean(t.featured),
                 params: sanitizeParams(t.params)
             });
         } catch { }

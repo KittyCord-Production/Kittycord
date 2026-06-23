@@ -10,7 +10,7 @@ import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRa
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { browseGallery, deleteGalleryTheme, enableTheme, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
+import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
 import { derivePalette, NAME_RE, type StudioParams } from "./template";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -79,6 +79,9 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
         <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
             <Swatches params={theme.params} />
             <div>
+                {theme.featured && (
+                    <Text variant="text-xs/semibold" style={{ color: "#ff8ac4", marginBottom: 2 }}>⭐ Staff pick</Text>
+                )}
                 <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{theme.name}</Text>
                 <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {theme.authorName}</Text>
             </div>
@@ -92,10 +95,10 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
 }
 
 function GalleryModal({ rootProps }: { rootProps: any; }) {
-    const [sort, setSort] = React.useState<"new" | "top">("top");
+    const [sort, setSort] = React.useState<GallerySort>("top");
     const [themes, setThemes] = React.useState<GalleryTheme[] | null>(null);
 
-    function load(which: "new" | "top") {
+    function load(which: GallerySort) {
         setSort(which);
         setThemes(null);
         browseGallery(which).then(setThemes).catch(e => {
@@ -111,6 +114,7 @@ function GalleryModal({ rootProps }: { rootProps: any; }) {
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
                     <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Theme Gallery 🎨</Text>
+                    <Button size={Button.Sizes.SMALL} look={sort === "featured" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</Button>
                     <Button size={Button.Sizes.SMALL} look={sort === "top" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("top")} style={{ marginRight: 4 }}>Top</Button>
                     <Button size={Button.Sizes.SMALL} look={sort === "new" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("new")} style={{ marginRight: 8 }}>New</Button>
                     <ModalCloseButton onClick={rootProps.onClose} />
@@ -120,7 +124,9 @@ function GalleryModal({ rootProps }: { rootProps: any; }) {
                 {themes === null && <Text variant="text-md/normal" style={{ padding: "24px 0", opacity: 0.7 }}>Loading the gallery…</Text>}
                 {themes !== null && themes.length === 0 && (
                     <Text variant="text-md/normal" style={{ padding: "24px 0" }}>
-                        No themes here yet — be the first to publish one from your Studio themes!
+                        {sort === "featured"
+                            ? "No staff picks yet — check back soon, or browse Top and New."
+                            : "No themes here yet — be the first to publish one from your Studio themes!"}
                     </Text>
                 )}
                 {themes !== null && themes.length > 0 && (

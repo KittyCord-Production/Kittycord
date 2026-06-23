@@ -67,11 +67,12 @@ export interface GalleryTheme {
     authorName: string;
     likes: number;
     created: number;
+    featured?: boolean;
     params: unknown;
 }
 
 export async function listGallery(_: IpcMainInvokeEvent, sort: unknown): Promise<GalleryTheme[]> {
-    const query = sort === "top" ? "top" : "new";
+    const query = sort === "top" ? "top" : sort === "featured" ? "featured" : "new";
     try {
         const res = await fetch(`${ENDPOINT}/themes/list?sort=${query}`);
         if (!res.ok) return [];
