@@ -147,12 +147,13 @@ const LOADING_JS = `
 
 app.on("browser-window-created", (_, win) => {
     try {
+        const isMainWindow = win.getTitle() === "Discord";
         win.webContents.on("dom-ready", () => {
             try {
                 const url = win.webContents.getURL() || "";
                 if (/splash/i.test(url)) {
                     win.webContents.executeJavaScript(SPLASH_JS).catch(() => { });
-                } else if (/discord\.com/i.test(url) && !/\/popout|\/overlay/i.test(url)) {
+                } else if (isMainWindow && /discord\.com/i.test(url) && !/\/popout|\/overlay/i.test(url)) {
                     win.webContents.executeJavaScript(LOADING_JS).catch(() => { });
                 }
             } catch { }
