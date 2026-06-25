@@ -11,6 +11,7 @@
 import amoledBlack from "file://themes/amoledBlack.theme.css";
 import lavender from "file://themes/lavender.theme.css";
 import midnight from "file://themes/midnight.theme.css";
+import modern from "file://themes/modern.theme.css";
 import monoGlass from "file://themes/monoGlass.theme.css";
 import sakura from "file://themes/sakura.theme.css";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
@@ -23,7 +24,8 @@ const BUNDLED_THEMES: Record<string, string> = {
     "Sakura.theme.css": sakura,
     "Midnight.theme.css": midnight,
     "AMOLEDBlack.theme.css": amoledBlack,
-    "Lavender.theme.css": lavender
+    "Lavender.theme.css": lavender,
+    "Modern.theme.css": modern
 };
 
 try {

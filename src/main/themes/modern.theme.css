@@ -1,0 +1,614 @@
+/**
+ * @name        Modern
+ * @author      Kittycord
+ * @description Aufgeräumtes, flaches Near-Black-Theme im "Modern"-Stil)
+ * @version     1.0.0
+ */
+
+/* ============================================================================
+   0. SO PASST DU DAS THEME AN
+   ----------------------------------------------------------------------------
+   Alles Wichtige steht im :root-Block direkt darunter:
+     - Heller/dunkler?             -> --am-bg-1 (Chat) und --am-bg-2 (Kanalleiste).
+     - Anderer Akzent (Buttons)?   -> --am-accent-h (Farbton, 235 = Blurple).
+     - Andere Linkfarbe?           -> --am-link.
+     - Rundere/kantigere Ecken?    -> --am-radius* anpassen.
+     - Eigenes Hintergrundbild?    -> siehe Block 2 (#app-mount).
+   Block 5 (SIGNATUR-LAYOUT, waagerechte Serverleiste + Account oben) und Block 6
+   (Kanal-Icons) sind bewusst hart von der Discord-Struktur abhaengig. Macht ein
+   Discord-Update sie kaputt, kannst du Block 5 bzw. 6 komplett loeschen - der
+   Look (Blocks 1-4) bleibt davon unberuehrt.
+   ========================================================================== */
+
+:root {
+  /* Basisflaechen (flach, opak - kein Glas). */
+  --am-bg-1: #111111;
+  --am-bg-2: #181818;
+  --am-bg-3: #1a1a1a;
+  --am-bg-input: #282828;
+  --am-bg-card: #242424;
+  --am-bg-elevated: #303030;
+  --am-bg-server: #303030;
+
+  /* Akzent = Blurple. Farbton hochdrehen/aendern fuer eigene Akzentfarbe. */
+  --am-accent-h: 235;
+  --am-accent-s: 85.6%;
+  --am-accent-l: 64.7%;
+  --am-accent: hsl(var(--am-accent-h) var(--am-accent-s) var(--am-accent-l));
+
+  --am-link: #00b0f4;
+  --am-live: #ed4245;
+  --am-ping: #f23f42;
+
+  /* Ecken. */
+  --am-radius-sm: 4px;
+  --am-radius: 8px;
+  --am-radius-lg: 16px;
+}
+
+/* ============================================================================
+   1. DISCORD-VARIABLEN UMFAERBEN (flach, near-black)
+   ========================================================================== */
+:root,
+.theme-dark,
+.theme-darker,
+.theme-light,
+.theme-midnight {
+  --background-primary: var(--am-bg-1);
+  --background-secondary: var(--am-bg-2);
+  --background-secondary-alt: #333333;
+  --background-tertiary: var(--am-bg-elevated);
+  --background-accent: var(--am-accent);
+  --background-floating: var(--am-bg-3);
+  --background-nested-floating: var(--am-bg-3);
+  --background-mobile-primary: var(--am-bg-1);
+  --background-mobile-secondary: var(--am-bg-2);
+  --channeltextarea-background: var(--am-bg-input);
+  --background-message-hover: rgba(255, 255, 255, 0.01);
+
+  --background-modifier-hover: rgba(87, 87, 87, 0.2);
+  --background-modifier-active: rgba(87, 87, 87, 0.24);
+  --background-modifier-selected: rgba(100, 100, 100, 0.2);
+  --background-modifier-accent: rgba(255, 255, 255, 0.06);
+
+  --input-background: #333333;
+  --modal-background: var(--am-bg-3);
+  --modal-footer-background: var(--am-bg-1);
+  --activity-card-background: var(--am-bg-card);
+  --deprecated-card-bg: var(--am-bg-2);
+  --deprecated-card-editable-bg: var(--am-bg-2);
+  --deprecated-quickswitcher-input-background: rgba(120, 120, 120, 0.15);
+  --deprecated-text-input-bg: #333333;
+
+  --background-base-lowest: #0d0d0d;
+  --background-base-lower: var(--am-bg-1);
+  --background-base-low: var(--am-bg-2);
+  --background-base-low-alt: var(--am-bg-2);
+  --background-surface-higher: var(--am-bg-3);
+  --background-surface-high: var(--am-bg-2);
+  --background-surface-highest: var(--am-bg-elevated);
+  --card-background-default: var(--am-bg-card);
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-muted: rgba(255, 255, 255, 0.08);
+  --border-normal: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --app-frame-border: rgba(255, 255, 255, 0.06);
+
+  /* Texte. */
+  --header-primary: #ffffff;
+  --header-secondary: #bdbdbd;
+  --text-normal: #dedede;
+  --text-muted: #787878;
+  --text-link: var(--am-link);
+  --text-link-low-saturation: var(--am-link);
+  --text-positive: #4fdc7b;
+  --channels-default: #919191;
+  --channel-icon: #787878;
+  --interactive-normal: #bdbdbd;
+  --interactive-hover: #dedede;
+  --interactive-active: #ffffff;
+  --interactive-muted: #575757;
+
+  --input-placeholder-text: #787878;
+  --mention-foreground: #ffffff;
+  --mention-background: rgba(100, 100, 100, 0.2);
+
+  --scrollbar-auto-thumb: #4e4e4e;
+  --scrollbar-auto-track: #242424;
+  --scrollbar-thin-thumb: #242424;
+  --scrollbar-thin-track: transparent;
+  --scrollbar-auto-scrollbar-color-thumb: #242424;
+  --scrollbar-auto-scrollbar-color-track: #333333;
+
+  /* Blurple-Marken-Rampe (Buttons, Auswahl, aktive Akzente). */
+  --brand-100: hsl(var(--am-accent-h) var(--am-accent-s) 98%);
+  --brand-160: hsl(var(--am-accent-h) var(--am-accent-s) 95%);
+  --brand-260: hsl(var(--am-accent-h) var(--am-accent-s) 89%);
+  --brand-360: hsl(var(--am-accent-h) var(--am-accent-s) 78%);
+  --brand-400: hsl(var(--am-accent-h) var(--am-accent-s) 72%);
+  --brand-460: hsl(var(--am-accent-h) var(--am-accent-s) 68%);
+  --brand-500: var(--am-accent);
+  --brand-560: hsl(var(--am-accent-h) 51% 52%);
+  --brand-600: hsl(var(--am-accent-h) 47% 44%);
+  --brand-630: hsl(var(--am-accent-h) 47% 38%);
+  --brand-660: hsl(var(--am-accent-h) 47% 33%);
+  --brand-700: hsl(var(--am-accent-h) 47% 26%);
+  --brand-760: hsl(var(--am-accent-h) 47% 22%);
+  --brand-800: hsl(var(--am-accent-h) 47% 19%);
+  --brand-860: hsl(var(--am-accent-h) 47% 10%);
+  --brand-experiment: var(--am-accent);
+  --brand-experiment-360: hsl(var(--am-accent-h) var(--am-accent-s) 78%);
+  --brand-experiment-460: hsl(var(--am-accent-h) var(--am-accent-s) 68%);
+  --brand-experiment-500: var(--am-accent);
+  --brand-experiment-560: hsl(var(--am-accent-h) 51% 52%);
+  --brand-experiment-600: hsl(var(--am-accent-h) 47% 44%);
+  --brand-experiment-700: hsl(var(--am-accent-h) 47% 26%);
+  --control-brand-foreground: var(--am-accent);
+  --control-brand-foreground-new: var(--am-accent);
+}
+
+/* ============================================================================
+   2. HINTERGRUND HINTER DEM GANZEN CLIENT
+   >> Eigenes Wallpaper? 'background' unten ersetzen durch z.B.:
+        background: url("https://example.com/bild.jpg") center/cover fixed;
+   ========================================================================== */
+html,
+html body,
+#app-mount,
+[class*="app_"],
+[class*="appAsidePanelWrapper_"],
+[class*="bg_"] {
+  background-color: var(--am-bg-1) !important;
+}
+
+/* Grosse Flaechen flach erzwingen - schlaegt ein konkurrierendes Theme (z.B. ein
+   rosa Standard-Theme) und neue Discord-Variablen ueber #app-mount-Spezifitaet. */
+#app-mount [class*="chatContent_"],
+#app-mount [class*="chat_"]:not([class*="chatContent"]),
+#app-mount [class*="messagesWrapper_"],
+#app-mount [class*="subtitleContainer_"] {
+  background-color: var(--am-bg-1) !important;
+}
+
+#app-mount [class*="guilds_"] {
+  background-color: var(--am-bg-1) !important;
+}
+
+#app-mount [class*="sidebar_"]:not([class*="sidebarList"]):not([class*="sidebarRegion"]) {
+  background-color: var(--am-bg-2) !important;
+}
+
+#app-mount [class*="membersWrap_"],
+#app-mount [class*="members_"]:not([class*="member_"]) {
+  background-color: var(--am-bg-2) !important;
+}
+
+/* Nachrichten-Eingabefeld ("Chatbox") flach einfaerben. Andere Farbe gewuenscht?
+   --am-bg-input oben aendern (z.B. var(--am-bg-1) fuer komplett flach). */
+#app-mount [class*="channelTextArea_"] {
+  background-color: var(--am-bg-input) !important;
+}
+
+#app-mount [class*="channelTextArea_"] [class*="themedBackground_"],
+#app-mount [class*="channelTextArea_"] [class*="scrollableContainer_"] {
+  background-color: transparent !important;
+}
+
+/* ============================================================================
+   3. ABGERUNDETE ECKEN & DUENNE SCROLLBALKEN
+   ========================================================================== */
+[class*="channelTextArea_"],
+[class*="scrollableContainer_"],
+[class*="searchBar_"],
+[class*="input_"] {
+  border-radius: var(--am-radius) !important;
+}
+
+[class*="button_"]:not([class*="lookBlank"]):not([class*="reaction"]),
+[class*="lookFilled_"],
+[class*="lookOutlined_"] {
+  border-radius: var(--am-radius-sm) !important;
+}
+
+[class*="card_"],
+[class*="embedWrapper"],
+[class*="embed_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="menu_"],
+[class*="tooltip_"],
+[class*="imageWrapper_"],
+[class*="attachment_"],
+[class*="wrapperAudio_"],
+[class*="codeContainer"],
+pre,
+[class*="hljs"] {
+  border-radius: var(--am-radius) !important;
+}
+
+[class*="mention"],
+[class*="role_"],
+[class*="pill_"],
+[class*="tag_"] {
+  border-radius: var(--am-radius-sm) !important;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
+}
+
+/* ============================================================================
+   4. AUFGERAEUMT (Modern-Feinschliff)
+   ========================================================================== */
+
+/* Zeitstempel nur beim Hovern einer Nachricht. */
+[class*="timestamp_"],
+[class*="timestampInline_"] {
+  opacity: 0;
+  transition: opacity .175s ease;
+}
+
+[class*="message_"]:hover [class*="timestamp_"],
+[class*="message_"]:hover [class*="timestampInline_"],
+[class*="messageListItem_"]:hover [class*="timestamp_"],
+[class*="messageListItem_"]:hover [class*="timestampInline_"] {
+  opacity: 1;
+}
+
+/* Blauer Auswahl-Indikator am aktiven Kanal (gleitet ein). */
+@keyframes am-selection-indicator {
+  0% {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+[class*="modeSelected_"] {
+  position: relative;
+}
+
+[class*="modeSelected_"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: 0 3px 3px 0;
+  background: var(--am-accent);
+  animation: am-selection-indicator 333ms cubic-bezier(.1, .9, .2, 1);
+}
+
+/* Karten-/Embed-Trennlinien dezent. */
+[class*="chatContent_"],
+[class*="membersWrap_"],
+[class*="modal_"],
+[class*="popout_"],
+[class*="card_"] {
+  border: 1px solid var(--border-subtle);
+}
+
+/* "LIVE"/Stream-Indikator bleibt rot. */
+[class*="live_"]:not([class*="container"]):not([class*="wrapper"]),
+[class*="liveBadge"],
+[class*="liveTag"],
+[class*="goLiveChiclet"] {
+  background-color: var(--am-live) !important;
+  border-color: var(--am-live) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+}
+
+/* Ping-/Erwaehnungs-Badges hervorheben. */
+[class*="numberBadge_"],
+[class*="mentionBadge"],
+[class*="unreadMentionsBar_"] {
+  background-color: var(--am-ping) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+}
+
+/* ============================================================================
+   5. WAAGERECHTE SERVERLEISTE OBEN
+   ----------------------------------------------------------------------------
+   Uebernommen aus "Horizontal Server List" von Gibbu (DiscordStyles) - hier
+   inline statt per externem Import, damit das Theme eigenstaendig bleibt.
+   Quelle: https://github.com/DiscordStyles/HorizontalServerList
+   Nutzt Discords aktuelle Klassen-Hashes. Aktualisiert Discord die Hashes,
+   diesen Block aus der Quelle neu einspielen. Konfiguration im :root unten:
+     --HSL-server-direction: column | column-reverse
+     --HSL-server-alignment: flex-start | center | flex-end
+   ========================================================================== */
+:root {
+  --HSL-server-direction: column;
+  --HSL-server-alignment: flex-start;
+  --notices-height: 36px;
+  --serverlist-offset: var(--custom-guild-list-width);
+}
+
+.base__5e434[data-fullscreen=false] .content__5e434 {
+  margin-top: var(--serverlist-offset);
+  overflow: visible !important;
+}
+
+:fullscreen .content__5e434 {
+  margin: 0 !important;
+}
+
+#app-mount .sidebar__5e434 {
+  border-radius: 0;
+  overflow: visible !important;
+}
+
+#app-mount .guilds__5e434 {
+  transform-origin: top left;
+  rotate: -90deg;
+  height: 100vw !important;
+  bottom: unset;
+  position: absolute !important;
+  left: 0;
+}
+
+#app-mount .tree_ef3116 {
+  padding-top: var(--HSL-top-padding, var(--size-sm));
+}
+
+#app-mount .wrapper__6e9f8,
+#app-mount .folderPreview__48112,
+#app-mount .folderIconWrapper__48112,
+#app-mount .lowerBadge_cc5dd2,
+#app-mount .upperBadge_cc5dd2 {
+  rotate: 90deg;
+}
+
+#app-mount .childWrapper__6e9f8 {
+  rotate: 0deg;
+}
+
+#app-mount .itemsContainer_ef3116,
+#app-mount .stack_dbd263 {
+  flex-direction: var(--HSL-server-direction);
+  justify-content: var(--HSL-server-alignment);
+}
+
+#app-mount .notice__6e2b9 {
+  height: var(--notices-height);
+}
+
+#app-mount .notice__6e2b9 + .content__5e434 {
+  --serverlist-offset: calc(var(--notices-height) + var(--custom-guild-list-width));
+}
+
+.container__5e434 > div[style]:not(.base__5e434) {
+  width: 100vw !important;
+  height: var(--serverlist-offset) !important;
+  position: absolute;
+  top: calc(var(--serverlist-offset) + var(--custom-app-top-bar-height));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.container__5e434 > div[style]:not(.base__5e434) .guilds__5e434 {
+  pointer-events: all;
+}
+
+.container__5e434 > div[style]:not(.base__5e434) + .base__5e434 .content__5e434 {
+  margin-top: calc(var(--serverlist-offset) * 2);
+}
+
+/* ============================================================================
+   6. KANAL-ICONS (EXPERIMENTELL) - Icon je nach Kanalname
+   ----------------------------------------------------------------------------
+   Tauscht das Standard-Icon eines Kanals gegen ein passendes aus, sobald sein
+   Name ein Stichwort enthaelt (z.B. "rules" -> Schild). Nicht zugeordnete
+   Kanaele behalten ihr Standard-Icon. Weitere Stichwoerter/Icons lassen sich
+   nach demselben Muster ergaenzen. Bricht es auf deiner Discord-Version, loesche
+   diesen Block 6 - der Rest des Themes bleibt unberuehrt.
+   ========================================================================== */
+:root {
+  --icon-voice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z'/%3E%3C/svg%3E");
+  --icon-rules: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 40 40' fill='none'%3E%3Cpath fill='currentColor' fill-rule='evenodd' clip-rule='evenodd' d='M33 34.5833V7.49998H35V36.6666H9C6.791 36.6666 5 34.801 5 32.5V7.49998C5 5.19894 6.791 3.33331 9 3.33331H31V30.4166H9C7.8955 30.4166 7 31.3485 7 32.5C7 33.6515 7.8955 34.5833 9 34.5833H33ZM23.9718 9.99998L15.8889 17.9915L12.7086 14.8441L10 17.5058L15.8885 23.3333L26.6667 12.6669L23.9718 9.99998Z'/%3E%3C/svg%3E");
+  --icon-announcement: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z'/%3E%3C/svg%3E");
+  --icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+  --icon-discussion: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z'/%3E%3C/svg%3E");
+  --icon-games: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cg%3E%3Crect fill='none' height='24' width='24'/%3E%3C/g%3E%3Cg%3E%3Cg%3E%3Cpath d='M21.58,16.09l-1.09-7.66C20.21,6.46,18.52,5,16.53,5H7.47C5.48,5,3.79,6.46,3.51,8.43l-1.09,7.66 C2.2,17.63,3.39,19,4.94,19h0c0.68,0,1.32-0.27,1.8-0.75L9,16h6l2.25,2.25c0.48,0.48,1.13,0.75,1.8,0.75h0 C20.61,19,21.8,17.63,21.58,16.09z M19.48,16.81C19.4,16.9,19.27,17,19.06,17c-0.15,0-0.29-0.06-0.39-0.16L15.83,14H8.17 l-2.84,2.84C5.23,16.94,5.09,17,4.94,17c-0.21,0-0.34-0.1-0.42-0.19c-0.08-0.09-0.16-0.23-0.13-0.44l1.09-7.66 C5.63,7.74,6.48,7,7.47,7h9.06c0.99,0,1.84,0.74,1.98,1.72l1.09,7.66C19.63,16.58,19.55,16.72,19.48,16.81z'/%3E%3Cpolygon points='9,8 8,8 8,10 6,10 6,11 8,11 8,13 9,13 9,11 11,11 11,10 9,10'/%3E%3Ccircle cx='17' cy='12' r='1'/%3E%3Ccircle cx='15' cy='9' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --icon-music: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z'/%3E%3C/svg%3E");
+  --icon-support: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cg%3E%3Crect fill='none' height='24' width='24'/%3E%3C/g%3E%3Cg%3E%3Cg%3E%3Cpath d='M21,12.22C21,6.73,16.74,3,12,3c-4.69,0-9,3.65-9,9.28C2.4,12.62,2,13.26,2,14v2c0,1.1,0.9,2,2,2h1v-6.1 c0-3.87,3.13-7,7-7s7,3.13,7,7V19h-8v2h8c1.1,0,2-0.9,2-2v-1.22c0.59-0.31,1-0.92,1-1.64v-2.3C22,13.14,21.59,12.53,21,12.22z'/%3E%3Ccircle cx='9' cy='13' r='1'/%3E%3Ccircle cx='15' cy='13' r='1'/%3E%3Cpath d='M18,11.03C17.52,8.18,15.04,6,12.05,6c-3.03,0-6.29,2.51-6.03,6.45c2.47-1.01,4.33-3.21,4.86-5.89 C12.19,9.19,14.88,11,18,11.03z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --icon-github: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' d='M0 0h24v24H0V0z'/%3E%3Cpath d='M12 1.5C6.2 1.5 1.5 6.2 1.5 12c0 4.6 3.1 8.6 7.2 10 .5.1.7-.2.7-.5v-2c-3 .7-3.6-1.2-3.6-1.2-.4-1.3-1.2-1.6-1.2-1.6-.9-.6.1-.6.1-.6 1.1.1 1.6 1.1 1.6 1.1.9 1.7 2.5 1.2 3.1.9.1-.6.3-1.2.6-1.4-2.3-.3-4.9-1.2-4.9-5.2 0-1.2.4-2.1 1.1-2.8 0-.4-.3-1.5.2-3 0 0 .8-.3 3 1.1.8-.1 1.7-.3 2.6-.3.8 0 1.8.1 2.6.3 2-1.4 2.8-1.1 2.8-1.1.5 1.5.2 2.5.1 2.7.6.7 1.1 1.7 1.1 2.8 0 4-2.4 5-4.9 5.2.4.3.7.9.7 2v3c0 .3.2.6.7.5 4.2-1.4 7.2-5.4 7.2-10C22.5 6.2 17.8 1.5 12 1.5z'/%3E%3C/svg%3E");
+  --icon-idea: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Crect fill='none' height='24' width='24' y='0'/%3E%3Cpath d='M7,20h4c0,1.1-0.9,2-2,2S7,21.1,7,20z M5,19h8v-2H5V19z M16.5,9.5c0,3.82-2.66,5.86-3.77,6.5H5.27 C4.16,15.36,1.5,13.32,1.5,9.5C1.5,5.36,4.86,2,9,2S16.5,5.36,16.5,9.5z M21.37,7.37L20,8l1.37,0.63L22,10l0.63-1.37L24,8 l-1.37-0.63L22,6L21.37,7.37z M19,6l0.94-2.06L22,3l-2.06-0.94L19,0l-0.94,2.06L16,3l2.06,0.94L19,6z'/%3E%3C/svg%3E");
+  --icon-bot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cg%3E%3Crect fill='none' height='24' width='24' y='0'/%3E%3C/g%3E%3Cg%3E%3Cpath d='M20,9V7c0-1.1-0.9-2-2-2h-3c0-1.66-1.34-3-3-3S9,3.34,9,5H6C4.9,5,4,5.9,4,7v2c-1.66,0-3,1.34-3,3c0,1.66,1.34,3,3,3v4 c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-4c1.66,0,3-1.34,3-3C23,10.34,21.66,9,20,9z M7.5,11.5C7.5,10.67,8.17,10,9,10 s1.5,0.67,1.5,1.5S9.83,13,9,13S7.5,12.33,7.5,11.5z M16,17H8v-2h8V17z M15,13c-0.83,0-1.5-0.67-1.5-1.5S14.17,10,15,10 s1.5,0.67,1.5,1.5S15.83,13,15,13z'/%3E%3C/g%3E%3C/svg%3E");
+  --icon-media: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z'/%3E%3C/svg%3E");
+  --icon-link-ch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z'/%3E%3C/svg%3E");
+  --icon-meme: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Ccircle cx='15.5' cy='9.5' r='1.5'/%3E%3Ccircle cx='8.5' cy='9.5' r='1.5'/%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7z'/%3E%3C/svg%3E");
+}
+
+/* Eigenes Icon als maskiertes Pseudo-Element; unsichtbar solange kein Treffer. */
+[class*="sidebar_"] [class*="containerDefault_"] [class*="link_"] [class*="iconContainer_"] {
+  position: relative;
+}
+
+[class*="sidebar_"] [class*="containerDefault_"] [class*="link_"] [class*="iconContainer_"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--channel-icon);
+  -webkit-mask-image: var(--am-ch-icon, none);
+  mask-image: var(--am-ch-icon, none);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  opacity: var(--am-ch-on, 0);
+}
+
+/* Standard-SVG nur bei zugeordneten Kanaelen ausblenden. */
+[class*="sidebar_"] [class*="link_"][aria-label*="voice" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="rules" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="announcement" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="info" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="general" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="off-topic" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="gaming" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="music" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="support" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="help" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="github" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="suggestion" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="bot" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="media" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="link" i] [class*="iconContainer_"] > svg,
+[class*="sidebar_"] [class*="link_"][aria-label*="meme" i] [class*="iconContainer_"] > svg {
+  visibility: hidden;
+}
+
+/* Stichwort -> Icon. Weitere Zeilen nach demselben Muster ergaenzen. */
+[class*="sidebar_"] [class*="link_"][aria-label*="voice" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-voice);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="rules" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-rules);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="announcement" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-announcement);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="info" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-info);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="general" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-discussion);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="off-topic" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-discussion);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="gaming" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-games);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="music" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-music);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="support" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-support);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="help" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-support);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="github" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-github);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="suggestion" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-idea);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="bot" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-bot);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="media" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-media);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="link" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-link-ch);
+  --am-ch-on: 1;
+}
+
+[class*="sidebar_"] [class*="link_"][aria-label*="meme" i] [class*="iconContainer_"] {
+  --am-ch-icon: var(--icon-meme);
+  --am-ch-on: 1;
+}
+
+/* ============================================================================
+   7. ACCOUNT-NAME OBEN RECHTS
+   ----------------------------------------------------------------------------
+   Nur der Account-Knopf (Avatar + Name, accountPopoutButton...) wandert nach
+   oben rechts. Die Regler (Mute/Deafen/Settings, buttons_...) bleiben unten
+   links unangetastet. Position justieren: --am-account-right (groesser = weiter
+   nach links). Der Status-Untertext wird ausgeblendet, damit es wie im Vorbild
+   einzeilig bleibt - die letzte Regel loeschen, wenn du den Status sehen willst.
+   ========================================================================== */
+:root {
+  --am-account-right: 370px;
+  --am-account-top: 3px;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] {
+  position: fixed !important;
+  top: var(--am-account-top) !important;
+  right: var(--am-account-right) !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  background: var(--am-bg-1) !important;
+  border-radius: var(--am-radius-sm) !important;
+  z-index: 3001 !important;
+  -webkit-app-region: no-drag;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="accountPopoutButton_"] {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="panelSubtextContainer_"] {
+  display: none !important;
+}
+
+/* Regler (Mute/Deafen/Settings) unten links zentrieren - der Account-Name sitzt
+   ja jetzt oben rechts, also fuellt die Reglerreihe die freie Breite mittig. */
+#app-mount [class*="panels_"] [class*="buttons_"] {
+  flex: 1 1 auto !important;
+  justify-content: center !important;
+}
