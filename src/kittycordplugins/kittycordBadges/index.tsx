@@ -5,7 +5,7 @@
  */
 
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
-import definePlugin from "@utils/types";
+import definePlugin, { type PluginNative } from "@utils/types";
 
 import { BRAND_WEBSITE } from "../../branding";
 
@@ -55,17 +55,29 @@ const ROLES: TeamRole[] = [
     }
 ];
 
-const badges: ProfileBadge[] = ROLES.map(role => {
-    const members = new Set(role.members);
-    return {
-        id: role.id,
-        description: role.label,
-        iconSrc: role.icon,
-        position: BadgePosition.START,
-        link: role.link,
-        shouldShow: ({ userId }) => members.has(userId)
-    };
-});
+const Native = VencordNative?.pluginHelpers?.KittycordBadges as PluginNative<typeof import("./native")> | undefined;
+
+const roleMembers = new Map<string, Set<string>>(ROLES.map(role => [role.id, new Set(role.members)]));
+
+let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+async function refresh() {
+    if (!Native) return;
+    const members = await Native.getTeam();
+    if (!members) return;
+    const next = new Map<string, Set<string>>(ROLES.map(role => [role.id, new Set<string>()]));
+    for (const { id, role } of members) next.get(role)?.add(id);
+    for (const [role, set] of next) roleMembers.set(role, set);
+}
+
+const badges: ProfileBadge[] = ROLES.map(role => ({
+    id: role.id,
+    description: role.label,
+    iconSrc: role.icon,
+    position: BadgePosition.START,
+    link: role.link,
+    shouldShow: ({ userId }) => roleMembers.get(role.id)?.has(userId) ?? false
+}));
 
 export default definePlugin({
     name: "KittycordBadges",
@@ -74,11 +86,17 @@ export default definePlugin({
     dependencies: ["BadgeAPI"],
     required: true,
 
-    start() {
+    async start() {
         badges.forEach(b => addProfileBadge(b));
+        await refresh();
+        refreshTimer = setInterval(refresh, 10 * 60 * 1000);
     },
 
     stop() {
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
         badges.forEach(b => removeProfileBadge(b));
     }
 });
