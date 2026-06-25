@@ -161,6 +161,9 @@ if (!IS_VANILLA) {
 
             process.env.DISCORD_PRELOAD = original;
 
+            const isOverlay = (original ?? "").toLowerCase().includes("overlay");
+            process.env.KITTYCORD_IS_OVERLAY = isOverlay ? "1" : "";
+
             super(options);
 
             if (disableMinSize) {
