@@ -147,6 +147,7 @@ const LOADING_JS = `
 
 app.on("browser-window-created", (_, win) => {
     try {
+        if (win.webContents.isOffscreen()) return;
         win.webContents.on("dom-ready", () => {
             try {
                 const url = win.webContents.getURL() || "";
