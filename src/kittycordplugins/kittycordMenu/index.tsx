@@ -34,6 +34,7 @@ const FEATURES: Feature[] = [
     { plugin: "ShareSetup", action: "Share setup with a friend", label: "Share setup" },
     { plugin: "InviteFriend", action: "Invite a friend", label: "Invite a friend" },
     { plugin: "KittyInvites", action: "Share invite stats", label: "Invite stats" },
+    { plugin: "ShowOff", action: "Show off my Kittycord look", label: "Show off my look" },
     { plugin: "Onboarding", action: "Run setup wizard", label: "Setup wizard" }
 ];
 

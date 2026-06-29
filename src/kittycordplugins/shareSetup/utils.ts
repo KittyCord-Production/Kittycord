@@ -9,9 +9,10 @@ import { exportSettings, importSettings } from "@api/SettingsSync/offline";
 import { Logger } from "@utils/Logger";
 import type { PluginNative } from "@utils/types";
 import { MessageAttachment } from "@vencord/discord-types";
-import { moment, UserStore } from "@webpack/common";
+import { IconUtils, moment, UserStore } from "@webpack/common";
 
 import { downloadAttachmentText, sendFileToUser } from "../_shared/dm";
+import { renderSetupCard, SETUP_PREVIEW_FILENAME } from "../_shared/setupCard";
 
 const logger = new Logger("ShareSetup");
 
@@ -55,9 +56,31 @@ export async function buildEnvelopeFile(scope: ShareScope): Promise<File> {
     return new File([data], `kittycord-setup-${moment().format("YYYY-MM-DD")}${FILE_SUFFIX}`, { type: "application/json" });
 }
 
+function scopeSummary(scope: ShareScope, pluginCount: number): string {
+    if (scope === "css") return "Themes & QuickCSS";
+    if (scope === "all") return `${pluginCount} plugins, themes & settings`;
+    return `${pluginCount} plugins & their settings`;
+}
+
+export async function buildSetupPreview(scope: ShareScope): Promise<Blob | null> {
+    try {
+        const me = UserStore.getCurrentUser();
+        const name = me ? (me.globalName || me.username) : "A friend";
+        const avatarUrl = me ? IconUtils.getUserAvatarURL(me, true, 256) : null;
+        return await renderSetupCard({ name, avatarUrl, summary: scopeSummary(scope, enabledPluginNames().length) });
+    } catch (e) {
+        logger.error("Failed to render setup preview", e);
+        return null;
+    }
+}
+
 export async function sendShare(userId: string, scope: ShareScope, note: string) {
     const file = await buildEnvelopeFile(scope);
-    await sendFileToUser(userId, file, note);
+    const preview = await buildSetupPreview(scope);
+    const files = preview
+        ? [new File([preview], SETUP_PREVIEW_FILENAME, { type: "image/png" }), file]
+        : file;
+    await sendFileToUser(userId, files, note);
 }
 
 export function findShareAttachment(attachments: MessageAttachment[] | undefined): MessageAttachment | null {

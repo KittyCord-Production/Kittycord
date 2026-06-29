@@ -25,7 +25,7 @@ import type { ComponentType } from "react";
 import { FriendsListModal, KittycordFriendsRoster, KittycordFriendsTab, useKittycordFriends } from "./friends";
 import { getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
 import style from "./style.css?managed";
-import { applyShare, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
+import { applyShare, buildSetupPreview, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
 const ModalRoot = ModalRootRaw as ComponentType<any>;
@@ -41,6 +41,8 @@ const SCOPE_OPTIONS: { label: string; value: ShareScope; }[] = [
 const scopeLabel = (s: ShareScope) => SCOPE_OPTIONS.find(o => o.value === s)?.label ?? s;
 
 const logger = new Logger("ShareSetup");
+
+const DEFAULT_NOTE = "Here's my Kittycord setup 🐱 grab Kittycord at https://kittycord.dev, then open the file to import it.";
 
 async function enableFriendDiscovery() {
     await registerSelf();
@@ -99,13 +101,27 @@ function restartPrompt() {
 
 function SendModal({ rootProps, user }: { rootProps: any; user: User; }) {
     const [scope, setScope] = React.useState<ShareScope>("plugins");
-    const [note, setNote] = React.useState("Here's my Kittycord setup — open it in Kittycord to import.");
+    const [note, setNote] = React.useState(DEFAULT_NOTE);
     const [busy, setBusy] = React.useState(false);
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        let cancelled = false;
+        let url: string | null = null;
+        setPreviewUrl(null);
+        (async () => {
+            const blob = await buildSetupPreview(scope);
+            if (cancelled || !blob) return;
+            url = URL.createObjectURL(blob);
+            setPreviewUrl(url);
+        })();
+        return () => { cancelled = true; if (url) URL.revokeObjectURL(url); };
+    }, [scope]);
 
     async function send() {
         setBusy(true);
         try {
-            await sendShare(user.id, scope, note.trim() || "Here's my Kittycord setup.");
+            await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
             showToast("Setup sent.", Toasts.Type.SUCCESS);
             rootProps.onClose();
         } catch (e) {
@@ -116,14 +132,20 @@ function SendModal({ rootProps, user }: { rootProps: any; user: User; }) {
     }
 
     return (
-        <ModalRoot {...rootProps} size={ModalSize.SMALL}>
+        <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
                 <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Send your Kittycord setup</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
+                {previewUrl && (
+                    <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
+                        <img src={previewUrl} alt="Setup preview card" style={{ width: "100%", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
+                    </div>
+                )}
+
                 <Text variant="text-sm/normal" style={{ margin: "12px 0" }}>
-                    Sends {getUniqueUsername(user)} a file they can import in Kittycord. Your account token is never included.
+                    Sends {getUniqueUsername(user)} this preview plus a file they can import — the preview shows even if they don't have Kittycord yet. Your account token is never included.
                 </Text>
 
                 <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>What to share</Text>
@@ -194,7 +216,7 @@ const ImportCard = ErrorBoundary.wrap(ImportCardInner, { noop: true });
 function FriendsModal({ rootProps }: { rootProps: any; }) {
     const { phase, friends, reload, setPhase, setFriends } = useKittycordFriends();
     const [scope, setScope] = React.useState<ShareScope>("plugins");
-    const [note, setNote] = React.useState("Here's my Kittycord setup — open it in Kittycord to import.");
+    const [note, setNote] = React.useState(DEFAULT_NOTE);
 
     async function stopDiscoverable() {
         await setShareConsent(false);
@@ -204,7 +226,7 @@ function FriendsModal({ rootProps }: { rootProps: any; }) {
 
     async function sendTo(user: User) {
         try {
-            await sendShare(user.id, scope, note.trim() || "Here's my Kittycord setup.");
+            await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
             showToast(`Sent to ${user.globalName || user.username}.`, Toasts.Type.SUCCESS);
         } catch (e) {
             showToast(String((e as Error)?.message ?? "Could not send the setup."), Toasts.Type.FAILURE);

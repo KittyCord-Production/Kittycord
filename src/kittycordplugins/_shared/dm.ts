@@ -50,12 +50,17 @@ export function uploadAttachment(channelId: string, file: File): Promise<{ id: s
     });
 }
 
-export async function sendFileToUser(userId: string, file: File, content: string) {
+export async function sendFileToUser(userId: string, files: File | File[], content: string) {
     const channelId = await ensureDmChannel(userId);
     if (!channelId) throw new Error("Could not open a DM with that user.");
 
-    const attachment = await uploadAttachment(channelId, file);
-    if (!attachment) throw new Error("Upload failed. Please try again.");
+    const list = Array.isArray(files) ? files : [files];
+    const attachments: { id: string; filename: string; uploaded_filename: string; }[] = [];
+    for (let i = 0; i < list.length; i++) {
+        const uploaded = await uploadAttachment(channelId, list[i]);
+        if (!uploaded) throw new Error("Upload failed. Please try again.");
+        attachments.push({ ...uploaded, id: String(i) });
+    }
 
     await RestAPI.post({
         url: Constants.Endpoints.MESSAGES(channelId),
@@ -65,7 +70,7 @@ export async function sendFileToUser(userId: string, file: File, content: string
             channel_id: channelId,
             sticker_ids: [],
             type: 0,
-            attachments: [attachment]
+            attachments
         }
     });
 }
