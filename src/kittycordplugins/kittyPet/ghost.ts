@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { getCursor } from "./cursor";
 import { buildGhostUri, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 import { burst, spawnHearts } from "./hearts";
 import { PetConfig, PetHooks } from "./pet";
@@ -258,6 +259,20 @@ export class GhostController {
     }
 
     private advance(cfg: PetConfig, now: number, dt: number) {
+        if (cfg.followCursor) {
+            const c = getCursor();
+            this.targetX = Math.min(Math.max(c.x - cfg.size / 2, this.minX), this.maxX);
+            this.targetY = Math.min(Math.max(c.y - cfg.size / 2, this.minY), this.maxY);
+            const k = 1 - Math.exp(-6 * cfg.speed * dt);
+            this.x += (this.targetX - this.x) * k;
+            this.y += (this.targetY - this.y) * k;
+            this.sleeping = false;
+            this.luring = false;
+            this.removeTreat();
+            this.state = "fly";
+            return;
+        }
+
         if (this.state === "fly") {
             const rate = 2.4 * cfg.speed;
             const k = 1 - Math.exp(-rate * dt);

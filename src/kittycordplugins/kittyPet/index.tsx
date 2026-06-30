@@ -11,6 +11,7 @@ import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRa
 import definePlugin, { OptionType } from "@utils/types";
 import { Button, React, SelectedChannelStore, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 
+import { startCursorTracking, stopCursorTracking } from "./cursor";
 import { GhostController } from "./ghost";
 import { GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS } from "./ghostArt";
 import { startHearts, stopHearts } from "./hearts";
@@ -100,6 +101,12 @@ const settings = definePluginSettings({
         default: 1,
         stickToMarkers: true
     },
+    followCursor: {
+        type: OptionType.BOOLEAN,
+        description: "Make your pet follow your mouse cursor instead of wandering on its own",
+        default: false,
+        onChange: () => updateCursorTracking()
+    },
     reactions: {
         type: OptionType.BOOLEAN,
         description: "React to pings, new messages and typing",
@@ -147,12 +154,18 @@ function onPlay() {
     grantPlayXp(currentProfile()).then(notifyLevel);
 }
 
+function updateCursorTracking() {
+    if (settings.store.followCursor) startCursorTracking();
+    else stopCursorTracking();
+}
+
 function buildController(): PetController | GhostController {
     const getConfig = () => ({
         size: settings.store.size,
         speed: settings.store.speed,
         reactions: settings.store.reactions,
-        sleepWhenIdle: settings.store.sleepWhenIdle
+        sleepWhenIdle: settings.store.sleepWhenIdle,
+        followCursor: settings.store.followCursor
     });
     if (settings.store.style === "ghost") return new GhostController({ getConfig, onPet });
     if (settings.store.style === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: TEDDY_ACCESSORIES });
@@ -384,6 +397,7 @@ export default definePlugin({
         await loadSave("ghost");
         await loadSave("teddy");
         await loadSave("raccoon");
+        updateCursorTracking();
         startController();
     },
 
@@ -391,6 +405,7 @@ export default definePlugin({
         controller?.stop();
         controller = null;
         stopHearts();
+        stopCursorTracking();
         disableStyle(style);
     }
 });

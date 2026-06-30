@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { getCursor } from "./cursor";
 import { burst, spawnHearts } from "./hearts";
 import { ACCESSORIES, ACCESSORY_URIS, AnimationName, ANIMATIONS, SHEET, SITTING, SPRITE_SIZE } from "./sprites";
 
@@ -12,6 +13,7 @@ export interface PetConfig {
     speed: number;
     reactions: boolean;
     sleepWhenIdle: boolean;
+    followCursor: boolean;
 }
 
 export interface PetHooks {
@@ -264,6 +266,22 @@ export class PetController {
             if (this.stateTicks === 0) {
                 if (this.state === "tired" && cfg.sleepWhenIdle) this.setState("sleep");
                 else this.setState("idle");
+            }
+            return;
+        }
+
+        if (cfg.followCursor) {
+            this.luring = false;
+            this.removeTreat();
+            this.targetX = Math.min(Math.max(getCursor().x - cfg.size / 2, this.minX), this.maxX);
+            const step = Math.max(1, 3 * cfg.speed);
+            const remaining = this.targetX - this.x;
+            if (Math.abs(remaining) > step) {
+                this.dir = remaining > 0 ? 1 : -1;
+                this.x += step * this.dir;
+                if (this.state !== "walk") this.setState("walk");
+            } else if (this.state === "walk") {
+                this.setState("idle");
             }
             return;
         }
