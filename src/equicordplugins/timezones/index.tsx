@@ -206,8 +206,12 @@ const TimestampComponent = ErrorBoundary.wrap(({ userId, timestamp, type }: Prop
     if (settings.store.showTimezoneInfo) {
         const userTimezone = getSystemTimezone();
         if (timezone === userTimezone) {
-            displayTime = "local";
-            isLocal = true;
+            if (settings.store.showDate) {
+                displayTime = shortTime;
+            } else {
+                displayTime = "local";
+                isLocal = true;
+            }
         } else {
             const timezoneInfo = getTimezoneAbbreviation(timezone, currentTime);
             displayTime = `${shortTime} ${timezoneInfo || timezone}`;
