@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { del, get, set } from "@api/DataStore";
 import { Channel, Message } from "@vencord/discord-types";
 import { findCssClassesLazy } from "@webpack";
 import { MessageStore, useEffect, UserStore, useState, useStateFromStores } from "@webpack/common";
@@ -53,6 +54,36 @@ export function onClearedChannelChange(cb: (channelId: string) => void) {
     };
 }
 
+const CLEARED_CHANNELS_KEY = "Ghosted_clearedChannels";
+
+export function saveClearedChannels() {
+    set(CLEARED_CHANNELS_KEY, Array.from(clearedChannels.entries())).catch(() => { });
+}
+
+function maybePersistCleared() {
+    if (settings.store.persistCleared) saveClearedChannels();
+}
+
+export function clearStoredClearedChannels() {
+    del(CLEARED_CHANNELS_KEY).catch(() => { });
+}
+
+export async function loadClearedChannels() {
+    if (!settings.store.persistCleared) return;
+    try {
+        const stored = await get<[string, string][]>(CLEARED_CHANNELS_KEY);
+        if (!Array.isArray(stored)) return;
+        for (const [channelId, messageId] of stored) {
+            clearedChannels.set(channelId, messageId);
+            if (countedChannels.has(channelId)) {
+                countedChannels.delete(channelId);
+                setBooCount(getBooCount() - 1);
+            }
+            for (const listener of clearedChannelListeners) listener(channelId);
+        }
+    } catch { }
+}
+
 export function getGhostedChannels(): string[] {
     return Array.from(countedChannels);
 }
@@ -69,6 +100,7 @@ export function clearChannelFromGhost(channelId: string): void {
     if (lastMessage) {
         clearedChannels.set(channelId, lastMessage.id);
     }
+    maybePersistCleared();
 
     // notify all listeners that this channel was cleared
     for (const listener of clearedChannelListeners) {
@@ -149,6 +181,7 @@ export function Boo({ channel }: { channel: Channel; }) {
             // so it can be re-ghosted
             if (currentLastMessageId !== clearedAtMessageId) {
                 clearedChannels.delete(id);
+                maybePersistCleared();
                 wasManuallyCleared = false; // update the flag since we deleted it
                 // notify listeners that this channel is no longer cleared (new message)
                 for (const listener of clearedChannelListeners) {
@@ -165,6 +198,7 @@ export function Boo({ channel }: { channel: Channel; }) {
             }
             if (clearedChannels.has(id)) {
                 clearedChannels.delete(id);
+                maybePersistCleared();
             }
             return;
         }

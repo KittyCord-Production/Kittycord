@@ -16,7 +16,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { Channel } from "@vencord/discord-types";
 import { Menu, openModal,Tooltip, useEffect, useState } from "@webpack/common";
 
-import { Boo, clearChannelFromGhost, getBooCount, getGhostedChannels, onBooCountChange } from "./Boo";
+import { Boo, clearChannelFromGhost, clearStoredClearedChannels, getBooCount, getGhostedChannels, loadClearedChannels, onBooCountChange, saveClearedChannels } from "./Boo";
 import { getChannelDisplayName, GhostedUsersModal } from "./GhostedUsersModal";
 import { IconGhost } from "./IconGhost";
 
@@ -34,6 +34,16 @@ export const settings = definePluginSettings({
         description: "Show ghost icons next to individual DMs",
         default: true,
         restartNeeded: false
+    },
+    persistCleared: {
+        type: OptionType.BOOLEAN,
+        description: "Remember cleared (unghosted) DMs across restarts, until they message you again",
+        default: true,
+        restartNeeded: false,
+        onChange(value) {
+            if (value) saveClearedChannels();
+            else clearStoredClearedChannels();
+        }
     },
     ignoreGroupDms: {
         type: OptionType.BOOLEAN,
@@ -186,7 +196,8 @@ export default definePlugin({
         );
     },
 
-    start() {
+    async start() {
+        await loadClearedChannels();
         addServerListElement(ServerListRenderPosition.Above, this.renderIndicator);
     },
 
