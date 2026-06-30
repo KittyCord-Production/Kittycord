@@ -54,6 +54,12 @@ export const settings = definePluginSettings({
         default: false
     },
 
+    showDate: {
+        type: OptionType.BOOLEAN,
+        description: "Show the date next to the time",
+        default: false
+    },
+
     showTimezoneInfo: {
         type: OptionType.BOOLEAN,
         description: "Show timezone info next to time",
@@ -189,7 +195,11 @@ const TimestampComponent = ErrorBoundary.wrap(({ userId, timestamp, type }: Prop
 
     if (!timezone) return null;
 
-    const shortTime = getTime(timezone, currentTime, { hour: "numeric", minute: "numeric" });
+    const shortTime = getTime(timezone, currentTime, {
+        ...(settings.store.showDate && { month: "short", day: "numeric" }),
+        hour: "numeric",
+        minute: "numeric"
+    });
     let displayTime = shortTime;
     let isLocal = false;
 
