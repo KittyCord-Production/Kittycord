@@ -6,12 +6,13 @@
 
 import { get, set } from "@api/DataStore";
 
-export type PetProfile = "cat" | "ghost" | "teddy";
+export type PetProfile = "cat" | "ghost" | "teddy" | "raccoon";
 
 const KEYS: Record<PetProfile, string> = {
     cat: "Kittycord_KittyPet",
     ghost: "Kittycord_KittyGhost",
-    teddy: "Kittycord_KittyTeddy"
+    teddy: "Kittycord_KittyTeddy",
+    raccoon: "Kittycord_KittyRaccoon"
 };
 
 export interface PetSave {
@@ -51,7 +52,7 @@ export function nextLevelXp(level: number): number | null {
 
 const defaults = (): PetSave => ({ xp: 0, pets: 0, equipped: null, msgDay: "", msgXp: 0, notifiedLevel: 1, name: "", tint: "pink", aura: "pink", lastPetDay: "", streak: 0, playDay: "", playXp: 0 });
 
-const saves: Record<PetProfile, PetSave> = { cat: defaults(), ghost: defaults(), teddy: defaults() };
+const saves: Record<PetProfile, PetSave> = { cat: defaults(), ghost: defaults(), teddy: defaults(), raccoon: defaults() };
 let writeQueue: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(fn: () => Promise<T>): Promise<T> {

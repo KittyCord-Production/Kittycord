@@ -15,6 +15,7 @@ import { GhostController } from "./ghost";
 import { GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS } from "./ghostArt";
 import { startHearts, stopHearts } from "./hearts";
 import { PetController } from "./pet";
+import { buildRaccoonUri, RACCOON_ACCESSORIES, RACCOON_ACCESSORY_LEVELS, RACCOON_ACCESSORY_THUMBS } from "./raccoonArt";
 import { ACCESSORIES, ACCESSORY_URIS } from "./sprites";
 import { addXp, DAILY_MSG_XP_CAP, DAILY_PET_XP, getSave, grantPlayXp, levelFor, loadSave, MAX_LEVEL, nextLevelXp, PetProfile, updateSave } from "./state";
 import style from "./style.css?managed";
@@ -53,7 +54,8 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const PET_COPY: Record<PetProfile, { title: string; grown: string; play: string; namePlaceholder: string; who: string; }> = {
     cat: { title: "KittyPet", grown: "Fully grown — what a good kitty.", play: "🍪 Play", namePlaceholder: "Name your kitty…", who: "Your kitty" },
     ghost: { title: "KittyGhost", grown: "Fully grown — what a lovely little spirit.", play: "🎾 Play", namePlaceholder: "Name your ghost…", who: "Your ghost" },
-    teddy: { title: "KittyTeddy", grown: "Fully grown — what a cuddly bear.", play: "🍯 Play", namePlaceholder: "Name your teddy…", who: "Your teddy" }
+    teddy: { title: "KittyTeddy", grown: "Fully grown — what a cuddly bear.", play: "🍯 Play", namePlaceholder: "Name your teddy…", who: "Your teddy" },
+    raccoon: { title: "KittyRaccoon", grown: "Fully grown — what a cheeky little trash panda.", play: "🍇 Play", namePlaceholder: "Name your raccoon…", who: "Your raccoon" }
 };
 
 interface AccessorySet {
@@ -66,7 +68,8 @@ interface AccessorySet {
 const ACCESSORY_SETS: Record<PetProfile, AccessorySet> = {
     cat: { registry: ACCESSORIES, levels: CAT_ACCESSORY_LEVELS, thumbs: ACCESSORY_URIS, pixel: true },
     ghost: { registry: GHOST_ACCESSORIES, levels: GHOST_ACCESSORY_LEVELS, thumbs: GHOST_ACCESSORY_THUMBS, pixel: false },
-    teddy: { registry: TEDDY_ACCESSORIES, levels: TEDDY_ACCESSORY_LEVELS, thumbs: TEDDY_ACCESSORY_THUMBS, pixel: false }
+    teddy: { registry: TEDDY_ACCESSORIES, levels: TEDDY_ACCESSORY_LEVELS, thumbs: TEDDY_ACCESSORY_THUMBS, pixel: false },
+    raccoon: { registry: RACCOON_ACCESSORIES, levels: RACCOON_ACCESSORY_LEVELS, thumbs: RACCOON_ACCESSORY_THUMBS, pixel: false }
 };
 
 const settings = definePluginSettings({
@@ -76,7 +79,8 @@ const settings = definePluginSettings({
         options: [
             { label: "Cat — walks along the bottom", value: "cat", default: true },
             { label: "Ghost — drifts around the screen", value: "ghost" },
-            { label: "Teddy — drifts around the screen", value: "teddy" }
+            { label: "Teddy — drifts around the screen", value: "teddy" },
+            { label: "Raccoon — drifts around the screen", value: "raccoon" }
         ],
         onChange: () => restartController()
     },
@@ -116,7 +120,10 @@ const settings = definePluginSettings({
 
 let controller: PetController | GhostController | null = null;
 
-const currentProfile = (): PetProfile => settings.store.style === "ghost" ? "ghost" : settings.store.style === "teddy" ? "teddy" : "cat";
+const currentProfile = (): PetProfile => {
+    const s = settings.store.style;
+    return s === "ghost" || s === "teddy" || s === "raccoon" ? s : "cat";
+};
 
 function onPet() {
     const profile = currentProfile();
@@ -149,6 +156,7 @@ function buildController(): PetController | GhostController {
     });
     if (settings.store.style === "ghost") return new GhostController({ getConfig, onPet });
     if (settings.store.style === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: TEDDY_ACCESSORIES });
+    if (settings.store.style === "raccoon") return new GhostController({ getConfig, onPet }, { build: buildRaccoonUri, accessories: RACCOON_ACCESSORIES });
     return new PetController({ getConfig, onPet });
 }
 
@@ -314,7 +322,7 @@ function PetModal({ rootProps }: { rootProps: any; }) {
 
 export default definePlugin({
     name: "KittyPet",
-    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost or teddy bear that drifts around the screen on its own. It reacts to pings, can be petted, and levels up to unlock accessories. Each pet keeps its own level and accessories.",
+    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost, teddy bear or raccoon that drifts around the screen on its own. It reacts to pings, can be petted, and levels up to unlock accessories. Each pet keeps its own level and accessories.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Fun", "Customisation"],
     settings,
@@ -375,6 +383,7 @@ export default definePlugin({
         await loadSave("cat");
         await loadSave("ghost");
         await loadSave("teddy");
+        await loadSave("raccoon");
         startController();
     },
 
