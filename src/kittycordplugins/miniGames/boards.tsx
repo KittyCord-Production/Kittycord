@@ -19,7 +19,7 @@ export function name(id: string): string {
 
 export function GameCard({ title, children }: { title: string; children: React.ReactNode; }) {
     return (
-        <div style={{ display: "inline-block", padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)", minWidth: 220 }}>
+        <div style={{ display: "inline-block", padding: 12, margin: "4px 0", borderRadius: 8, border: "1px solid rgba(255, 95, 166, 0.25)", background: "var(--background-secondary)", minWidth: 220 }}>
             <Text variant="text-md/semibold" style={{ color: ACCENT, marginBottom: 8 }}>🎮 {title}</Text>
             {children}
         </div>
@@ -57,8 +57,8 @@ export function TttBoard({ state, meId, onMove, onRematch }: TttProps) {
                             width: 36,
                             height: 36,
                             borderRadius: 6,
-                            border: "1px solid var(--background-modifier-accent)",
-                            background: "var(--background-tertiary)",
+                            border: "1px solid rgba(255, 95, 166, 0.55)",
+                            background: "rgba(255, 95, 166, 0.08)",
                             color: cell === "X" ? ACCENT : ACCENT_2,
                             fontSize: 18,
                             fontWeight: 700,
