@@ -16,6 +16,7 @@ const STAFF_ICON = svgIcon("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0
 const HELPER_ICON = svgIcon("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#ff5fa6' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
 const DONOR_ICON = svgIcon("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#ff5fa6' d='M12 20.7 4.3 13a5 5 0 0 1 7.05-7.05l.65.64.65-.64A5 5 0 0 1 19.7 13z'/><circle cx='8.6' cy='9.4' r='1.35' fill='#fff' opacity='.85'/></svg>");
 const CONTRIBUTOR_ICON = svgIcon("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#ff5fa6' d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>");
+const BUGHUNTER_ICON = svgIcon("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#ff5fa6' d='M12 5c1.7 0 3.1 1 3.8 2.4C17.6 8.5 19 10.6 19 13c0 3.3-3.1 6-7 6s-7-2.7-7-6c0-2.4 1.4-4.5 3.2-5.6C8.9 6 10.3 5 12 5Z'/><path fill='none' stroke='#fff' stroke-width='1.5' stroke-linecap='round' d='M12 8.5v8M8.6 5.6 6.5 3.5M15.4 5.6l2.1-2.1'/><circle cx='9' cy='12' r='1' fill='#fff'/><circle cx='15' cy='12' r='1' fill='#fff'/></svg>");
 
 interface TeamRole {
     id: string;
@@ -66,6 +67,13 @@ const ROLES: TeamRole[] = [
         id: "kittycord-contributor",
         label: "Kittycord Contributor",
         icon: CONTRIBUTOR_ICON,
+        link: "https://github.com/KittyCord-Production/Kittycord",
+        members: []
+    },
+    {
+        id: "kittycord-bughunter",
+        label: "Kittycord Bug Hunter",
+        icon: BUGHUNTER_ICON,
         link: "https://github.com/KittyCord-Production/Kittycord",
         members: []
     }
