@@ -146,7 +146,7 @@ async function generateDebugInfoMessage() {
 
     const info = {
         Kittycord:
-            `v${VERSION} • [${gitHashShort}](<https://github.com/Equicord/Equicord/commit/${gitHash}>)` +
+            `v${VERSION} • [${gitHashShort}](<https://github.com/KittyCord-Production/Kittycord/commit/${gitHash}>)` +
             `${IS_EQUIBOP ? "" : SettingsPlugin.getVersionInfo()} - ${Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(BUILD_TIMESTAMP)}`,
         Client: `${RELEASE_CHANNEL} ~ ${clientString}`,
         Platform: platformDisplay
@@ -332,14 +332,14 @@ export default definePlugin({
 
     commands: [
         {
-            name: "equicord-debug",
+            name: "kittycord-debug",
             description: "Send Kittycord debug info",
             // @ts-ignore
             predicate: ctx => isAnyPluginDev(UserStore.getCurrentUser()?.id) || isEquicordGuild(ctx?.guild?.id, true),
             execute: async () => ({ content: await generateDebugInfoMessage() })
         },
         {
-            name: "equicord-plugins",
+            name: "kittycord-plugins",
             description: "Send Kittycord plugin list",
             // @ts-ignore
             predicate: ctx => isAnyPluginDev(UserStore.getCurrentUser()?.id) || isEquicordGuild(ctx?.guild?.id, true),
@@ -463,14 +463,14 @@ export default definePlugin({
         }
 
         if (equicordSupport && isSupportChannel(props.channel.id) && PermissionStore.can(PermissionsBits.SEND_MESSAGES, props.channel)) {
-            if (props.message.content.includes("/equicord-debug") || props.message.content.includes("/equicord-plugins")) {
+            if (props.message.content.includes("/kittycord-debug") || props.message.content.includes("/kittycord-plugins")) {
                 buttons.push(
                     <Button
                         key="vc-dbg"
                         variant="secondary"
                         onClick={async () => sendMessage(props.channel.id, { content: await generateDebugInfoMessage() })}
                     >
-                        Run /equicord-debug
+                        Run /kittycord-debug
                     </Button>,
                     <Button
                         key="vc-plg-list"
@@ -490,7 +490,7 @@ export default definePlugin({
                             }
                         }}
                     >
-                        Run /equicord-plugins
+                        Run /kittycord-plugins
                     </Button>
                 );
             }
@@ -537,7 +537,7 @@ export default definePlugin({
 
         return (
             <Card variant="warning" className={Margins.top8} defaultPadding>
-                Please do not private message Kittycord & Vencord plugin developers for support!
+                Please do not private message Kittycord plugin developers for support!
                 <br />
                 Instead, use the support channel: {Parser.parse("https://discord.com/channels/1173279886065029291/1297590739911573585")}
                 {!ChannelStore.getChannel(SUPPORT_CHANNEL_ID) && " (Click the link to join)"}

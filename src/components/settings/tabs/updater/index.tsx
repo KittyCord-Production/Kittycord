@@ -48,19 +48,19 @@ function EquibopSection() {
     return (
         <Flex className={Margins.bottom20} flexDirection="column" gap="1em">
             <Card variant="brand">
-                <HeadingSecondary>Equibop & Equicord</HeadingSecondary>
-                <Paragraph>Equibop and Equicord are two separate things. This updater is for Equicord.</Paragraph>
+                <HeadingSecondary>Kittycord</HeadingSecondary>
+                <Paragraph>This updater keeps Kittycord up to date.</Paragraph>
                 <Paragraph className={Margins.top8}>
-                    You receive separate popups for Equibop updates. You can also manually update by installing the <Link href="https://equibop.org/install">latest version</Link>.
+                    You may also get separate popups to update the Kittycord desktop app. You can grab the <Link href="https://kittycord.dev">latest version</Link> any time.
                 </Paragraph>
             </Card>
 
             {isEquibopOutdated && (
                 <Card variant="warning">
-                    <HeadingSecondary>Equibop Outdated</HeadingSecondary>
+                    <HeadingSecondary>Kittycord Outdated</HeadingSecondary>
                     <Flex flexDirection="column" gap="0.5em">
-                        <Paragraph>Your version of Equibop is outdated!</Paragraph>
-                        <Button variant="link" onClick={() => VesktopNative.app.openUpdater()}>Open Equibop Updater</Button>
+                        <Paragraph>Your version of the Kittycord app is outdated!</Paragraph>
+                        <Button variant="link" onClick={() => VesktopNative.app.openUpdater()}>Open Kittycord Updater</Button>
                     </Flex>
                 </Card>
             )}

@@ -2,7 +2,7 @@
     "name": "kittycord",
     "private": "true",
     "version": "1.14.15.0",
-    "description": "Kittycord — a Discord client mod combining the best of Vencord, Equicord and moggcord",
+    "description": "Kittycord — a Discord client mod",
     "homepage": "https://kittycord.dev",
     "bugs": {
         "url": "https://github.com/KittyCord-Production/Kittycord/issues"

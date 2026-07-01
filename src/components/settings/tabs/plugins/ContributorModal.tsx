@@ -55,7 +55,7 @@ function ContributorModal({ user, modalProps }: { user: User; modalProps: Render
             .sort((a, b) => Number(a.required ?? false) - Number(b.required ?? false));
     }, [user.id, user.username]);
 
-    const ContributedHyperLink = <Link href="https://github.com/Equicord/Equicord">contributed</Link>;
+    const ContributedHyperLink = <Link href="https://github.com/KittyCord-Production/Kittycord">contributed</Link>;
 
     const hasLinks = website || githubName;
 
