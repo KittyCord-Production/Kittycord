@@ -29,7 +29,7 @@ const HEX_RE = /^#[0-9a-f]{6}$/i;
 const cosmetics = new Map<string, Cosmetic>();
 let refreshTimer: ReturnType<typeof setInterval> | null = null;
 
-async function refresh() {
+export async function refresh() {
     if (!Native) return;
     const list = await Native.getCosmetics();
     cosmetics.clear();

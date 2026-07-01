@@ -1,0 +1,96 @@
+.kc-looks-save {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.kc-looks-save-input {
+    width: 220px;
+}
+
+.kc-looks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kc-looks-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--background-secondary-alt);
+    border: 1px solid var(--background-modifier-accent);
+}
+
+.kc-looks-card.kc-looks-active {
+    border-color: #ff5fa6;
+}
+
+.kc-looks-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.kc-looks-title {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.kc-looks-tag {
+    color: #ff5fa6;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.kc-looks-preview {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.kc-looks-deko {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+}
+
+.kc-looks-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.kc-looks-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.kc-looks-badge img {
+    border-radius: 3px;
+}
+
+.kc-looks-plain {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+}
+
+.kc-looks-actions {
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.kc-looks-empty {
+    padding: 14px 0;
+    color: var(--text-muted);
+    font-style: italic;
+}

@@ -21,7 +21,7 @@ const customBadges = new Map<string, Array<CustomBadge | undefined>>();
 
 const isUrl = (s: string) => /^https:\/\//i.test(s);
 
-async function refreshBadges() {
+export async function refreshBadges() {
     const list = await Native.getBadges();
     customBadges.clear();
     for (const b of list) {

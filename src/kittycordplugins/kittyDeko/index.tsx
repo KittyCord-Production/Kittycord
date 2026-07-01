@@ -32,7 +32,7 @@ function subscribe(cb: () => void) {
     return () => void listeners.delete(cb);
 }
 
-async function refresh() {
+export async function refresh() {
     if (!Native) return;
     const list = await Native.getDeko();
     deko.clear();

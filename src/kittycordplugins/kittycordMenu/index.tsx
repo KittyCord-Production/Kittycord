@@ -28,6 +28,7 @@ const FEATURES: Feature[] = [
     { plugin: "ScheduledMessages", action: "Open Scheduler", label: "Scheduled messages" },
     { plugin: "KittycordStudio", action: "Open Studio", label: "Theme Studio" },
     { plugin: "KittycordCosmetics", action: "Style your name", label: "Name style" },
+    { plugin: "Looks", action: "Open Looks", label: "Looks" },
     { plugin: "KittyPet", action: "Open KittyPet", label: "KittyPet" },
     { plugin: "KittyPet", action: "Play with KittyPet", label: "Play with KittyPet" },
     { plugin: "MiniGames", action: "Start a game", label: "Play a game" },
