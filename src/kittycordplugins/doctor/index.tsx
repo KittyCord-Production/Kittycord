@@ -5,6 +5,7 @@
  */
 
 import { isPluginEnabled, pluginRequiresRestart, plugins } from "@api/PluginManager";
+import { Settings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { ShieldIcon } from "@components/Icons";
@@ -38,6 +39,7 @@ interface Scan {
     enabledCount: number;
     failed: string[];
     discordBuild: number;
+    transparencyOn: boolean;
 }
 
 function scan(): Scan {
@@ -60,7 +62,8 @@ function scan(): Scan {
         patchesOk: erroredPatches < 3 && noEffectPatches < 8,
         enabledCount,
         failed,
-        discordBuild
+        discordBuild,
+        transparencyOn: IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && Settings.transparent === true
     };
 }
 
@@ -126,7 +129,7 @@ function DoctorPanel() {
         });
     }
 
-    const allHealthy = data.patchesOk && data.failed.length === 0;
+    const allHealthy = data.patchesOk && data.failed.length === 0 && !data.transparencyOn;
 
     return (
         <ErrorBoundary noop>
@@ -157,6 +160,14 @@ function DoctorPanel() {
                 {updateState === "outdated" && " An update is available."}
                 {updateState === "error" && " Couldn't check for updates."}
             </StatusCard>
+
+            {IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && (
+                <StatusCard title="Window behavior" ok={!data.transparencyOn}>
+                    {data.transparencyOn
+                        ? "Window Transparency is on, so Windows can't snap this window — dragging it to the top or pressing Win+Arrow won't maximize it. Turn off \"Enable Window Transparency\" in Kittycord settings to get snapping back. Tip: Background Material gives a glass look without this limitation."
+                        : "Window snapping and drag-to-maximize work normally."}
+                </StatusCard>
+            )}
 
             <Flex style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
                 <Button size={Button.Sizes.SMALL} color={Button.Colors.PRIMARY} onClick={() => setData(scan())}>Re-scan</Button>
