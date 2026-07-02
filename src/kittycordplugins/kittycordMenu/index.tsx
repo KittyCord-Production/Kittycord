@@ -39,6 +39,7 @@ const FEATURES: Feature[] = [
     { plugin: "KittyInvites", action: "Share invite stats", label: "Invite stats" },
     { plugin: "ShowOff", action: "Show off my Kittycord look", label: "Show off my look" },
     { plugin: "Onboarding", action: "Run setup wizard", label: "Setup wizard" },
+    { plugin: "CommunityHub", action: "Open Community", label: "Community" },
     { plugin: "KittycordDoctor", action: "Open Doctor", label: "Doctor" }
 ];
 
