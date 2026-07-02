@@ -23,8 +23,8 @@ function isChannelExempted(channel: Channel): boolean {
 }
 
 const countedChannels = new Set<string>();
-// track channels that were manually cleared and the message ID at time of clear
-const clearedChannels = new Map<string, string>();
+// track channels that were manually cleared and when
+const clearedChannels = new Map<string, number>();
 // listeners for when a channel is cleared or un-cleared (thororen is this allowed lolz)
 const clearedChannelListeners = new Set<(channelId: string) => void>();
 
@@ -68,13 +68,19 @@ export function clearStoredClearedChannels() {
     del(CLEARED_CHANNELS_KEY).catch(() => { });
 }
 
+const DISCORD_EPOCH = 1420070400000;
+
+function snowflakeToTimestamp(id: string): number {
+    return Number(BigInt(id) >> 22n) + DISCORD_EPOCH;
+}
+
 export async function loadClearedChannels() {
     if (!settings.store.persistCleared) return;
     try {
-        const stored = await get<[string, string][]>(CLEARED_CHANNELS_KEY);
+        const stored = await get<[string, string | number][]>(CLEARED_CHANNELS_KEY);
         if (!Array.isArray(stored)) return;
-        for (const [channelId, messageId] of stored) {
-            clearedChannels.set(channelId, messageId);
+        for (const [channelId, value] of stored) {
+            clearedChannels.set(channelId, typeof value === "number" ? value : snowflakeToTimestamp(value));
             if (countedChannels.has(channelId)) {
                 countedChannels.delete(channelId);
                 setBooCount(getBooCount() - 1);
@@ -89,24 +95,20 @@ export function getGhostedChannels(): string[] {
 }
 
 export function clearChannelFromGhost(channelId: string): void {
-    if (!countedChannels.has(channelId)) {
-        return;
+    if (countedChannels.delete(channelId)) {
+        setBooCount(getBooCount() - 1);
     }
-    countedChannels.delete(channelId);
-    setBooCount(getBooCount() - 1);
 
     // so we can detect new messages from the other person
     const lastMessage = MessageStore.getMessages(channelId)?.last();
-    if (lastMessage) {
-        clearedChannels.set(channelId, lastMessage.id);
-    }
+    const lastMessageTimestampMs = lastMessage ? new Date(lastMessage.timestamp).getTime() : 0;
+    clearedChannels.set(channelId, Math.max(Date.now(), lastMessageTimestampMs));
     maybePersistCleared();
 
     // notify all listeners that this channel was cleared
     for (const listener of clearedChannelListeners) {
         listener(channelId);
     }
-
 }
 
 export function isChannelCleared(channelId: string): boolean {
@@ -169,24 +171,19 @@ export function Boo({ channel }: { channel: Channel; }) {
 
         // if manually cleared, check if there's a NEW message from the other person
         if (wasManuallyCleared && !state.isCurrentUser) {
-            const clearedAtMessageId = clearedChannels.get(id);
-            const currentLastMessageId = lastMessage?.id;
+            const clearedAt = clearedChannels.get(id)!;
 
-            // if it's the same message, stay cleared (don't re-ghost)
-            if (clearedAtMessageId === currentLastMessageId) {
+            // only a message newer than the clear un-clears; just opening the chat never does
+            if (lastMessageTimestampMs <= clearedAt) {
                 return;
             }
 
-            // if there's a NEW message from the OTHER person, remove from cleared state
-            // so it can be re-ghosted
-            if (currentLastMessageId !== clearedAtMessageId) {
-                clearedChannels.delete(id);
-                maybePersistCleared();
-                wasManuallyCleared = false; // update the flag since we deleted it
-                // notify listeners that this channel is no longer cleared (new message)
-                for (const listener of clearedChannelListeners) {
-                    listener(id);
-                }
+            clearedChannels.delete(id);
+            maybePersistCleared();
+            wasManuallyCleared = false;
+            // notify listeners that this channel is no longer cleared (new message)
+            for (const listener of clearedChannelListeners) {
+                listener(id);
             }
         }
 
