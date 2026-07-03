@@ -1,5 +1,5 @@
 .kc-fakevoice-indicator {
-    color: #ff5fa6;
+    color: var(--kc-accent, #ff5fa6);
     vertical-align: middle;
     margin: 0 2px;
     flex-shrink: 0;

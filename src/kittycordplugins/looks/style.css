@@ -27,7 +27,7 @@
 }
 
 .kc-looks-card.kc-looks-active {
-    border-color: #ff5fa6;
+    border-color: var(--kc-accent, #ff5fa6);
 }
 
 .kc-looks-main {
@@ -43,7 +43,7 @@
 }
 
 .kc-looks-tag {
-    color: #ff5fa6;
+    color: var(--kc-accent, #ff5fa6);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }

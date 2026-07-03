@@ -27,7 +27,7 @@
 
 .kc-priv-no {
     background: var(--background-secondary);
-    border-left: 3px solid #ff5fa6;
+    border-left: 3px solid var(--kc-accent, #ff5fa6);
 }
 
 .kc-priv-report {

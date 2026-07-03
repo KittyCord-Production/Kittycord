@@ -55,7 +55,7 @@
 .kc-inv-seg-on,
 .kc-inv-seg-on:hover {
     color: #fff;
-    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
+    background: linear-gradient(135deg, var(--kc-accent, #ff5fa6), var(--kc-accent-soft, #ff8ac4));
 }
 
 .kc-inv-search {
@@ -139,7 +139,7 @@
     font-weight: 800;
     font-size: 13px;
     font-variant-numeric: tabular-nums;
-    color: #ff8ac4;
+    color: var(--kc-accent-soft, #ff8ac4);
     background: var(--background-tertiary);
     padding: 4px 12px;
     border-radius: 999px;
@@ -147,18 +147,18 @@
 
 .kc-inv-row.kc-inv-top1 .kc-inv-count {
     color: #fff;
-    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
-    box-shadow: 0 2px 8px rgba(255, 95, 166, .38);
+    background: linear-gradient(135deg, var(--kc-accent, #ff5fa6), var(--kc-accent-soft, #ff8ac4));
+    box-shadow: 0 2px 8px rgb(var(--kc-accent-glow, 255 95 166) / 38%);
 }
 
 /* The #1 row gets a soft "throne" tint; your own row gets a subtle highlight + accent stripe.
    Both use controlled Kittycord pink (not theme brand vars, which some themes turn into a loud fill). */
 .kc-inv-row.kc-inv-top1 {
-    background: linear-gradient(90deg, rgba(255, 95, 166, .16), var(--background-secondary) 62%);
+    background: linear-gradient(90deg, rgb(var(--kc-accent-glow, 255 95 166) / 16%), var(--background-secondary) 62%);
 }
 
 .kc-inv-me,
 .kc-inv-me:hover {
     background: var(--background-modifier-selected);
-    box-shadow: inset 3px 0 0 0 #ff5fa6;
+    box-shadow: inset 3px 0 0 0 var(--kc-accent, #ff5fa6);
 }

@@ -21,7 +21,7 @@
     border-radius: 16px;
     border: 1px solid #402835;
     background:
-        radial-gradient(120% 160% at 0% 0%, rgb(255 95 166 / 22%), transparent 58%),
+        radial-gradient(120% 160% at 0% 0%, rgb(var(--kc-accent-glow, 255 95 166) / 22%), transparent 58%),
         linear-gradient(135deg, #301e28, #21151c);
 }
 
@@ -33,7 +33,7 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgb(255 138 196 / 20%), transparent 70%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--kc-accent-soft, #ff8ac4) 20%, transparent), transparent 70%);
     pointer-events: none;
 }
 
@@ -42,14 +42,14 @@
     height: 46px;
     border-radius: 14px;
     flex-shrink: 0;
-    box-shadow: 0 4px 16px rgb(255 95 166 / 40%);
+    box-shadow: 0 4px 16px rgb(var(--kc-accent-glow, 255 95 166) / 40%);
 }
 
 .kc-fr-hero-title {
     font-weight: 800;
     font-size: 21px;
     line-height: 1.1;
-    color: #ff8ac4;
+    color: var(--kc-accent-soft, #ff8ac4);
 }
 
 .kc-fr-hero-sub {
@@ -78,7 +78,7 @@
     font-weight: 800;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
-    color: #ff8ac4;
+    color: var(--kc-accent-soft, #ff8ac4);
     background: var(--background-tertiary);
     padding: 2px 10px;
     border-radius: 999px;
@@ -107,7 +107,7 @@
 }
 
 .kc-fr-row-online {
-    background: linear-gradient(90deg, rgb(255 95 166 / 12%), var(--background-secondary) 58%);
+    background: linear-gradient(90deg, rgb(var(--kc-accent-glow, 255 95 166) / 12%), var(--background-secondary) 58%);
 }
 
 .kc-fr-av {
@@ -177,18 +177,18 @@
 }
 
 .kc-fr-btn-ghost:hover {
-    background: rgb(255 95 166 / 16%);
-    color: #ff8ac4;
+    background: rgb(var(--kc-accent-glow, 255 95 166) / 16%);
+    color: var(--kc-accent-soft, #ff8ac4);
 }
 
 .kc-fr-btn-primary {
     color: #fff;
-    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
-    box-shadow: 0 2px 8px rgb(255 95 166 / 35%);
+    background: linear-gradient(135deg, var(--kc-accent, #ff5fa6), var(--kc-accent-soft, #ff8ac4));
+    box-shadow: 0 2px 8px rgb(var(--kc-accent-glow, 255 95 166) / 35%);
 }
 
 .kc-fr-btn-primary:hover {
-    box-shadow: 0 4px 14px rgb(255 95 166 / 50%);
+    box-shadow: 0 4px 14px rgb(var(--kc-accent-glow, 255 95 166) / 50%);
 }
 
 .kc-fr-link {
@@ -202,7 +202,7 @@
 }
 
 .kc-fr-link:hover {
-    color: #ff8ac4;
+    color: var(--kc-accent-soft, #ff8ac4);
     text-decoration: underline;
 }
 
