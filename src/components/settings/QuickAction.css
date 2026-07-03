@@ -29,7 +29,7 @@
 }
 
 .vc-settings-quickActions-pill:hover {
-    background: rgb(255 95 166 / 14%);
+    background: rgb(var(--kc-accent-glow, 255 95 166) / 14%);
     transform: translateY(-1px);
     box-shadow: var(--elevation-high);
 }
@@ -43,5 +43,5 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    color: #ff8ac4;
+    color: var(--kc-accent-soft, #ff8ac4);
 }

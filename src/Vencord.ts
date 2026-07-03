@@ -32,6 +32,7 @@ export { PlainSettings, Settings };
 import { coreStyleRootNode, initStyles } from "@api/Styles";
 import { ChangelogTab, openSettingsTabModal, UpdaterTab } from "@components/settings";
 import { markUpdateNoticeShown, shouldSurfaceUpdateNotice } from "@components/settings/tabs/changelog/changelogManager";
+import { ACCENT_PRESETS } from "@shared/accentPresets";
 import { debounce } from "@shared/debounce";
 import { IS_WINDOWS } from "@utils/constants";
 import { createAndAppendStyle } from "@utils/css";
@@ -298,6 +299,15 @@ async function init() {
 
 initPluginManager();
 initStyles();
+
+const accentStyleNode = createAndAppendStyle("vencord-kittycord-accent", coreStyleRootNode);
+function applyAccent() {
+    const preset = ACCENT_PRESETS[Settings.kittycordAccent] ?? ACCENT_PRESETS.pink;
+    accentStyleNode.textContent = `:root{--kc-accent:${preset.accent};--kc-accent-soft:${preset.soft};--kc-accent-glow:${preset.glow}}`;
+}
+applyAccent();
+SettingsStore.addChangeListener("kittycordAccent", applyAccent);
+
 startAllPlugins(StartAt.Init);
 init();
 

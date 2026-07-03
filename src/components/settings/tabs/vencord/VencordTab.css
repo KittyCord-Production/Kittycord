@@ -60,10 +60,10 @@
     padding: 24px;
     margin-bottom: 20px;
     border-radius: 16px;
-    border: 1px solid rgb(255 95 166 / 30%);
+    border: 1px solid rgb(var(--kc-accent-glow, 255 95 166) / 30%);
     background:
-        radial-gradient(ellipse at top left, rgb(255 138 196 / 28%), transparent 65%),
-        radial-gradient(ellipse at bottom right, rgb(255 61 139 / 20%), transparent 60%),
+        radial-gradient(ellipse at top left, color-mix(in srgb, var(--kc-accent-soft, #ff8ac4) 28%, transparent), transparent 65%),
+        radial-gradient(ellipse at bottom right, color-mix(in srgb, var(--kc-accent, #ff5fa6) 20%, transparent), transparent 60%),
         var(--background-base-low, var(--background-secondary));
     overflow: hidden;
 }
@@ -73,7 +73,7 @@
     height: 76px;
     border-radius: 20px;
     flex-shrink: 0;
-    box-shadow: 0 8px 24px -6px rgb(255 95 166 / 50%);
+    box-shadow: 0 8px 24px -6px rgb(var(--kc-accent-glow, 255 95 166) / 50%);
 }
 
 .vc-vencord-tab-hero-title {
@@ -97,10 +97,41 @@
     margin-top: 10px;
 }
 
+.vc-vencord-tab-accent-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.vc-vencord-tab-accent-swatch {
+    all: unset;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+.vc-vencord-tab-accent-swatch:hover {
+    transform: translateY(-1px);
+}
+
+.vc-vencord-tab-accent-swatch:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.vc-vencord-tab-accent-swatch-active {
+    border-color: var(--header-primary);
+    box-shadow: 0 0 0 4px rgb(var(--kc-accent-glow, 255 95 166) / 25%);
+}
+
 .vc-vencord-tab-hero-badge {
-    background: rgb(255 95 166 / 16%);
-    color: #ff8ac4;
-    border: 1px solid rgb(255 95 166 / 35%);
+    background: rgb(var(--kc-accent-glow, 255 95 166) / 16%);
+    color: var(--kc-accent-soft, #ff8ac4);
+    border: 1px solid rgb(var(--kc-accent-glow, 255 95 166) / 35%);
     border-radius: 999px;
     padding: 3px 10px;
     font-size: 12px;

@@ -10,15 +10,18 @@
 // Both are covered with a Kittycord overlay that removes itself once Discord is ready. The DOM is
 // version-specific, so this is best-effort and is wrapped so it can never block Discord startup.
 
+import { ACCENT_PRESETS, AccentPreset } from "@shared/accentPresets";
 import { app } from "electron";
 
 import { KITTY_ICON_DATA_URL } from "./iconData";
+import { RendererSettings } from "./settings";
 
 // The Kittycord logo as an <img> filling its rounded container (the real app icon as a data URL).
 const KITTY_IMG = '<img src="' + KITTY_ICON_DATA_URL + '" alt="Kittycord" style="width:100%;height:100%;display:block">';
 
 // Shared dark background: a soft radial gradient for depth instead of a flat fill.
-const KITTY_BG = "radial-gradient(130% 90% at 50% 32%, #1e1019 0%, #120a10 52%, #0a0608 100%)";
+const kittyBg = (p: AccentPreset) => `radial-gradient(130% 90% at 50% 32%, color-mix(in srgb, ${p.accent} 8%, #0a090d) 0%, color-mix(in srgb, ${p.accent} 4%, #08060a) 52%, color-mix(in srgb, ${p.accent} 2%, #050405) 100%)`;
+const kittyBgBase = (p: AccentPreset) => `color-mix(in srgb, ${p.accent} 2%, #050405)`;
 
 // Shared animation keyframes used by both overlays.
 const KITTY_KEYFRAMES =
@@ -29,21 +32,21 @@ const KITTY_KEYFRAMES =
     "@keyframes kc-in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}";
 
 // Overlay for the small startup splash/update window: stays until the window closes.
-const SPLASH_JS = `
+const buildSplashJs = (p: AccentPreset) => `
 (function () {
     try {
         if (window.__OVERLAY__) return;
         if (document.getElementById("kc-splash")) return;
         var css = document.createElement("style");
         css.textContent =
-            "html,body{margin:0;overflow:hidden;background:#0a0608 !important}" +
-            "#kc-splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:${KITTY_BG};z-index:2147483647;font-family:'gg sans','Segoe UI',sans-serif;-webkit-app-region:drag;animation:kc-in .5s ease both}" +
+            "html,body{margin:0;overflow:hidden;background:${kittyBgBase(p)} !important}" +
+            "#kc-splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:${kittyBg(p)};z-index:2147483647;font-family:'gg sans','Segoe UI',sans-serif;-webkit-app-region:drag;animation:kc-in .5s ease both}" +
             "#kc-splash .kc-stage{position:relative;width:104px;height:104px;display:flex;align-items:center;justify-content:center}" +
-            "#kc-splash .kc-halo{position:absolute;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle, rgba(255,95,166,.30) 0%, rgba(255,95,166,.09) 42%, transparent 70%);filter:blur(6px);animation:kc-breathe 3.4s ease-in-out infinite}" +
+            "#kc-splash .kc-halo{position:absolute;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle, rgb(${p.glow} / .30) 0%, rgb(${p.glow} / .09) 42%, transparent 70%);filter:blur(6px);animation:kc-breathe 3.4s ease-in-out infinite}" +
             "#kc-splash .kc-logo{position:relative;width:88px;height:88px;border-radius:22px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);animation:kc-float 3.4s ease-in-out infinite}" +
-            "#kc-splash .kc-name{color:#ff6fb0;font-size:25px;font-weight:800;letter-spacing:.4px;text-shadow:0 2px 16px rgba(255,95,166,.35)}" +
+            "#kc-splash .kc-name{color:${p.accent};font-size:25px;font-weight:800;letter-spacing:.4px;text-shadow:0 2px 16px rgb(${p.glow} / .35)}" +
             "#kc-splash .kc-dots{display:flex;gap:6px;margin-top:2px}" +
-            "#kc-splash .kc-dots i{width:6px;height:6px;border-radius:50%;background:#ff6fb0;animation:kc-bounce 1s ease-in-out infinite}" +
+            "#kc-splash .kc-dots i{width:6px;height:6px;border-radius:50%;background:${p.accent};animation:kc-bounce 1s ease-in-out infinite}" +
             "#kc-splash .kc-dots i:nth-child(2){animation-delay:.15s}#kc-splash .kc-dots i:nth-child(3){animation-delay:.3s}" +
             "${KITTY_KEYFRAMES}";
         (document.head || document.documentElement).appendChild(css);
@@ -59,7 +62,7 @@ const SPLASH_JS = `
 // Overlay for the MAIN client loading screen: covers Discord's "Did you know" screen, then fades
 // out once the app UI (server list / app chrome) appears, or after a short timeout as a safety net.
 // It never covers Discord's login/auth screens and never blocks input, so it can't trap the user.
-const LOADING_JS = `
+const buildLoadingJs = (p: AccentPreset) => `
 (function () {
     try {
         // Never mount the loading backdrop in Discord's in-game overlay renderer, or it turns the
@@ -78,14 +81,14 @@ const LOADING_JS = `
 
         var css = document.createElement("style");
         css.textContent =
-            "#kc-loading{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:${KITTY_BG};z-index:2147483647;font-family:'gg sans','Segoe UI',sans-serif;transition:opacity .45s ease;animation:kc-in .5s ease both}" +
+            "#kc-loading{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:${kittyBg(p)};z-index:2147483647;font-family:'gg sans','Segoe UI',sans-serif;transition:opacity .45s ease;animation:kc-in .5s ease both}" +
             "#kc-loading .kc-stage{position:relative;width:128px;height:128px;display:flex;align-items:center;justify-content:center}" +
-            "#kc-loading .kc-halo{position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle, rgba(255,95,166,.32) 0%, rgba(255,95,166,.10) 42%, transparent 70%);filter:blur(7px);animation:kc-breathe 3.4s ease-in-out infinite}" +
+            "#kc-loading .kc-halo{position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle, rgb(${p.glow} / .32) 0%, rgb(${p.glow} / .10) 42%, transparent 70%);filter:blur(7px);animation:kc-breathe 3.4s ease-in-out infinite}" +
             "#kc-loading .kc-logo{position:relative;width:104px;height:104px;border-radius:24px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);animation:kc-float 3.4s ease-in-out infinite}" +
-            "#kc-loading .kc-name{color:#ff6fb0;font-size:31px;font-weight:800;letter-spacing:.4px;text-shadow:0 2px 18px rgba(255,95,166,.35)}" +
+            "#kc-loading .kc-name{color:${p.accent};font-size:31px;font-weight:800;letter-spacing:.4px;text-shadow:0 2px 18px rgb(${p.glow} / .35)}" +
             "#kc-loading .kc-bar{width:188px;height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}" +
-            "#kc-loading .kc-bar span{position:absolute;top:0;left:-35%;height:100%;width:35%;border-radius:99px;background:linear-gradient(90deg,transparent,#ff6fb0 50%,transparent);box-shadow:0 0 12px rgba(255,95,166,.6);animation:kc-comet 1.25s ease-in-out infinite}" +
-            "#kc-loading .kc-tip{color:#caa6bb;font-size:12.5px;letter-spacing:.3px;opacity:.85;min-height:16px;transition:opacity .35s ease}" +
+            "#kc-loading .kc-bar span{position:absolute;top:0;left:-35%;height:100%;width:35%;border-radius:99px;background:linear-gradient(90deg,transparent,${p.accent} 50%,transparent);box-shadow:0 0 12px rgb(${p.glow} / .6);animation:kc-comet 1.25s ease-in-out infinite}" +
+            "#kc-loading .kc-tip{color:color-mix(in srgb,${p.soft} 30%,#b6b0b4);font-size:12.5px;letter-spacing:.3px;opacity:.85;min-height:16px;transition:opacity .35s ease}" +
             "${KITTY_KEYFRAMES}";
         (document.head || document.documentElement).appendChild(css);
 
@@ -151,10 +154,11 @@ app.on("browser-window-created", (_, win) => {
         win.webContents.on("dom-ready", () => {
             try {
                 const url = win.webContents.getURL() || "";
+                const preset = ACCENT_PRESETS[RendererSettings.store.kittycordAccent!] ?? ACCENT_PRESETS.pink;
                 if (/splash/i.test(url)) {
-                    win.webContents.executeJavaScript(SPLASH_JS).catch(() => { });
+                    win.webContents.executeJavaScript(buildSplashJs(preset)).catch(() => { });
                 } else if (/discord\.com/i.test(url) && !/\/popout|\/overlay/i.test(url)) {
-                    win.webContents.executeJavaScript(LOADING_JS).catch(() => { });
+                    win.webContents.executeJavaScript(buildLoadingJs(preset)).catch(() => { });
                 }
             } catch { }
         });

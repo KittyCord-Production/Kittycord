@@ -11,15 +11,15 @@
 .vc-settings-tab .vc-addon-card {
     min-width: 0;
     border-radius: 11px;
-    border: 1px solid rgb(255 95 166 / 11%);
+    border: 1px solid rgb(var(--kc-accent-glow, 255 95 166) / 11%);
     background:
-        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(160deg, rgb(var(--kc-accent-glow, 255 95 166) / 6%), rgb(var(--kc-accent-glow, 255 95 166) / 2%)),
         linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
         var(--background-base-lower-alt, var(--card-background-default));
 }
 
 .vc-settings-tab .vc-addon-card:hover {
-    border-color: rgb(255 95 166 / 28%);
+    border-color: rgb(var(--kc-accent-glow, 255 95 166) / 28%);
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgb(0 0 0 / 28%);
 }
@@ -27,9 +27,9 @@
 section.vc-settings-tab .vc-plugins-info-card,
 section.vc-settings-tab .vc-plugin-stats {
     border-radius: 13px !important;
-    border: 1px solid rgb(255 95 166 / 11%) !important;
+    border: 1px solid rgb(var(--kc-accent-glow, 255 95 166) / 11%) !important;
     background:
-        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(160deg, rgb(var(--kc-accent-glow, 255 95 166) / 6%), rgb(var(--kc-accent-glow, 255 95 166) / 2%)),
         linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
         var(--background-base-lower-alt, var(--background-secondary)) !important;
 }
@@ -46,18 +46,18 @@ section.vc-settings-tab .vc-plugin-stats::before {
     width: 18px;
     height: 2px;
     border-radius: 2px;
-    background: linear-gradient(90deg, #ff5fa6, transparent);
+    background: linear-gradient(90deg, var(--kc-accent, #ff5fa6), transparent);
 }
 
 section.vc-settings-tab .vc-plugin-stats-card-divider {
-    border-left-color: rgb(255 95 166 / 18%);
+    border-left-color: rgb(var(--kc-accent-glow, 255 95 166) / 18%);
 }
 
 section.vc-settings-tab .vc-plugins-info-card:hover,
 section.vc-settings-tab .vc-plugin-stats:hover {
-    border-color: rgb(255 95 166 / 24%) !important;
+    border-color: rgb(var(--kc-accent-glow, 255 95 166) / 24%) !important;
     background:
-        linear-gradient(160deg, rgb(255 95 166 / 9%), rgb(255 95 166 / 3%)),
+        linear-gradient(160deg, rgb(var(--kc-accent-glow, 255 95 166) / 9%), rgb(var(--kc-accent-glow, 255 95 166) / 3%)),
         linear-gradient(0deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 12%)),
         var(--background-base-low, var(--background-secondary)) !important;
 }
@@ -66,28 +66,28 @@ section.vc-settings-tab .vc-plugin-ui-elements-button {
     margin-top: 0;
     padding: 12px 14px;
     border-radius: 12px;
-    border: 1px solid rgb(255 95 166 / 11%);
+    border: 1px solid rgb(var(--kc-accent-glow, 255 95 166) / 11%);
     background:
-        linear-gradient(160deg, rgb(255 95 166 / 6%), rgb(255 95 166 / 2%)),
+        linear-gradient(160deg, rgb(var(--kc-accent-glow, 255 95 166) / 6%), rgb(var(--kc-accent-glow, 255 95 166) / 2%)),
         linear-gradient(0deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 16%)),
         var(--background-base-lower-alt, var(--background-secondary));
 }
 
 section.vc-settings-tab .vc-plugin-ui-elements-button:hover {
-    border-color: rgb(255 95 166 / 28%);
+    border-color: rgb(var(--kc-accent-glow, 255 95 166) / 28%);
     background:
-        linear-gradient(160deg, rgb(255 95 166 / 9%), rgb(255 95 166 / 3%)),
+        linear-gradient(160deg, rgb(var(--kc-accent-glow, 255 95 166) / 9%), rgb(var(--kc-accent-glow, 255 95 166) / 3%)),
         linear-gradient(0deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 12%)),
         var(--background-base-low, var(--background-secondary));
 }
 
 /* The signature pop: enabled plugin toggles turn Kittycord pink. */
 .vc-settings-tab .vc-switch-checked .vc-switch-indicator {
-    background: linear-gradient(135deg, #ff5fa6, #ff8ac4);
-    border-color: #ff5fa6;
+    background: linear-gradient(135deg, var(--kc-accent, #ff5fa6), var(--kc-accent-soft, #ff8ac4));
+    border-color: var(--kc-accent, #ff5fa6);
 }
 
 .vc-settings-tab .vc-switch-checked:hover .vc-switch-indicator {
-    background: linear-gradient(135deg, #ff4f9c, #ff7ab8);
-    border-color: #ff8ac4;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--kc-accent, #ff5fa6) 92%, black), color-mix(in srgb, var(--kc-accent-soft, #ff8ac4) 92%, black));
+    border-color: var(--kc-accent-soft, #ff8ac4);
 }

@@ -20,6 +20,7 @@ import { openContributorModal, openPluginModal, SettingsTab, wrapTab } from "@co
 import { QuickAction, QuickActionCard } from "@components/settings/QuickAction";
 import { SpecialCard } from "@components/settings/SpecialCard";
 import BadgeAPI from "@plugins/_api/badges";
+import { ACCENT_PRESETS, KittycordAccent } from "@shared/accentPresets";
 import { gitRemote } from "@shared/vencordUserAgent";
 import { DONOR_ROLE_ID, GUILD_ID, IS_WINDOWS, VC_DONOR_ROLE_ID, VC_GUILD_ID } from "@utils/constants";
 import { classNameFactory } from "@utils/css";
@@ -152,6 +153,26 @@ function Switches() {
     });
 }
 
+function AccentPicker() {
+    const settings = useSettings(["kittycordAccent"]);
+
+    return (
+        <div className={cl("accent-row")} role="group" aria-label="Accent color">
+            {Object.entries(ACCENT_PRESETS).map(([key, preset]) => (
+                <button
+                    key={key}
+                    type="button"
+                    className={cl("accent-swatch", { "accent-swatch-active": settings.kittycordAccent === key })}
+                    style={{ background: preset.accent }}
+                    aria-label={key.charAt(0).toUpperCase() + key.slice(1)}
+                    aria-pressed={settings.kittycordAccent === key}
+                    onClick={() => { settings.kittycordAccent = key as KittycordAccent; }}
+                />
+            ))}
+        </div>
+    );
+}
+
 const COMMUNITY_INVITE = "KaBMzypPHT";
 
 function DiscordIcon({ className }: { className?: string; }) {
@@ -258,6 +279,14 @@ function EquicordSettings() {
                     }
                 />
             </QuickActionCard>
+
+            <Divider className={Margins.top20} />
+
+            <Heading className={Margins.top20}>Accent Color</Heading>
+            <Paragraph className={Margins.bottom16}>
+                Pick the color Kittycord uses for its own UI and the startup screen. The startup screen picks up a new color on the next launch.
+            </Paragraph>
+            <AccentPicker />
 
             <Divider className={Margins.top20} />
 
