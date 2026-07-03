@@ -7,7 +7,7 @@
 import { del, get, set } from "@api/DataStore";
 import { Channel, Message } from "@vencord/discord-types";
 import { findCssClassesLazy } from "@webpack";
-import { MessageStore, useEffect, UserStore, useState, useStateFromStores } from "@webpack/common";
+import { MessageStore, SelectedChannelStore, useEffect, UserStore, useState, useStateFromStores } from "@webpack/common";
 
 import { cl, settings } from ".";
 import { IconGhost } from "./IconGhost";
@@ -121,9 +121,11 @@ export function Boo({ channel }: { channel: Channel; }) {
     const { id } = channel;
 
     const currentUserId = useStateFromStores([UserStore], () => UserStore.getCurrentUser()?.id);
+    const selectedChannelId = useStateFromStores([SelectedChannelStore], () => SelectedChannelStore.getChannelId());
     const lastMessage: Message = useStateFromStores([MessageStore], () =>
         MessageStore.getMessages(id)?.last()
     );
+    const isViewing = selectedChannelId === id;
 
     const [state, setState] = useState({
         isCurrentUser: null as boolean | null,
@@ -200,8 +202,8 @@ export function Boo({ channel }: { channel: Channel; }) {
             return;
         }
 
-        // if exempted or bot (if setting enabled), remove from ghost tracking
-        if (isExempted || (settings.store.ignoreBots && lastMessage.author.bot) || isInactive) {
+        // if exempted, bot (if setting enabled) or currently open, remove from ghost tracking
+        if (isExempted || (settings.store.ignoreBots && lastMessage.author.bot) || isInactive || isViewing) {
             if (countedChannels.has(id)) {
                 countedChannels.delete(id);
                 setBooCount(getBooCount() - 1);
@@ -221,9 +223,9 @@ export function Boo({ channel }: { channel: Channel; }) {
                 setBooCount(getBooCount() + 1);
             }
         }
-    }, [state.isCurrentUser, state.isDataProcessed, id, lastMessage?.id, isInactive]);
+    }, [state.isCurrentUser, state.isDataProcessed, id, lastMessage?.id, isInactive, isViewing]);
 
-    if (!state.isDataProcessed || !currentUserId || !lastMessage || state.isCurrentUser || isChannelExempted(channel) || isCleared || (settings.store.ignoreBots && lastMessage.author.bot) || isInactive)
+    if (!state.isDataProcessed || !currentUserId || !lastMessage || state.isCurrentUser || isChannelExempted(channel) || isCleared || (settings.store.ignoreBots && lastMessage.author.bot) || isInactive || isViewing)
         return null;
 
     if (!settings.store.showDmIcons) return null;
