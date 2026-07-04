@@ -2,7 +2,7 @@
  * @name Kittycord Candy
  * @author Kittycord
  * @description The Kittycord installer look for your whole Discord — deep plum, candy pink, rounded everything.
- * @version 1.1.0
+ * @version 1.2.0
  * @website https://kittycord.dev
  * @source https://github.com/CenturyRV/Kittycord
 */
@@ -157,7 +157,12 @@ html.kc-perf-noblur .theme-dark,
 html.kc-perf-noblur .theme-darker,
 html.kc-perf-noblur .theme-midnight,
 html.kc-perf-noblur .visual-refresh.theme-dark,
-html.kc-perf-noblur .visual-refresh .theme-dark {
+html.kc-perf-noblur .visual-refresh .theme-dark,
+html.kc-idle-noblur .theme-dark,
+html.kc-idle-noblur .theme-darker,
+html.kc-idle-noblur .theme-midnight,
+html.kc-idle-noblur .visual-refresh.theme-dark,
+html.kc-idle-noblur .visual-refresh .theme-dark {
     --background-primary: var(--kc-bg-3);
     --background-secondary: var(--kc-bg-2);
     --background-secondary-alt: var(--kc-bg-2);
@@ -171,7 +176,8 @@ html.kc-perf-noblur .visual-refresh .theme-dark {
     --bg-base-tertiary: var(--kc-bg-1);
 }
 
-html.kc-perf-noblur #app-mount {
+html.kc-perf-noblur #app-mount,
+html.kc-idle-noblur #app-mount {
     background: var(--kc-bg-1);
 }
 
