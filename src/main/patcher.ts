@@ -71,6 +71,18 @@ if (!IS_VANILLA) {
         console.error("[Kittycord] Failed to set up telemetry", err);
     }
 
+    try {
+        require("./crashReporter");
+    } catch (err) {
+        console.error("[Kittycord] Failed to set up crash reporting", err);
+    }
+
+    try {
+        require("./deepLinks");
+    } catch (err) {
+        console.error("[Kittycord] Failed to set up deep links", err);
+    }
+
     // Optional opt-in "which friends use Kittycord?" registry (inert until configured + the user agrees).
     try {
         require("./shareRegistry");

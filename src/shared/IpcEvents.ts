@@ -62,6 +62,13 @@ export const enum IpcEvents {
     GET_TELEMETRY_CONSENT = "KittycordGetTelemetryConsent",
     SET_TELEMETRY_CONSENT = "KittycordSetTelemetryConsent",
 
+    GET_CRASH_CONSENT = "KittycordGetCrashConsent",
+    SET_CRASH_CONSENT = "KittycordSetCrashConsent",
+    REPORT_CRASH = "KittycordReportCrash",
+
+    DEEP_LINK = "KittycordDeepLink",
+    DEEP_LINK_POLL = "KittycordDeepLinkPoll",
+
     GET_SHARE_CONSENT = "KittycordGetShareConsent",
     SET_SHARE_CONSENT = "KittycordSetShareConsent",
     SHARE_REGISTER = "KittycordShareRegister",

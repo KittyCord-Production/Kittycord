@@ -29,6 +29,7 @@ import { addNicknameIcon, removeNicknameIcon } from "@api/NicknameIcons";
 import { Settings, SettingsStore } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
 import { traceFunction } from "@debug/Tracer";
+import { reportKittycordCrash } from "@utils/crashReporter";
 import { Logger } from "@utils/Logger";
 import { onlyOnce } from "@utils/onlyOnce";
 import { canonicalizeFind, canonicalizeReplacement } from "@utils/patches";
@@ -184,10 +185,11 @@ export function subscribePluginFluxEvents(p: Plugin, fluxDispatcher: typeof Flux
                 try {
                     const res = handler!.apply(p, arguments as any);
                     return res instanceof Promise
-                        ? res.catch(e => logger.error(`${p.name}: Error while handling ${event}\n`, e))
+                        ? res.catch(e => { logger.error(`${p.name}: Error while handling ${event}\n`, e); reportKittycordCrash(e, p.name); })
                         : res;
                 } catch (e) {
                     logger.error(`${p.name}: Error while handling ${event}\n`, e);
+                    reportKittycordCrash(e, p.name);
                 }
             };
 

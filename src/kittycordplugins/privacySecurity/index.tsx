@@ -71,6 +71,11 @@ function PrivacyTab() {
                     title="Let friends find you on Kittycord"
                     description="Stores only a scrambled, one-way hash of your Discord ID so friends who also use Kittycord can find each other. Off unless you enable it."
                 />
+                <ConsentToggle
+                    bridge={VencordNative.kittycordCrash}
+                    title="Send anonymous crash reports"
+                    description="If a Kittycord feature hits an error, sends only a scrubbed message and stack plus the version, so it can be fixed. No account, no messages, no personal data. Off unless you enable it."
+                />
 
                 <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Why your antivirus might warn</Text>
                 <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>

@@ -140,6 +140,17 @@ window.VencordNative = {
         setConsent: NOOP_ASYNC,
     },
 
+    kittycordCrash: {
+        getConsent: async () => ({ consent: null as boolean | null, endpointConfigured: false }),
+        setConsent: NOOP_ASYNC,
+        report: NOOP_ASYNC,
+    },
+
+    kittycordDeepLinks: {
+        onLink: NOOP,
+        poll: async () => null,
+    },
+
     kittycordShare: {
         // No main process on web -> friend discovery is inert.
         getConsent: async () => ({ consent: null as boolean | null, endpointConfigured: false }),

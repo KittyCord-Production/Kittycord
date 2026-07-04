@@ -111,6 +111,17 @@ export default {
         setConsent: (consent: boolean) => invoke<void>(IpcEvents.SET_TELEMETRY_CONSENT, consent),
     },
 
+    kittycordCrash: {
+        getConsent: () => invoke<{ consent: boolean | null; endpointConfigured: boolean; }>(IpcEvents.GET_CRASH_CONSENT),
+        setConsent: (consent: boolean) => invoke<void>(IpcEvents.SET_CRASH_CONSENT, consent),
+        report: (payload: { message: string; stack?: string; plugin?: string; }) => invoke<void>(IpcEvents.REPORT_CRASH, payload),
+    },
+
+    kittycordDeepLinks: {
+        onLink: (cb: (action: { kind: string; value: string; }) => void) => { ipcRenderer.on(IpcEvents.DEEP_LINK, (_, action) => cb(action)); },
+        poll: () => invoke<{ kind: string; value: string; } | null>(IpcEvents.DEEP_LINK_POLL),
+    },
+
     kittycordShare: {
         getConsent: () => invoke<{ consent: boolean | null; endpointConfigured: boolean; }>(IpcEvents.GET_SHARE_CONSENT),
         setConsent: (consent: boolean) => invoke<void>(IpcEvents.SET_SHARE_CONSENT, consent),
