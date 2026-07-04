@@ -83,6 +83,18 @@ export async function listGallery(_: IpcMainInvokeEvent, sort: unknown): Promise
     }
 }
 
+export async function getGalleryTheme(_: IpcMainInvokeEvent, id: unknown): Promise<GalleryTheme | null> {
+    if (typeof id !== "string") return null;
+    try {
+        const res = await fetch(`${ENDPOINT}/themes/get?id=${encodeURIComponent(id)}`);
+        if (!res.ok) return null;
+        const body = await res.json() as { theme?: unknown; };
+        return body.theme && typeof body.theme === "object" ? body.theme as GalleryTheme : null;
+    } catch {
+        return null;
+    }
+}
+
 export async function publishTheme(_: IpcMainInvokeEvent, id: unknown, authorName: unknown, params: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     try {

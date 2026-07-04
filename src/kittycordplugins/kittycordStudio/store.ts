@@ -106,6 +106,31 @@ export async function browseGallery(sort: GallerySort): Promise<GalleryTheme[]> 
     return out;
 }
 
+export async function applyGalleryThemeById(id: string): Promise<GalleryTheme | null> {
+    if (!Native) return null;
+    const raw = await Native.getGalleryTheme(id);
+    if (!raw) return null;
+
+    let theme: GalleryTheme;
+    try {
+        theme = {
+            id: String(raw.id),
+            name: String(raw.name),
+            authorName: String(raw.authorName),
+            likes: Number(raw.likes) || 0,
+            created: Number(raw.created) || 0,
+            featured: Boolean(raw.featured),
+            params: sanitizeParams(raw.params)
+        };
+    } catch {
+        return null;
+    }
+
+    const fileName = await saveTheme(theme.params);
+    enableTheme(fileName);
+    return theme;
+}
+
 async function getTokens(): Promise<Record<string, string>> {
     return (await get<Record<string, string>>(TOKENS_KEY)) ?? {};
 }
