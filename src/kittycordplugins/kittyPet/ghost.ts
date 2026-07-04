@@ -62,6 +62,11 @@ export class GhostController {
     private renderedWants: boolean | null = null;
     private luring = false;
     private treatEl: HTMLDivElement | null = null;
+    private onClick = (e: MouseEvent) => {
+        if (this.hooks.getConfig().followCursor) return;
+        const r = this.container.getBoundingClientRect();
+        if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) this.pet();
+    };
 
     constructor(hooks: PetHooks, art: PetArt = GHOST_ART) {
         this.hooks = hooks;
@@ -79,7 +84,6 @@ export class GhostController {
         this.bob.appendChild(this.body);
         this.container.appendChild(this.bob);
         this.container.appendChild(this.nameEl);
-        this.container.addEventListener("click", () => this.pet());
     }
 
     start() {
@@ -94,6 +98,7 @@ export class GhostController {
         this.nextHopAt = now + 800;
         this.nextBlinkAt = now + BLINK_MIN;
         document.body.appendChild(this.container);
+        document.addEventListener("click", this.onClick);
         this.disposeSuspend = watchSuspend(suspended => {
             if (suspended) {
                 this.stopLoop();
@@ -113,6 +118,7 @@ export class GhostController {
         this.disposeSuspend = null;
         this.stopLoop();
         this.removeTreat();
+        document.removeEventListener("click", this.onClick);
         this.container.remove();
     }
 

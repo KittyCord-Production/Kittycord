@@ -49,6 +49,11 @@ export class PetController {
     private timer: ReturnType<typeof setInterval> | null = null;
     private disposeSuspend: (() => void) | null = null;
     private onResize = () => { this.measure(); };
+    private onClick = (e: MouseEvent) => {
+        if (this.hooks.getConfig().followCursor) return;
+        const r = this.container.getBoundingClientRect();
+        if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) this.pet();
+    };
 
     private state: State = "idle";
     private stateTicks = 0;
@@ -89,7 +94,6 @@ export class PetController {
         this.container.appendChild(this.sprite);
         this.container.appendChild(this.accessoryEl);
         this.container.appendChild(this.nameEl);
-        this.container.addEventListener("click", () => this.pet());
     }
 
     start() {
@@ -98,6 +102,7 @@ export class PetController {
         this.targetX = this.minX + Math.random() * Math.max(0, this.maxX - this.minX);
         this.setState("walk");
         window.addEventListener("resize", this.onResize);
+        document.addEventListener("click", this.onClick);
         document.body.appendChild(this.container);
         this.disposeSuspend = watchSuspend(suspended => {
             if (suspended) {
@@ -115,6 +120,7 @@ export class PetController {
         this.disposeSuspend = null;
         this.stopTimer();
         window.removeEventListener("resize", this.onResize);
+        document.removeEventListener("click", this.onClick);
         this.removeTreat();
         this.container.remove();
     }
