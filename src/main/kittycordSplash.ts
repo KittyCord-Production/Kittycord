@@ -35,7 +35,7 @@ const KITTY_KEYFRAMES =
 const buildSplashJs = (p: AccentPreset) => `
 (function () {
     try {
-        if (window.__OVERLAY__) return;
+        if (window.__OVERLAY__ || document.getElementById("__OVERLAY__SENTINEL__") || /overlay/i.test(location.href || "")) return;
         if (document.getElementById("kc-splash")) return;
         var css = document.createElement("style");
         css.textContent =
@@ -57,6 +57,15 @@ const buildSplashJs = (p: AccentPreset) => `
             '<div class="kc-name">Kittycord</div>' +
             '<div class="kc-dots"><i></i><i></i><i></i></div>';
         document.body.appendChild(o);
+        var ticks = 0;
+        var watch = setInterval(function () {
+            var isOverlay = window.__OVERLAY__ || document.getElementById("__OVERLAY__SENTINEL__");
+            if (isOverlay) {
+                if (css.parentNode) css.parentNode.removeChild(css);
+                if (o.parentNode) o.parentNode.removeChild(o);
+            }
+            if (isOverlay || ++ticks >= 40) clearInterval(watch);
+        }, 250);
     } catch (e) {}
 })();`;
 
@@ -156,10 +165,11 @@ app.on("browser-window-created", (_, win) => {
         win.webContents.on("dom-ready", () => {
             try {
                 const url = win.webContents.getURL() || "";
+                if (/overlay/i.test(url) || win.isAlwaysOnTop()) return;
                 const preset = ACCENT_PRESETS[RendererSettings.store.kittycordAccent!] ?? ACCENT_PRESETS.pink;
                 if (/splash/i.test(url)) {
                     win.webContents.executeJavaScript(buildSplashJs(preset)).catch(() => { });
-                } else if (/discord\.com/i.test(url) && !/\/popout|\/overlay/i.test(url)) {
+                } else if (/discord\.com/i.test(url) && !/popout/i.test(url)) {
                     win.webContents.executeJavaScript(buildLoadingJs(preset)).catch(() => { });
                 }
             } catch { }
