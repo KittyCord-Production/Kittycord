@@ -247,7 +247,7 @@ async function maybeSuggestPerformanceMode() {
 
         const cores = navigator.hardwareConcurrency || 8;
         const memory = (navigator as { deviceMemory?: number; }).deviceMemory ?? 8;
-        if (cores > 2 && memory > 4) return;
+        if (cores > 4 && memory > 4) return;
 
         if (await dsGet(PERFORMANCE_SUGGESTION_KEY)) return;
         await dsSet(PERFORMANCE_SUGGESTION_KEY, true);

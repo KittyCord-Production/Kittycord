@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { isPluginEnabled, pluginRequiresRestart, plugins } from "@api/PluginManager";
+import { isPluginEnabled, pluginRequiresRestart, plugins, startPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
@@ -32,6 +32,8 @@ const canUpdate = !IS_WEB && !IS_UPDATER_DISABLED;
 
 const WARN_COLOR = "#f0b232";
 
+const HEAVY_THEMES = ["MonoGlass.theme.css", "Sakura.theme.css", "Midnight.theme.css", "Lavender.theme.css", "MidnightMagicGlass.theme.css"];
+
 interface Scan {
     erroredPatches: number;
     noEffectPatches: number;
@@ -40,6 +42,9 @@ interface Scan {
     failed: string[];
     discordBuild: number;
     transparencyOn: boolean;
+    perfOn: boolean;
+    heavyTheme: string | null;
+    weakDevice: boolean;
 }
 
 function scan(): Scan {
@@ -56,6 +61,8 @@ function scan(): Scan {
     let discordBuild = -1;
     try { discordBuild = getBuildNumber(); } catch { /* build number unavailable */ }
 
+    const heavyThemeFile = Settings.enabledThemes.find(t => HEAVY_THEMES.includes(t));
+
     return {
         erroredPatches,
         noEffectPatches,
@@ -63,7 +70,10 @@ function scan(): Scan {
         enabledCount,
         failed,
         discordBuild,
-        transparencyOn: IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && Settings.transparent === true
+        transparencyOn: IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && Settings.transparent === true,
+        perfOn: isPluginEnabled("PerformanceMode"),
+        heavyTheme: heavyThemeFile?.replace(/\.theme\.css$/, "") ?? (isPluginEnabled("HelloKittyTheme") ? "HelloKittyTheme" : null),
+        weakDevice: (navigator.hardwareConcurrency || 8) <= 4 || ((navigator as { deviceMemory?: number; }).deviceMemory ?? 8) <= 4
     };
 }
 
@@ -129,7 +139,17 @@ function DoctorPanel() {
         });
     }
 
-    const allHealthy = data.patchesOk && data.failed.length === 0 && !data.transparencyOn;
+    function onEnablePerf() {
+        const p = plugins.PerformanceMode;
+        if (!p) return;
+        Settings.plugins.PerformanceMode.enabled = true;
+        if (startPlugin(p)) showToast("PerformanceMode is on.", Toasts.Type.SUCCESS);
+        else showToast("Restart Discord to finish turning on PerformanceMode.", Toasts.Type.MESSAGE);
+        setData(scan());
+    }
+
+    const perfAttention = !data.perfOn && (data.heavyTheme !== null || data.weakDevice);
+    const allHealthy = data.patchesOk && data.failed.length === 0 && !data.transparencyOn && !perfAttention;
 
     return (
         <ErrorBoundary noop>
@@ -151,6 +171,23 @@ function DoctorPanel() {
             <StatusCard title="Plugins" ok={data.failed.length === 0}>
                 {data.enabledCount} plugins enabled.
                 {data.failed.length > 0 && ` ${data.failed.length} didn't start: ${data.failed.join(", ")}.`}
+            </StatusCard>
+
+            <StatusCard title="Performance" ok={!perfAttention}>
+                {perfAttention
+                    ? data.heavyTheme
+                        ? `${data.heavyTheme} uses a glassy look that costs GPU power. PerformanceMode keeps the style but makes it much lighter.`
+                        : "This device looks low on power. PerformanceMode makes Discord noticeably lighter."
+                    : data.perfOn
+                        ? "PerformanceMode is on and keeping things light."
+                        : "No heavy themes active and your device has power to spare."}
+                {perfAttention && (
+                    <span style={{ display: "block", marginTop: 8 }}>
+                        <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={onEnablePerf}>
+                            Turn on PerformanceMode
+                        </Button>
+                    </span>
+                )}
             </StatusCard>
 
             <StatusCard title="Version" ok={updateState !== "outdated"}>
