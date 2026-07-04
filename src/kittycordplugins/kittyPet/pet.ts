@@ -7,6 +7,7 @@
 import { getCursor } from "./cursor";
 import { burst, spawnHearts } from "./hearts";
 import { ACCESSORIES, ACCESSORY_URIS, AnimationName, ANIMATIONS, SHEET, SITTING, SPRITE_SIZE } from "./sprites";
+import { watchSuspend } from "./suspend";
 
 export interface PetConfig {
     size: number;
@@ -46,6 +47,7 @@ export class PetController {
     private sprite: HTMLDivElement;
     private accessoryEl: HTMLImageElement;
     private timer: ReturnType<typeof setInterval> | null = null;
+    private disposeSuspend: (() => void) | null = null;
     private onResize = () => { this.measure(); };
 
     private state: State = "idle";
@@ -97,6 +99,28 @@ export class PetController {
         this.setState("walk");
         window.addEventListener("resize", this.onResize);
         document.body.appendChild(this.container);
+        this.disposeSuspend = watchSuspend(suspended => {
+            if (suspended) {
+                this.stopTimer();
+                this.container.style.display = "none";
+            } else {
+                this.container.style.display = "";
+                this.startTimer();
+            }
+        });
+    }
+
+    stop() {
+        this.disposeSuspend?.();
+        this.disposeSuspend = null;
+        this.stopTimer();
+        window.removeEventListener("resize", this.onResize);
+        this.removeTreat();
+        this.container.remove();
+    }
+
+    private startTimer() {
+        if (this.timer) return;
         this.timer = setInterval(() => {
             try {
                 this.onTick();
@@ -104,14 +128,11 @@ export class PetController {
         }, TICK_MS);
     }
 
-    stop() {
+    private stopTimer() {
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
         }
-        window.removeEventListener("resize", this.onResize);
-        this.removeTreat();
-        this.container.remove();
     }
 
     setEquipped(accessory: string | null) {

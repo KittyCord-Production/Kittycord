@@ -8,6 +8,7 @@ import { getCursor } from "./cursor";
 import { buildGhostUri, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 import { burst, spawnHearts } from "./hearts";
 import { PetConfig, PetHooks } from "./pet";
+import { watchSuspend } from "./suspend";
 
 export interface PetArt {
     build(opts: { expression: GhostExpression; accessory: string | null; }): string;
@@ -27,6 +28,7 @@ export class GhostController {
     private bob: HTMLDivElement;
     private body: HTMLImageElement;
     private raf: number | null = null;
+    private disposeSuspend: (() => void) | null = null;
 
     private x = 0;
     private y = 0;
@@ -92,14 +94,31 @@ export class GhostController {
         this.nextHopAt = now + 800;
         this.nextBlinkAt = now + BLINK_MIN;
         document.body.appendChild(this.container);
-        this.loop();
+        this.disposeSuspend = watchSuspend(suspended => {
+            if (suspended) {
+                this.stopLoop();
+                this.container.style.display = "none";
+            } else {
+                this.container.style.display = "";
+                if (this.raf === null) {
+                    this.lastFrame = performance.now();
+                    this.loop();
+                }
+            }
+        });
     }
 
     stop() {
-        if (this.raf !== null) cancelAnimationFrame(this.raf);
-        this.raf = null;
+        this.disposeSuspend?.();
+        this.disposeSuspend = null;
+        this.stopLoop();
         this.removeTreat();
         this.container.remove();
+    }
+
+    private stopLoop() {
+        if (this.raf !== null) cancelAnimationFrame(this.raf);
+        this.raf = null;
     }
 
     setEquipped(accessory: string | null) {
