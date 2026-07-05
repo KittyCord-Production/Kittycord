@@ -10,7 +10,7 @@ import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRa
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { BRAND_WEBSITE } from "../../branding";
+import { themeShareUrl } from "../../branding";
 import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
 import { derivePalette, NAME_RE, type StudioParams } from "./template";
 
@@ -60,7 +60,7 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
 
     async function copyLink() {
         try {
-            await navigator.clipboard.writeText(`${BRAND_WEBSITE}/en/t/?id=${theme.id}`);
+            await navigator.clipboard.writeText(themeShareUrl(theme.id));
             showToast("Share link copied — anyone can preview this theme.", Toasts.Type.SUCCESS);
         } catch {
             showToast("Could not copy the link.", Toasts.Type.FAILURE);
@@ -154,6 +154,7 @@ function PublishModal({ rootProps, params }: { rootProps: any; params: StudioPar
     const me = UserStore.getCurrentUser();
     const [authorName, setAuthorName] = React.useState((me?.globalName as string) || me?.username || "Someone");
     const [busy, setBusy] = React.useState(false);
+    const [publishedId, setPublishedId] = React.useState<string | null>(null);
 
     const nameValid = authorName.trim().length > 0 && authorName.trim().length <= 40;
 
@@ -161,13 +162,23 @@ function PublishModal({ rootProps, params }: { rootProps: any; params: StudioPar
         if (!nameValid) return;
         setBusy(true);
         try {
-            await publishTheme(params, authorName.trim());
+            const id = await publishTheme(params, authorName.trim());
             showToast(`"${params.name}" published to the gallery! 🎉`, Toasts.Type.SUCCESS);
-            rootProps.onClose();
+            setPublishedId(id);
         } catch (e) {
             showToast(String((e as Error)?.message ?? "Could not publish."), Toasts.Type.FAILURE);
         } finally {
             setBusy(false);
+        }
+    }
+
+    async function copyShareLink() {
+        if (!publishedId) return;
+        try {
+            await navigator.clipboard.writeText(themeShareUrl(publishedId));
+            showToast("Share link copied. Paste it anywhere to show off your theme.", Toasts.Type.SUCCESS);
+        } catch {
+            showToast("Could not copy the link.", Toasts.Type.FAILURE);
         }
     }
 
@@ -181,17 +192,31 @@ function PublishModal({ rootProps, params }: { rootProps: any; params: StudioPar
                 <div style={{ margin: "12px 0" }}>
                     <Swatches params={params} />
                 </div>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 12 }}>
-                    This shares the theme's colors and the display name you choose with the community gallery — nothing else. No account, no messages, no personal data. You can remove it anytime.
-                </Text>
+                {publishedId ? (
+                    <>
+                        <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 12 }}>
+                            "{params.name}" is live in the gallery. Copy its share link and paste it into any chat so friends can preview and apply it.
+                        </Text>
+                        <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
+                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Done</Button>
+                            <Button color={Button.Colors.BRAND} onClick={copyShareLink}>Copy share link</Button>
+                        </Flex>
+                    </>
+                ) : (
+                    <>
+                        <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 12 }}>
+                            This shares the theme's colors and the display name you choose with the community gallery — nothing else. No account, no messages, no personal data. You can remove it anytime.
+                        </Text>
 
-                <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Show as</Text>
-                <TextInput value={authorName} onChange={setAuthorName} maxLength={40} placeholder="Your display name" />
+                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Show as</Text>
+                        <TextInput value={authorName} onChange={setAuthorName} maxLength={40} placeholder="Your display name" />
 
-                <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!nameValid || busy} onClick={publish}>Publish</Button>
-                </Flex>
+                        <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
+                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
+                            <Button color={Button.Colors.BRAND} disabled={!nameValid || busy} onClick={publish}>Publish</Button>
+                        </Flex>
+                    </>
+                )}
             </ModalContent>
         </ModalRoot>
     );

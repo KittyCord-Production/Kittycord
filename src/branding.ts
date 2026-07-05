@@ -21,6 +21,8 @@ export const BRAND_USER_AGENT_NAME = BRAND_NAME;
 /** The official Kittycord website. */
 export const BRAND_WEBSITE = "https://kittycord.dev";
 
+export const themeShareUrl = (id: string) => `${BRAND_WEBSITE}/t/?id=${id}`;
+
 /**
  * The Kittycord cat mascot as an inline SVG. Exposed as a data URI so it can be used as an
  * <img src> (e.g. plugin badges) with no network request — `data:` URIs are allowed by the CSP,

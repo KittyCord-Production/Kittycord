@@ -135,7 +135,7 @@ async function getTokens(): Promise<Record<string, string>> {
     return (await get<Record<string, string>>(TOKENS_KEY)) ?? {};
 }
 
-export async function publishTheme(params: StudioParams, authorName: string): Promise<void> {
+export async function publishTheme(params: StudioParams, authorName: string): Promise<string> {
     if (!Native) throw new Error("The gallery needs the Kittycord desktop app.");
     const me = UserStore.getCurrentUser();
     if (!me) throw new Error("Could not read your account.");
@@ -146,6 +146,7 @@ export async function publishTheme(params: StudioParams, authorName: string): Pr
     const tokens = await getTokens();
     tokens[result.id] = result.ownerToken;
     await set(TOKENS_KEY, tokens);
+    return result.id;
 }
 
 export async function likeGalleryTheme(themeId: string): Promise<number | null> {
