@@ -16,7 +16,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { Channel } from "@vencord/discord-types";
 import { Menu, openModal,Tooltip, useEffect, useState } from "@webpack/common";
 
-import { Boo, clearChannelFromGhost, clearStoredClearedChannels, getBooCount, getGhostedChannels, loadClearedChannels, onBooCountChange, saveClearedChannels } from "./Boo";
+import { Boo, clearChannelFromGhost, clearStoredClearedChannels, forgetChannel, getBooCount, getGhostedChannels, loadClearedChannels, onBooCountChange, saveClearedChannels } from "./Boo";
 import { getChannelDisplayName, GhostedUsersModal } from "./GhostedUsersModal";
 import { IconGhost } from "./IconGhost";
 
@@ -167,6 +167,12 @@ export default definePlugin({
         "user-context": (menuItems, props) => {
             const group = findGroupChildrenByChildId("close-dm", menuItems);
             group?.push(makeContextItem(props));
+        }
+    },
+
+    flux: {
+        CHANNEL_DELETE({ channel }: { channel: Channel; }) {
+            forgetChannel(channel.id);
         }
     },
 

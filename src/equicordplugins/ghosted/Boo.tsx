@@ -111,6 +111,15 @@ export function clearChannelFromGhost(channelId: string): void {
     }
 }
 
+export function forgetChannel(channelId: string): void {
+    if (countedChannels.delete(channelId)) {
+        setBooCount(getBooCount() - 1);
+    }
+    if (clearedChannels.delete(channelId)) {
+        maybePersistCleared();
+    }
+}
+
 export function isChannelCleared(channelId: string): boolean {
     return clearedChannels.has(channelId);
 }
@@ -129,7 +138,6 @@ export function Boo({ channel }: { channel: Channel; }) {
 
     const [state, setState] = useState({
         isCurrentUser: null as boolean | null,
-        containsQuestionMark: false,
         isDataProcessed: false,
     });
     const [isCleared, setIsCleared] = useState(false);
@@ -140,12 +148,8 @@ export function Boo({ channel }: { channel: Channel; }) {
     useEffect(() => {
         if (!lastMessage || !currentUserId) return;
 
-        const lastIsCurrentUser = lastMessage.author.id === currentUserId;
-        const containsQuestionMark = !lastIsCurrentUser && lastMessage.content.includes("?");
-
         setState({
-            isCurrentUser: lastIsCurrentUser,
-            containsQuestionMark,
+            isCurrentUser: lastMessage.author.id === currentUserId,
             isDataProcessed: true,
         });
     }, [lastMessage, currentUserId]);
@@ -230,9 +234,15 @@ export function Boo({ channel }: { channel: Channel; }) {
 
     if (!settings.store.showDmIcons) return null;
 
+    const ghostAgeMs = Date.now() - lastMessageTimestampMs;
+    const fill = ghostAgeMs >= 7 * 24 * 60 * 60 * 1000 ? "#f23f43"
+        : ghostAgeMs >= 24 * 60 * 60 * 1000 ? "#f57731"
+            : ghostAgeMs >= 60 * 60 * 1000 ? "#f0b232"
+                : "#23a55a";
+
     return (
         <div className={cl("icon", ChannelWrapperStyles.wrapper)}>
-            <IconGhost fill={state.containsQuestionMark ? "#ff8000" : "currentColor"} />
+            <IconGhost fill={fill} />
         </div>
     );
 }
