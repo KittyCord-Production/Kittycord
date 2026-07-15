@@ -42,7 +42,10 @@ const PRESETS: Array<{ name: string; color1: string; color2: string; }> = [
     { name: "Ocean", color1: "#58B9FF", color2: "#6BFFE3" },
     { name: "Lilac", color1: "#B58CFF", color2: "#FF8AC4" },
     { name: "Mint", color1: "#6BFFB4", color2: "#58D6FF" },
-    { name: "Cherry", color1: "#FF4D6D", color2: "#FFB3C6" }
+    { name: "Cherry", color1: "#FF4D6D", color2: "#FFB3C6" },
+    { name: "Mango", color1: "#FF9A3C", color2: "#FFDD6B" },
+    { name: "Lagoon", color1: "#2FD8C8", color2: "#58B9FF" },
+    { name: "Flamingo", color1: "#FF6FA3", color2: "#FF9A6B" }
 ];
 
 function nameStyle(color1: string, color2?: string): CSSProperties {
