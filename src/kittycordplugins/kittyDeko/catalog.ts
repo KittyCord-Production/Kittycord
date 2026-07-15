@@ -30,7 +30,12 @@ export const CATALOG: Deko[] = [
     { id: "stars", label: "Starlight", file: "stars", animated: true },
     { id: "ears", label: "Cat ears", file: "ears" },
     { id: "crown", label: "Crown", file: "crown", minInvites: 25 },
-    { id: "bubbles", label: "Bubbles", file: "bubbles" }
+    { id: "bubbles", label: "Bubbles", file: "bubbles" },
+    { id: "sunrays", label: "Sun rays", file: "sunrays", animated: true },
+    { id: "waves", label: "Waves", file: "waves", animated: true },
+    { id: "shells", label: "Seashells", file: "shells" },
+    { id: "sunset", label: "Sunset", file: "sunset", minInvites: 3 },
+    { id: "palms", label: "Palms", file: "palms", minInvites: 15 }
 ];
 
 export const byId = new Map(CATALOG.map(d => [d.id, d]));
