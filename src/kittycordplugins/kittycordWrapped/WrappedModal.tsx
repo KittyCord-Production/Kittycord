@@ -13,7 +13,7 @@ import { saveFile } from "@utils/web";
 import { Alerts, Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { renderCard, renderShareCard } from "./card";
+import { renderCard, renderShareCard, SKINS, type WrappedVariant } from "./card";
 import { settings } from "./settings";
 import { buildSnapshot, resetData } from "./storage";
 
@@ -25,13 +25,22 @@ const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("KittycordWrapped");
 
-function fileFromBlob(blob: Blob) {
-    return new File([blob], "kittycord-wrapped.png", { type: "image/png" });
+function fileFromBlob(blob: Blob, variant: WrappedVariant) {
+    return new File([blob], variant === "summer" ? "kittycord-summer.png" : "kittycord-wrapped.png", { type: "image/png" });
 }
 
-const SHARE_CAPTION = "my year on Discord, by Kittycord 🐱 https://kittycord.dev";
+const CAPTIONS: Record<WrappedVariant, string> = {
+    year: "my year on Discord, by Kittycord 🐱 https://kittycord.dev",
+    summer: "my Kittycord summer so far 🐱☀️ https://kittycord.dev"
+};
 
-function WrappedModal({ rootProps }: { rootProps: any; }) {
+const TITLES: Record<WrappedVariant, string> = {
+    year: "Kittycord Wrapped 🎁",
+    summer: "Kittycord Summer ☀️"
+};
+
+function WrappedModal({ rootProps, variant }: { rootProps: any; variant: WrappedVariant; }) {
+    const skin = SKINS[variant];
     const [showNames, setShowNames] = React.useState(settings.store.showServerNames);
     const [landscape, setLandscape] = React.useState(false);
     const [blob, setBlob] = React.useState<Blob | null>(null);
@@ -44,7 +53,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
         (async () => {
             try {
                 const snap = buildSnapshot(showNames);
-                const result = await (landscape ? renderShareCard(snap) : renderCard(snap));
+                const result = await (landscape ? renderShareCard(snap, skin) : renderCard(snap, skin));
                 if (cancelled) return;
                 url = URL.createObjectURL(result);
                 setBlob(result);
@@ -58,7 +67,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
             cancelled = true;
             if (url) URL.revokeObjectURL(url);
         };
-    }, [showNames, landscape]);
+    }, [showNames, landscape, skin]);
 
     function onToggleNames(value: boolean) {
         settings.store.showServerNames = value;
@@ -67,16 +76,16 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
 
     function save() {
         if (!blob) return;
-        saveFile(fileFromBlob(blob));
-        showToast("Saved your Wrapped card.", Toasts.Type.SUCCESS);
+        saveFile(fileFromBlob(blob, variant));
+        showToast("Saved your card.", Toasts.Type.SUCCESS);
     }
 
     function send() {
         if (!blob) return;
         const channel = getCurrentChannel();
         if (!channel) return showToast("Open a chat first to send it there.", Toasts.Type.FAILURE);
-        insertTextIntoChatInputBox(SHARE_CAPTION);
-        UploadHandler.promptToUpload([fileFromBlob(blob)], channel, DraftType.ChannelMessage);
+        insertTextIntoChatInputBox(CAPTIONS[variant]);
+        UploadHandler.promptToUpload([fileFromBlob(blob, variant)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
     }
 
@@ -103,7 +112,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
                 try {
                     await resetData();
                     const snap = buildSnapshot(showNames);
-                    const result = await (landscape ? renderShareCard(snap) : renderCard(snap));
+                    const result = await (landscape ? renderShareCard(snap, skin) : renderCard(snap, skin));
                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                     setBlob(result);
                     setPreviewUrl(URL.createObjectURL(result));
@@ -120,7 +129,7 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Kittycord Wrapped 🎁</Text>
+                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>{TITLES[variant]}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
@@ -159,6 +168,6 @@ function WrappedModal({ rootProps }: { rootProps: any; }) {
     );
 }
 
-export function openWrappedModal() {
-    openModal(props => <WrappedModal rootProps={props} />);
+export function openWrappedModal(variant: WrappedVariant = "year") {
+    openModal(props => <WrappedModal rootProps={props} variant={variant} />);
 }

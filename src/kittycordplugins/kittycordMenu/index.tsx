@@ -34,6 +34,7 @@ const FEATURES: Feature[] = [
     { plugin: "KittyPet", action: "Play with KittyPet", label: "Play with KittyPet" },
     { plugin: "MiniGames", action: "Start a game", label: "Play a game" },
     { plugin: "KittycordWrapped", action: "Open Kittycord Wrapped", label: "Wrapped" },
+    { plugin: "KittycordWrapped", action: "Open Summer Recap", label: "Summer Recap" },
     { plugin: "ShareSetup", action: "Open Kittycord friends", label: "Kittycord friends" },
     { plugin: "ShareSetup", action: "Share setup with a friend", label: "Share setup" },
     { plugin: "InviteFriend", action: "Invite a friend", label: "Invite a friend" },

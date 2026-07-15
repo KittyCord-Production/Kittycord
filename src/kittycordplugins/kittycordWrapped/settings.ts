@@ -36,5 +36,11 @@ export const settings = definePluginSettings({
         description: "internal",
         default: 0,
         hidden: true
+    },
+    lastSummerNudge: {
+        type: OptionType.NUMBER,
+        description: "internal",
+        default: 0,
+        hidden: true
     }
 });

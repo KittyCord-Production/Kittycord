@@ -61,6 +61,9 @@ export default definePlugin({
     toolboxActions: {
         "Open Kittycord Wrapped"() {
             openWrappedModal();
+        },
+        "Open Summer Recap"() {
+            openWrappedModal("summer");
         }
     },
 
@@ -79,12 +82,21 @@ export default definePlugin({
         }
 
         const now = new Date();
-        if (settings.store.nudges && now.getMonth() === 11 && settings.store.lastYearEndNudge < now.getFullYear()) {
+        if (!settings.store.nudges) return;
+
+        if (now.getMonth() === 11 && settings.store.lastYearEndNudge < now.getFullYear()) {
             settings.store.lastYearEndNudge = now.getFullYear();
             showNotification({
                 title: "Your Kittycord Wrapped is ready 🎁",
                 body: `${now.getFullYear()} is wrapping up — open your card and see your year on Discord.`,
                 onClick: () => openWrappedModal()
+            });
+        } else if (now.getMonth() >= 5 && now.getMonth() <= 7 && settings.store.lastSummerNudge < now.getFullYear()) {
+            settings.store.lastSummerNudge = now.getFullYear();
+            showNotification({
+                title: "Your Kittycord Summer card is ready ☀️",
+                body: "See your Kittycord summer so far and share it with a friend.",
+                onClick: () => openWrappedModal("summer")
             });
         }
     },
