@@ -673,11 +673,14 @@ function Get-DiscordInstalls {
     foreach ($b in $branches) {
         $base = Join-Path $env:LOCALAPPDATA $b.Dir
         if (-not (Test-Path $base)) { continue }
-        $appDir = Get-ChildItem -Path $base -Directory -Filter "app-*" -ErrorAction SilentlyContinue |
-            Sort-Object Name -Descending | Select-Object -First 1
-        if (-not $appDir) { continue }
-        $res = Join-Path $appDir.FullName "resources"
-        if (-not (Test-Path $res)) { continue }
+        $res = $null
+        $appDirs = Get-ChildItem -Path $base -Directory -Filter "app-*" -ErrorAction SilentlyContinue |
+            Sort-Object Name -Descending
+        foreach ($appDir in $appDirs) {
+            $candidate = Join-Path $appDir.FullName "resources"
+            if (Test-Path $candidate) { $res = $candidate; break }
+        }
+        if (-not $res) { continue }
 
         $stateKey = "stNot"
         $indexJs = Join-Path $res "app\index.js"
