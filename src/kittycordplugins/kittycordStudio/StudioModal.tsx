@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { get, set } from "@api/DataStore";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { Logger } from "@utils/Logger";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
-import { Button, React, showToast, Slider, Text, TextInput, Toasts } from "@webpack/common";
+import { Alerts, Button, React, showToast, Slider, Text, TextInput, Toasts } from "@webpack/common";
 import type { ComponentType } from "react";
 
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -24,6 +25,22 @@ const ModalContent = ModalContentRaw as ComponentType<any>;
 const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("KittycordStudio");
+
+const PUBLISH_NUDGED_KEY = "Kittycord_StudioPublishNudged";
+
+async function maybeNudgePublish(params: StudioParams, fileName: string) {
+    if (!galleryAvailable()) return;
+    const nudged = (await get<string[]>(PUBLISH_NUDGED_KEY)) ?? [];
+    if (nudged.includes(fileName)) return;
+    await set(PUBLISH_NUDGED_KEY, [...nudged, fileName]);
+    Alerts.show({
+        title: "Share it in the gallery?",
+        body: `"${params.name}" is ready. Publishing adds it to the community gallery so other Kittycord users can find and apply your theme.`,
+        confirmText: "Publish",
+        cancelText: "Not now",
+        onConfirm: () => openPublish(params)
+    });
+}
 
 const COLOR_FIELDS: { key: keyof StudioParams["colors"]; label: string; hint: string; }[] = [
     { key: "bg", label: "Background", hint: "the base of everything" },
@@ -147,11 +164,13 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
         if (!nameValid) return;
         setBusy(true);
         try {
-            const fileName = await saveTheme({ ...params, name: params.name.trim() }, initialFileName);
+            const cleanParams = { ...params, name: params.name.trim() };
+            const fileName = await saveTheme(cleanParams, initialFileName);
             enableTheme(fileName);
-            showToast(`"${params.name.trim()}" saved & applied.`, Toasts.Type.SUCCESS);
+            showToast(`"${cleanParams.name}" saved & applied.`, Toasts.Type.SUCCESS);
             onSaved();
             rootProps.onClose();
+            void maybeNudgePublish(cleanParams, fileName);
         } catch (e) {
             logger.error("save failed", e);
             showToast(String((e as Error)?.message ?? "Could not save the theme."), Toasts.Type.FAILURE);

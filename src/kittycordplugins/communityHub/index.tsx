@@ -17,7 +17,7 @@ import type { ComponentType } from "react";
 
 import { BRAND_WEBSITE } from "../../branding";
 import { openGallery } from "../kittycordStudio/GalleryModal";
-import { browseGallery, enableTheme, galleryAvailable, type GalleryTheme, saveTheme } from "../kittycordStudio/store";
+import { browseGallery, enableTheme, galleryAvailable, type GalleryTheme, likeGalleryTheme, saveTheme } from "../kittycordStudio/store";
 import { derivePalette, type StudioParams } from "../kittycordStudio/template";
 import type { NewsItem } from "./native";
 
@@ -33,10 +33,10 @@ const DISMISSED_KEY = "Kittycord_NewsDismissed";
 
 const open = (url: string) => VencordNative.native.openExternal(url);
 
-function Swatches({ params }: { params: StudioParams; }) {
+function Swatches({ params, width = 72, height = 24 }: { params: StudioParams; width?: number | string; height?: number; }) {
     const p = derivePalette(params);
     return (
-        <div style={{ display: "flex", borderRadius: 6, overflow: "hidden", height: 24, width: 72, flexShrink: 0 }}>
+        <div style={{ display: "flex", borderRadius: 6, overflow: "hidden", height, width, flexShrink: 0 }}>
             {[p.bg[1], p.bg[3], p.accent, p.accentHi, p.text].map((c, i) => (
                 <div key={i} style={{ flex: 1, background: c }} />
             ))}
@@ -49,6 +49,7 @@ function CommunityPanel() {
     const [dismissed, setDismissed] = React.useState<string[]>([]);
     const [themes, setThemes] = React.useState<GalleryTheme[] | null>(null);
     const [anyFeatured, setAnyFeatured] = React.useState(false);
+    const [likes, setLikes] = React.useState<Record<string, number>>({});
     const [busy, setBusy] = React.useState(false);
 
     React.useEffect(() => {
@@ -61,17 +62,19 @@ function CommunityPanel() {
             }
             try {
                 const featured = await browseGallery("featured");
-                if (featured.length > 0) {
-                    setAnyFeatured(true);
-                    setThemes(featured.slice(0, 4));
-                } else {
-                    setThemes((await browseGallery("top")).slice(0, 4));
-                }
+                const list = featured.length > 0 ? (setAnyFeatured(true), featured.slice(0, 4)) : (await browseGallery("top")).slice(0, 4);
+                setThemes(list);
+                setLikes(Object.fromEntries(list.map(t => [t.id, t.likes])));
             } catch {
                 setThemes([]);
             }
         })();
     }, []);
+
+    async function like(t: GalleryTheme) {
+        const n = await likeGalleryTheme(t.id);
+        if (n !== null) setLikes(prev => ({ ...prev, [t.id]: n }));
+    }
 
     async function dismiss(id: string) {
         const next = [...dismissed, id];
@@ -125,10 +128,26 @@ function CommunityPanel() {
             {hasThemes && (
                 <>
                     <Flex style={{ alignItems: "center", marginTop: 6, marginBottom: 6 }}>
-                        <Text variant="text-sm/semibold" style={{ flexGrow: 1 }}>{anyFeatured ? "Staff-pick themes" : "Popular themes"}</Text>
+                        <Text variant="text-sm/semibold" style={{ flexGrow: 1 }}>{anyFeatured ? "Theme of the week" : "Popular theme"}</Text>
                         <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={openGallery}>Browse all</Button>
                     </Flex>
-                    {themes!.map(t => (
+                    <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 14, marginBottom: 8 }}>
+                        <Swatches params={themes![0].params} width="100%" height={44} />
+                        <Flex style={{ alignItems: "center", gap: 10, marginTop: 12 }}>
+                            <div style={{ flexGrow: 1, minWidth: 0 }}>
+                                <Flex style={{ alignItems: "center", gap: 6 }}>
+                                    {themes![0].featured && <span style={{ fontSize: 12 }}>⭐</span>}
+                                    <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{themes![0].name}</Text>
+                                </Flex>
+                                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {themes![0].authorName}</Text>
+                            </div>
+                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => like(themes![0])}>
+                                ♥ {likes[themes![0].id] ?? themes![0].likes}
+                            </Button>
+                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={() => applyTheme(themes![0])}>Apply</Button>
+                        </Flex>
+                    </div>
+                    {themes!.slice(1).map(t => (
                         <div key={t.id} style={{ background: "var(--background-secondary)", borderRadius: 10, padding: 10, marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
                             <Swatches params={t.params} />
                             <div style={{ flexGrow: 1, minWidth: 0 }}>

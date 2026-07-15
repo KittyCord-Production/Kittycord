@@ -9,6 +9,7 @@ import definePlugin from "@utils/types";
 import type { Message } from "@vencord/discord-types";
 import { Alerts, Button, showToast, Text, Toasts, UserStore } from "@webpack/common";
 
+import { openGallery } from "./GalleryModal";
 import { fetchTheme, findThemeAttachment } from "./share";
 import { enableTheme, loadThemes, saveTheme } from "./store";
 import { openStudio, PreviewPane } from "./StudioModal";
@@ -79,6 +80,9 @@ export default definePlugin({
     toolboxActions: {
         "Open Studio"() {
             openStudio();
+        },
+        "Open Gallery"() {
+            openGallery();
         }
     },
 
