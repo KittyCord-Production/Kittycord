@@ -15,6 +15,7 @@ import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore
 
 import { INVITE_STATS_FILENAME, renderInviteStatsCard } from "../_shared/inviteStatsCard";
 import { ShareFileModal } from "../_shared/ShareFileModal";
+import { CATALOG, type Deko } from "../kittyDeko/catalog";
 import type { MyInvites } from "./native";
 import style from "./style.css?managed";
 
@@ -136,6 +137,13 @@ function InvitesTab() {
         }
     }
 
+    const gatedFrames = CATALOG
+        .filter((d): d is Deko & { minInvites: number; } => typeof d.minInvites === "number")
+        .sort((a, b) => a.minInvites - b.minInvites);
+    const unlockedFrames = gatedFrames.filter(d => mine.invites >= d.minInvites).length;
+    const nextFrame = gatedFrames.find(d => mine.invites < d.minInvites);
+    const milePct = nextFrame ? Math.min(1, mine.invites / nextFrame.minInvites) : 1;
+
     const list = seasonMode ? seasonBoard : board;
     const q = query.trim().toLowerCase();
     const rows = list
@@ -183,6 +191,25 @@ function InvitesTab() {
                     </>
                 )}
             </div>
+
+            {gatedFrames.length > 0 && (
+                <div className="kc-inv-milestone">
+                    <div className="kc-inv-mile-head">
+                        <span className="kc-inv-mile-title">
+                            {nextFrame ? `Next avatar frame: ${nextFrame.label}` : "Every invite frame unlocked 🐱"}
+                        </span>
+                        <span className="kc-inv-mile-count">{unlockedFrames}/{gatedFrames.length}</span>
+                    </div>
+                    <div className="kc-inv-mile-track">
+                        <div className="kc-inv-mile-fill" style={{ transform: `scaleX(${milePct})` }} />
+                    </div>
+                    <Text variant="text-sm/normal" style={{ opacity: .75, marginTop: 8 }}>
+                        {nextFrame
+                            ? `${nextFrame.minInvites - mine.invites} more ${nextFrame.minInvites - mine.invites === 1 ? "invite" : "invites"} to unlock it in KittyDeko.`
+                            : "You've earned every invite-locked frame in KittyDeko."}
+                    </Text>
+                </div>
+            )}
 
             <div className="kc-inv-boardhead">
                 <Text variant="heading-lg/semibold">{seasonMode ? "This season" : "All-time"} top inviters</Text>

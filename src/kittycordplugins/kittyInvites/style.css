@@ -20,6 +20,50 @@
     flex: 1;
 }
 
+.kc-inv-milestone {
+    background: var(--background-secondary);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 12px;
+}
+
+.kc-inv-mile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.kc-inv-mile-title {
+    font-weight: 600;
+    color: var(--header-primary);
+}
+
+.kc-inv-mile-count {
+    flex-shrink: 0;
+    font-weight: 800;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--kc-accent-soft, #ff8ac4);
+}
+
+.kc-inv-mile-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--background-tertiary);
+    overflow: hidden;
+}
+
+.kc-inv-mile-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--kc-accent, #ff5fa6), var(--kc-accent-soft, #ff8ac4));
+    transform-origin: left;
+    transition: transform .3s ease;
+}
+
 .kc-inv-boardhead {
     display: flex;
     align-items: center;
