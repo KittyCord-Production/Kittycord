@@ -22,6 +22,7 @@ export const BRAND_USER_AGENT_NAME = BRAND_NAME;
 export const BRAND_WEBSITE = "https://kittycord.dev";
 
 export const themeShareUrl = (id: string) => `${BRAND_WEBSITE}/t/?id=${id}`;
+export const inviteClaimUrl = (code: string) => `${BRAND_WEBSITE}/claim?code=${encodeURIComponent(code)}`;
 
 /**
  * The Kittycord cat mascot as an inline SVG. Exposed as a data URI so it can be used as an

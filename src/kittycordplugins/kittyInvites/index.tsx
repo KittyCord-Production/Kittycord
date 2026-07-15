@@ -8,10 +8,13 @@ import { disableStyle, enableStyle } from "@api/Styles";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { OwnerCrownIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
+import { copyWithToast } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
 import { openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore, UserUtils } from "@webpack/common";
+
+import { inviteClaimUrl } from "../../branding";
 
 import { INVITE_STATS_FILENAME, renderInviteStatsCard } from "../_shared/inviteStatsCard";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -144,6 +147,8 @@ function InvitesTab() {
     const nextFrame = gatedFrames.find(d => mine.invites < d.minInvites);
     const milePct = nextFrame ? Math.min(1, mine.invites / nextFrame.minInvites) : 1;
 
+    const shareUrl = mine.code ? inviteClaimUrl(mine.code) : null;
+
     const list = seasonMode ? seasonBoard : board;
     const q = query.trim().toLowerCase();
     const rows = list
@@ -163,6 +168,16 @@ function InvitesTab() {
                         {mine.code && mine.code === code.trim().toLowerCase() ? "Saved" : "Save"}
                     </Button>
                 </div>
+                {shareUrl && (
+                    <Button
+                        size={Button.Sizes.SMALL}
+                        look={Button.Looks.LINK}
+                        color={Button.Colors.PRIMARY}
+                        onClick={() => copyWithToast(shareUrl, "Invite link copied — paste it in any chat.")}
+                    >
+                        Copy invite link
+                    </Button>
+                )}
                 <Text variant="text-sm/normal" style={{ opacity: .75, marginTop: 10 }}>
                     {seasonMode
                         ? (mine.seasonInvites > 0
