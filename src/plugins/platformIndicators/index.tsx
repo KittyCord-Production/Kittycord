@@ -231,9 +231,8 @@ export default definePlugin({
         );
     },
     renderMemberListDecorator(props) {
-        if (!settings.store.list) return null;
+        if (!settings.store.list || !props.user) return null;
         return <PlatformIndicator user={props.user} isMemberList />;
-
     },
     renderMessageDecoration(props) {
         if (!settings.store.messages) return null;

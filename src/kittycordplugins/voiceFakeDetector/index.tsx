@@ -158,8 +158,8 @@ export default definePlugin({
     renderVoiceRow: (userId?: string) =>
         userId ? <FakeIndicator userId={userId} small /> : null,
 
-    renderMemberListDecorator: ({ user }: { user: User; }) =>
-        settings.store.memberList ? <FakeIndicator userId={user.id} small /> : null,
+    renderMemberListDecorator: ({ user }: { user?: User; }) =>
+        settings.store.memberList && user ? <FakeIndicator userId={user.id} small /> : null,
 
     renderNicknameIcon: ({ userId }: { userId: string; }) =>
         settings.store.profiles ? <FakeIndicator userId={userId} /> : null,
