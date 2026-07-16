@@ -5,9 +5,10 @@
  */
 
 import { getUserSettingLazy } from "@api/UserSettings";
-import { AvatarDecorationData, CustomStatus, DisplayNameStyles, Nameplate, ProfileEffect, ProfilePreset } from "./types";
 import { findStoreLazy } from "@webpack";
 import { FluxDispatcher, GuildMemberStore, IconUtils, UserProfileStore, UserStore } from "@webpack/common";
+
+import { AvatarDecorationData, CustomStatus, DisplayNameStyles, Nameplate, ProfileEffect, ProfilePreset } from "./types";
 
 const UserProfileSettingsStore = findStoreLazy("UserProfileSettingsStore");
 const CustomStatusSettings = getUserSettingLazy("status", "customStatus")!;

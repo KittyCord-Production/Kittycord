@@ -15,7 +15,6 @@ import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore, UserUtils } from "@webpack/common";
 
 import { inviteClaimUrl } from "../../branding";
-
 import { INVITE_STATS_FILENAME, renderInviteStatsCard } from "../_shared/inviteStatsCard";
 import { ShareFileModal } from "../_shared/ShareFileModal";
 import { CATALOG, type Deko } from "../kittyDeko/catalog";
