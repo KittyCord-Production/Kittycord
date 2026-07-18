@@ -39,9 +39,10 @@ features to Discord while keeping it lightweight and privacy-friendly.
 
 ## 📦 Installing
 
-> **Requirements:** Windows 10 (1803+) or 11, the standard Discord app from
+> **Requirements:** Windows 10 (1803+) / 11 or macOS, the standard Discord app from
 > [discord.com](https://discord.com/download) (launched once), and an internet connection.
-> Nothing extra to install — everything the installer needs ships with Windows.
+
+### Windows
 
 1. **Download** [`Kittycord-Installer.exe`](https://github.com/KittyCord-Production/Kittycord/releases/latest)
    from the latest release.
@@ -51,12 +52,24 @@ features to Discord while keeping it lightweight and privacy-friendly.
 
 ![Kittycord Installer](installer/preview.png)
 
-To uninstall, run the installer again and click **Uninstall** — it restores a completely clean
-Discord. See [installer/README.md](installer/README.md) for all the details and console
-alternatives.
+### macOS
 
-> A standalone Kittycord desktop client and Mac/Linux installers are on the roadmap. On other
-> platforms, use the developer build below.
+1. **Download** `Kittycord-Installer-macOS.zip` from the [latest release](https://github.com/KittyCord-Production/Kittycord/releases/latest) and unzip it.
+2. **Right-click** `Kittycord-Install-macOS.command` and choose **Open**, then confirm. (The
+   installer isn't signed, so a plain double-click is blocked the first time.)
+3. Follow the prompts. Discord gets patched — start it again to see Kittycord.
+
+Prefer the Terminal? One line does the same thing:
+
+```sh
+sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"
+```
+
+To uninstall on either platform, run the installer again and choose **Uninstall** — it restores a
+completely clean Discord. See [installer/README.md](installer/README.md) for all the details and
+console alternatives.
+
+> A standalone Kittycord desktop client and a Linux installer are on the roadmap.
 
 ## ❓ FAQ & Troubleshooting
 

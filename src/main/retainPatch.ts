@@ -55,8 +55,10 @@ const onChange = () => {
 };
 
 export const repatchNow = (): boolean => {
-    if (process.platform !== "win32") return false;
     try {
+        if (process.platform === "darwin")
+            return patchResourcesDir(process.resourcesPath, getPatcherJsPath());
+        if (process.platform !== "win32") return false;
         const stale = findStaleSibling(dirname(process.execPath));
         if (!stale) return false;
         return patchResourcesDir(stale, getPatcherJsPath());

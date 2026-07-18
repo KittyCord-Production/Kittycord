@@ -27,7 +27,8 @@ const ModalContent = ModalContentRaw as ComponentType<any>;
 const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const IS_WINDOWS_CLIENT = typeof navigator !== "undefined" && /win/i.test(navigator.platform || navigator.userAgent || "");
-const canRepairHost = IS_DISCORD_DESKTOP && !IS_VESKTOP && !IS_EQUIBOP && IS_WINDOWS_CLIENT;
+const IS_MAC_CLIENT = typeof navigator !== "undefined" && /mac/i.test(navigator.platform || navigator.userAgent || "");
+const canRepairHost = IS_DISCORD_DESKTOP && !IS_VESKTOP && !IS_EQUIBOP && (IS_WINDOWS_CLIENT || IS_MAC_CLIENT);
 const canUpdate = !IS_WEB && !IS_UPDATER_DISABLED;
 
 const WARN_COLOR = "#f0b232";
@@ -225,7 +226,7 @@ function DoctorPanel() {
 
             {!canRepairHost && !IS_WEB && (
                 <Text variant="text-xs/normal" style={{ opacity: 0.6, marginTop: 8 }}>
-                    One-click repair is available on the Windows desktop app. Elsewhere, re-run the installer if features are missing.
+                    If features go missing after a Discord update, re-run the Kittycord installer to fix them.
                 </Text>
             )}
         </ErrorBoundary>

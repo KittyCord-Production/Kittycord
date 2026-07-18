@@ -1,14 +1,27 @@
-# Kittycord Windows Installer
+# Kittycord Installer
 
-There are two installers:
+| Script | Platform | For whom | What it does |
+|---|---|---|---|
+| `Kittycord-Installer-GUI.ps1` | Windows | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Graphical installer: downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
+| `Kittycord-Online-Install.ps1` | Windows | **End users (console)** | Same job as the GUI, as a plain console script. |
+| `Kittycord-Install.ps1` | Windows | **Developers** | Patches Discord to load your local `dist/desktop` build (run `pnpm build` first). |
+| `Kittycord-Install-macOS.command` | macOS | **End users** | Downloads the latest `desktop.asar` and patches Discord.app. Double-click (right-click → Open the first time) or run over `curl`. Has Install / Repair / Uninstall built in. |
 
-| Script | For whom | What it does |
-|---|---|---|
-| `Kittycord-Installer-GUI.ps1` | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Graphical installer: downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
-| `Kittycord-Online-Install.ps1` | **End users (console)** | Same job as the GUI, as a plain console script. |
-| `Kittycord-Install.ps1` | **Developers** | Patches Discord to load your local `dist/desktop` build (run `pnpm build` first). |
+`Kittycord-Uninstall.ps1` reverts the Windows installs; the macOS script reverts itself via its Uninstall option.
 
-`Kittycord-Uninstall.ps1` reverts any of them.
+## macOS
+
+Discord must be the standard app from [discord.com](https://discord.com/download) in `/Applications`
+(or `~/Applications`), launched once. Because the script isn't signed, the first launch needs
+**right-click → Open** rather than a double-click; after that macOS remembers your choice. From the
+Terminal you can run it directly:
+
+```sh
+sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"
+```
+
+If Discord lives somewhere the script can't write, it tells you to re-run with `sudo`. The build is
+cached under `~/Library/Application Support/Kittycord/` and verified against its SHA-256 checksum.
 
 ## System requirements
 
@@ -73,4 +86,4 @@ This removes the injected `app/` folder and restores the original `app.asar`.
   move the repo, re-run the installer.
 - Discord host updates create a new `app-<version>` folder; re-run the installer after a Discord
   update if Kittycord stops loading (a host-update hook handles most cases automatically).
-- A standalone, double-clickable installer and a custom client are on the roadmap.
+- A standalone custom client and a Linux installer are on the roadmap.

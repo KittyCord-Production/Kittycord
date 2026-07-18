@@ -58,6 +58,12 @@ jobs:
                   cp dist/extension-firefox.zip out/
                   cp dist/Kittycord.user.js out/
                   cp dist/Kittycord.user.css out/
+                  # macOS installer: the raw .command powers the curl one-liner; the zip keeps the +x bit a browser download would strip
+                  chmod +x installer/Kittycord-Install-macOS.command
+                  cp installer/Kittycord-Install-macOS.command out/
+                  ( cd installer && zip -q -X "$GITHUB_WORKSPACE/out/Kittycord-Installer-macOS.zip" Kittycord-Install-macOS.command )
+                  sha256sum out/Kittycord-Install-macOS.command | cut -d' ' -f1 > out/Kittycord-Install-macOS.command.sha256
+                  sha256sum out/Kittycord-Installer-macOS.zip | cut -d' ' -f1 > out/Kittycord-Installer-macOS.zip.sha256
 
             - uses: actions/upload-artifact@v4
               with:
@@ -115,10 +121,22 @@ jobs:
                       Kittycord-Installer.exe
                       Kittycord-Installer.exe.sha256
 
+    mac-installer-test:
+        name: Test macOS installer
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Syntax-check installer script
+              run: bash -n installer/Kittycord-Install-macOS.command
+
+            - name: Run installer against a Discord fixture
+              run: bash installer/test/macos-install.test.sh
+
     release:
         name: Publish release
         runs-on: ubuntu-latest
-        needs: [build, installer]
+        needs: [build, installer, mac-installer-test]
         steps:
             - name: Download all build outputs
               uses: actions/download-artifact@v4
@@ -136,6 +154,12 @@ jobs:
                       Automated Kittycord build for commit ${{ github.sha }}.
 
                       **Install (Windows):** download `Kittycord-Installer.exe` below, run it, then start Discord.
+
+                      **Install (macOS):** download `Kittycord-Installer-macOS.zip`, unzip it, then right-click `Kittycord-Install-macOS.command` and choose Open (it's not signed, so a plain double-click is blocked the first time). Prefer the Terminal? Paste this:
+                      ```
+                      sh -c "$(curl -fsSL https://github.com/${{ github.repository }}/releases/latest/download/Kittycord-Install-macOS.command)"
+                      ```
+                      Run it again any time to repair after a Discord update, and choose Uninstall to revert.
 
                       **Verify your download:** every file ships with a matching `.sha256` checksum. Compare it against your download to confirm it's the genuine, untampered build — see [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md) for step-by-step instructions.
                   files: assets/**/*
