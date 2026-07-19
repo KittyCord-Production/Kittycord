@@ -16,11 +16,12 @@ import { getCommand, settings } from "./settings";
 
 function resolvePlaceholders(template: string, args: string, channelId: string) {
     const now = new Date();
-    const hadArgs = /\{args\}/i.test(template);
+    const hadArgs = /\{(args|mentions)\}/i.test(template);
 
-    let out = template.replaceAll("\\n", "\n").replace(/\{(args|channel|date|time)\}/gi, (_, key: string) => {
+    let out = template.replaceAll("\\n", "\n").replace(/\{(args|mentions|channel|date|time)\}/gi, (_, key: string) => {
         switch (key.toLowerCase()) {
             case "args": return args;
+            case "mentions": return (args.match(/\d{17,20}/g) ?? []).map(id => `<@${id}> - ${id}`).join("\n");
             case "channel": return `<#${channelId}>`;
             case "date": return now.toLocaleDateString();
             case "time": return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -37,7 +38,7 @@ function PlaceholderReference() {
     return (
         <Flex flexDirection="column" gap={4}>
             <Paragraph>Type your prefix and a trigger to send its template. Templates support these placeholders:</Paragraph>
-            <Paragraph><InlineCode>{"{args}"}</InlineCode> text you type after the trigger &middot; <InlineCode>{"{channel}"}</InlineCode> the current channel &middot; <InlineCode>{"{date}"}</InlineCode> today's date &middot; <InlineCode>{"{time}"}</InlineCode> the current time</Paragraph>
+            <Paragraph><InlineCode>{"{args}"}</InlineCode> text you type after the trigger &middot; <InlineCode>{"{mentions}"}</InlineCode> turns IDs after the trigger into pings &middot; <InlineCode>{"{channel}"}</InlineCode> the current channel &middot; <InlineCode>{"{date}"}</InlineCode> today's date &middot; <InlineCode>{"{time}"}</InlineCode> the current time</Paragraph>
         </Flex>
     );
 }

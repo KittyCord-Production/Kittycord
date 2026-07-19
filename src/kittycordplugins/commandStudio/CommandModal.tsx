@@ -93,7 +93,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
                     renderContent={() => (
                         <Flex flexDirection="column" gap={12}>
                             <Paragraph>
-                                Placeholders in your message get replaced when you send it: <InlineCode>{"{args}"}</InlineCode> is the text you type after the trigger, <InlineCode>{"{channel}"}</InlineCode> the current channel, <InlineCode>{"{date}"}</InlineCode> today's date and <InlineCode>{"{time}"}</InlineCode> the current time.
+                                Placeholders in your message get replaced when you send it: <InlineCode>{"{args}"}</InlineCode> is the text you type after the trigger, <InlineCode>{"{mentions}"}</InlineCode> turns every Discord ID after the trigger into a ping line, <InlineCode>{"{channel}"}</InlineCode> the current channel, <InlineCode>{"{date}"}</InlineCode> today's date and <InlineCode>{"{time}"}</InlineCode> the current time.
                             </Paragraph>
                             <Paragraph>
                                 If your message has no <InlineCode>{"{args}"}</InlineCode> but you still type extra text, it gets added to the end.
