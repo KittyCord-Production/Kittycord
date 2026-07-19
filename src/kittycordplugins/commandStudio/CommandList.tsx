@@ -12,21 +12,23 @@ import { DeleteIcon, PencilIcon } from "@components/Icons";
 import { Margins } from "@components/margins";
 import { Paragraph } from "@components/Paragraph";
 import { classNameFactory } from "@utils/css";
+import { copyWithToast } from "@utils/discord";
 
-import { openCommandModal } from "./CommandModal";
-import { removeCommand, settings } from "./settings";
+import { openCommandModal, openImportModal } from "./CommandModal";
+import { exportCommands, removeCommand, settings } from "./settings";
 
 const cl = classNameFactory("vc-commandStudio-");
 
 export function CommandList() {
     const { commands, prefix } = settings.use(["commands", "prefix"]);
     const activePrefix = prefix.trim() || ".";
+    const commandValues = Object.values(commands);
 
     return (
         <section className={Margins.top8}>
             <BaseText size="md" weight="semibold">Your Commands</BaseText>
             <Flex flexDirection="column" gap="0.5em" className={Margins.top8}>
-                {Object.values(commands).map(command => (
+                {commandValues.map(command => (
                     <Card key={command.trigger} className={cl("card")}>
                         <div className={cl("info")}>
                             <Paragraph size="md" weight="medium">{activePrefix}{command.trigger}</Paragraph>
@@ -41,7 +43,18 @@ export function CommandList() {
                         </Button>
                     </Card>
                 ))}
-                <Button onClick={() => openCommandModal()}>Create Command</Button>
+                <Flex gap="0.5em">
+                    <Button onClick={() => openCommandModal()}>Create Command</Button>
+                    <Button variant="secondary" onClick={() => openImportModal()}>Import</Button>
+                    {commandValues.length > 0 && (
+                        <Button
+                            variant="secondary"
+                            onClick={() => copyWithToast(exportCommands(commandValues), "Command pack copied — share it with anyone.")}
+                        >
+                            Share all
+                        </Button>
+                    )}
+                </Flex>
             </Flex>
         </section>
     );

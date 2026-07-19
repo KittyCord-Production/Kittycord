@@ -12,9 +12,9 @@ import { HeadingSecondary } from "@components/Heading";
 import { InfoIcon } from "@components/Icons";
 import { Paragraph } from "@components/Paragraph";
 import { RenderModalProps } from "@vencord/discord-types";
-import { Modal, openModal, TextArea, TextInput, useState } from "@webpack/common";
+import { Modal, openModal, showToast, TextArea, TextInput, Toasts, useState } from "@webpack/common";
 
-import { addCommand, CustomCommand, getCommand, removeCommand, settings } from "./settings";
+import { addCommand, CustomCommand, getCommand, importCommands, removeCommand, settings } from "./settings";
 
 const EXAMPLE_RESPONSE = "Hallo, wann hättest du Zeit? Vorschlag: {args}";
 
@@ -22,6 +22,54 @@ export function openCommandModal(initialValue: CustomCommand = { trigger: "", me
     openModal(modalProps => (
         <CommandDialog initialValue={initialValue} modalProps={modalProps} />
     ));
+}
+
+export function openImportModal() {
+    openModal(modalProps => <ImportDialog modalProps={modalProps} />);
+}
+
+function ImportDialog({ modalProps }: { modalProps: RenderModalProps; }) {
+    const [code, setCode] = useState("");
+
+    const parsed = importCommands(code);
+    const notice = code.trim() && !parsed ? "That isn't a valid command pack." : undefined;
+
+    return (
+        <Modal
+            {...modalProps}
+            title="Import commands"
+            subtitle="Paste a command pack someone shared with you."
+            actions={[
+                {
+                    text: "Cancel",
+                    variant: "secondary",
+                    onClick: modalProps.onClose
+                },
+                {
+                    text: "Import",
+                    variant: "primary",
+                    onClick: () => {
+                        if (!parsed) return;
+                        parsed.forEach(addCommand);
+                        showToast(`Imported ${parsed.length} command${parsed.length === 1 ? "" : "s"}.`, Toasts.Type.SUCCESS);
+                        modalProps.onClose();
+                    },
+                    disabled: !parsed
+                }
+            ]}
+            notice={notice ? { message: notice, type: "critical" } : undefined}
+        >
+            <Flex flexDirection="column" gap={12}>
+                <section>
+                    <HeadingSecondary>Command pack</HeadingSecondary>
+                    <TextArea value={code} onChange={setCode} placeholder="KCMD1:..." autosize />
+                </section>
+                {parsed && (
+                    <Paragraph>Ready to import {parsed.length} command{parsed.length === 1 ? "" : "s"}. Any with the same trigger will be replaced.</Paragraph>
+                )}
+            </Flex>
+        </Modal>
+    );
 }
 
 function CommandDialog({ initialValue, modalProps }: { initialValue: CustomCommand; modalProps: RenderModalProps; }) {

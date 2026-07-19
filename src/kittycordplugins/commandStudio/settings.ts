@@ -43,3 +43,30 @@ export function addCommand(command: CustomCommand) {
 export function removeCommand(trigger: string) {
     delete settings.store.commands[trigger.toLowerCase()];
 }
+
+const SHARE_PREFIX = "KCMD1:";
+
+export function exportCommands(commands: CustomCommand[]): string {
+    return SHARE_PREFIX + btoa(encodeURIComponent(JSON.stringify(commands)));
+}
+
+export function importCommands(code: string): CustomCommand[] | null {
+    const trimmed = code.trim();
+    if (!trimmed.startsWith(SHARE_PREFIX)) return null;
+    try {
+        const data = JSON.parse(decodeURIComponent(atob(trimmed.slice(SHARE_PREFIX.length))));
+        if (!Array.isArray(data)) return null;
+
+        const out: CustomCommand[] = [];
+        for (const c of data) {
+            if (!c || typeof c !== "object") continue;
+            const trigger = typeof c.trigger === "string" ? c.trigger.trim() : "";
+            const message = typeof c.message === "string" ? c.message : "";
+            if (!trigger || /\s/.test(trigger) || !message) continue;
+            out.push({ trigger, message, mode: c.mode === "insert" ? "insert" : "send" });
+        }
+        return out.length ? out : null;
+    } catch {
+        return null;
+    }
+}
