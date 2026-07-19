@@ -1,0 +1,31 @@
+.vc-supportkc-perks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.vc-supportkc-frames {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.vc-supportkc-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 84px;
+}
+
+.vc-supportkc-frame img {
+    width: 72px;
+    height: 72px;
+}
+
+.vc-supportkc-status {
+    margin-top: 16px;
+    padding: 16px;
+}

@@ -13,11 +13,12 @@ import { isOverlayWindow } from "@utils/overlay";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
 
-import { assetUrl, byId, CATALOG, KITTY_DEKO_SKU } from "./catalog";
+import { assetUrl, byId, CATALOG, Deko, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
 
 const Native = VencordNative?.pluginHelpers?.KittyDeko as PluginNative<typeof import("./native")> | undefined;
 const InvitesNative = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeof import("../kittyInvites/native")> | undefined;
+const SupportNative = VencordNative?.pluginHelpers?.SupportKittycord as PluginNative<typeof import("../supportKittycord/native")> | undefined;
 
 const deko = new Map<string, string>();
 const listeners = new Set<() => void>();
@@ -55,21 +56,32 @@ function DekoShop() {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const [saving, setSaving] = React.useState<string | null>(null);
     const [invites, setInvites] = React.useState(0);
+    const [supporter, setSupporter] = React.useState(false);
     const me = UserStore.getCurrentUser();
     const equipped = me ? deko.get(me.id) : undefined;
     const avatar = avatarUrl();
 
     React.useEffect(() => {
-        if (InvitesNative && me) InvitesNative.getMe(me.id).then(m => setInvites(m.invites)).catch(() => { });
+        if (!me) return;
+        if (InvitesNative) InvitesNative.getMe(me.id).then(m => setInvites(m.invites)).catch(() => { });
+        if (SupportNative) SupportNative.getStatus(me.id).then(s => setSupporter(s.supporter)).catch(() => { });
     }, []);
 
-    const lockedBy = (id: string) => Math.max(0, (byId.get(id)?.minInvites ?? 0) - invites);
+    const inviteLock = (id: string) => Math.max(0, (byId.get(id)?.minInvites ?? 0) - invites);
+    const isLocked = (d: Deko) => d.supporterOnly ? !supporter : inviteLock(d.id) > 0;
 
     async function equip(id: string | null) {
         if (!Native || !me) return;
-        if (id && lockedBy(id) > 0) {
-            showToast(`Invite ${byId.get(id)!.minInvites} friends to unlock this frame.`, Toasts.Type.FAILURE);
-            return;
+        if (id) {
+            const d = byId.get(id)!;
+            if (d.supporterOnly && !supporter) {
+                showToast("This frame is for Kittycord supporters.", Toasts.Type.FAILURE);
+                return;
+            }
+            if (inviteLock(id) > 0) {
+                showToast(`Invite ${d.minInvites} friends to unlock this frame.`, Toasts.Type.FAILURE);
+                return;
+            }
         }
         setSaving(id ?? "none");
         try {
@@ -113,7 +125,7 @@ function DekoShop() {
                 </Button>
             </div>
             {CATALOG.map(d => {
-                const locked = lockedBy(d.id) > 0;
+                const locked = isLocked(d);
                 return (
                     <div className="kc-deko-tile" key={d.id}>
                         <div className="kc-deko-preview">
@@ -126,7 +138,7 @@ function DekoShop() {
                             disabled={saving != null || locked}
                             onClick={() => equip(d.id)}
                         >
-                            {equipped === d.id ? "Equipped" : locked ? `🔒 ${d.minInvites} invites` : d.label}
+                            {equipped === d.id ? "Equipped" : locked ? (d.supporterOnly ? "💖 Supporters" : `🔒 ${d.minInvites} invites`) : d.label}
                         </Button>
                     </div>
                 );
@@ -139,7 +151,7 @@ function DekoTab() {
     return (
         <ErrorBoundary noop>
             <Text variant="text-md/normal" style={{ marginBottom: 16, color: "var(--text-muted)" }}>
-                Pick a free decoration for your avatar — everyone on Kittycord will see it. A few special frames unlock as you invite friends with your creator code.
+                Pick a free decoration for your avatar — everyone on Kittycord will see it. Some frames unlock as you invite friends with your creator code, and a few golden ones are a thank-you for Kittycord supporters.
             </Text>
             <DekoShop />
         </ErrorBoundary>

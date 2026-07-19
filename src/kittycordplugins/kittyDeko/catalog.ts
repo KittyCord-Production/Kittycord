@@ -13,6 +13,7 @@ export interface Deko {
     file: string;
     animated?: boolean;
     minInvites?: number;
+    supporterOnly?: boolean;
 }
 
 export const CATALOG: Deko[] = [
@@ -35,7 +36,10 @@ export const CATALOG: Deko[] = [
     { id: "waves", label: "Waves", file: "waves", animated: true },
     { id: "shells", label: "Seashells", file: "shells" },
     { id: "sunset", label: "Sunset", file: "sunset", minInvites: 3 },
-    { id: "palms", label: "Palms", file: "palms", minInvites: 15 }
+    { id: "palms", label: "Palms", file: "palms", minInvites: 15 },
+    { id: "halo", label: "Golden halo", file: "halo", animated: true, supporterOnly: true },
+    { id: "goldheart", label: "Golden hearts", file: "goldheart", supporterOnly: true },
+    { id: "celestial", label: "Celestial", file: "celestial", animated: true, supporterOnly: true }
 ];
 
 export const byId = new Map(CATALOG.map(d => [d.id, d]));

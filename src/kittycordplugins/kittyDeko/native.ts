@@ -6,12 +6,11 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
+import { CATALOG } from "./catalog";
+
 const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
 const SNOWFLAKE_RE = /^\d{17,20}$/;
-const DEKO_IDS = new Set([
-    "sakura", "galaxy", "neon", "ice", "flames", "wings", "aura", "butterfly",
-    "glow", "hearts", "sparkles", "stars", "ears", "crown", "bubbles"
-]);
+const DEKO_IDS = new Set(CATALOG.map(d => d.id));
 
 export interface DekoEntry {
     id: string;
