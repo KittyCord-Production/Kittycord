@@ -2,7 +2,7 @@ name: Release
 
 on:
     push:
-        branches: [main]
+        branches: [main, stable]
     workflow_dispatch:
 
 permissions:
@@ -144,7 +144,8 @@ jobs:
                   path: assets
                   merge-multiple: true
 
-            - name: Publish/refresh the rolling release
+            - name: Publish/refresh the stable release
+              if: github.ref_name == 'stable'
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: latest
@@ -162,4 +163,20 @@ jobs:
                       Run it again any time to repair after a Discord update, and choose Uninstall to revert.
 
                       **Verify your download:** every file ships with a matching `.sha256` checksum. Compare it against your download to confirm it's the genuine, untampered build — see [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md) for step-by-step instructions.
+                  files: assets/**/*
+
+            - name: Publish/refresh the beta release
+              if: github.ref_name != 'stable'
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: beta
+                  name: Kittycord Beta ${{ github.sha }}
+                  make_latest: false
+                  prerelease: true
+                  body: |
+                      Beta build for commit ${{ github.sha }}. New features land here first, so expect the occasional rough edge.
+
+                      To get beta builds, install Kittycord normally, then open Settings → Updater and set the release channel to Beta. You can switch back to Stable there any time.
+
+                      **Verify your download:** every file ships with a matching `.sha256` checksum — see [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md).
                   files: assets/**/*

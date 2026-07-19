@@ -29,8 +29,16 @@ import gitRemote from "~git-remote";
 import { ASAR_FILE, serializeErrors } from "./common";
 
 const API_BASE = `https://api.github.com/repos/${gitRemote}`;
-const RELEASE_DOWNLOAD_BASE = `https://github.com/${gitRemote}/releases/latest/download`;
+const RELEASE_BASE = `https://github.com/${gitRemote}/releases`;
+
+function downloadBase(channel?: string) {
+    return channel === "beta"
+        ? `${RELEASE_BASE}/download/beta`
+        : `${RELEASE_BASE}/latest/download`;
+}
+
 let PendingUpdate: string | null = null;
+let remoteHash: string | null = null;
 
 async function githubGet<T = any>(endpoint: string) {
     return fetchJson<T>(API_BASE + endpoint, {
@@ -43,34 +51,41 @@ async function githubGet<T = any>(endpoint: string) {
     });
 }
 
-async function calculateGitChanges() {
-    const isOutdated = await fetchUpdates();
+async function calculateGitChanges(channel?: string) {
+    const isOutdated = await fetchUpdates(channel);
     if (!isOutdated) return [];
 
     // The per-commit changelog still uses the GitHub API. If that is rate-limited or fails, we
     // still report that an update is available (just without the detailed commit list).
     try {
-        const data = await githubGet(`/compare/${gitHash}...HEAD`);
+        const data = await githubGet(`/compare/${gitHash}...${remoteHash ?? "HEAD"}`);
 
-        return data.commits.map((c: any) => ({
+        const commits = data.commits.map((c: any) => ({
             hash: c.sha,
             author: c.author?.login ?? c.commit?.author?.name ?? "Unknown Author",
             message: c.commit.message.split("\n")[0]
         }));
+
+        if (!commits.length)
+            return [{ hash: (remoteHash ?? "").slice(0, 7), author: "", message: "A different build is available on this channel." }];
+
+        return commits;
     } catch {
         return [{ hash: gitHash.slice(0, 7), author: "", message: "A new version is available." }];
     }
 }
 
-async function fetchUpdates() {
+async function fetchUpdates(channel?: string) {
+    const base = downloadBase(channel);
+
     // Check for updates via the release download CDN (version.txt) instead of the GitHub REST API,
     // so update checks are NOT subject to the 60 requests/hour unauthenticated API rate limit.
-    const remoteHash = (await fetchBuffer(`${RELEASE_DOWNLOAD_BASE}/version.txt`)).toString("utf-8").trim();
+    remoteHash = (await fetchBuffer(`${base}/version.txt`)).toString("utf-8").trim();
 
     if (!remoteHash || remoteHash === gitHash)
         return false;
 
-    PendingUpdate = `${RELEASE_DOWNLOAD_BASE}/${ASAR_FILE}`;
+    PendingUpdate = `${base}/${ASAR_FILE}`;
 
     return true;
 }
@@ -78,8 +93,9 @@ async function fetchUpdates() {
 // CI publishes a `<asar>.sha256` asset next to each build. Releases from before that have no
 // checksum, so a missing file skips verification instead of failing the update.
 async function fetchExpectedHash() {
+    if (!PendingUpdate) return null;
     try {
-        const hash = (await fetchBuffer(`${RELEASE_DOWNLOAD_BASE}/${ASAR_FILE}.sha256`)).toString("utf-8").trim().toLowerCase();
+        const hash = (await fetchBuffer(`${PendingUpdate}.sha256`)).toString("utf-8").trim().toLowerCase();
         return /^[0-9a-f]{64}$/.test(hash) ? hash : null;
     } catch {
         return null;
@@ -107,6 +123,6 @@ async function applyUpdates() {
 }
 
 ipcMain.handle(IpcEvents.GET_REPO, serializeErrors(() => `https://github.com/${gitRemote}`));
-ipcMain.handle(IpcEvents.GET_UPDATES, serializeErrors(calculateGitChanges));
-ipcMain.handle(IpcEvents.UPDATE, serializeErrors(fetchUpdates));
+ipcMain.handle(IpcEvents.GET_UPDATES, serializeErrors((_, channel?: string) => calculateGitChanges(channel)));
+ipcMain.handle(IpcEvents.UPDATE, serializeErrors((_, channel?: string) => fetchUpdates(channel)));
 ipcMain.handle(IpcEvents.BUILD, serializeErrors(applyUpdates));

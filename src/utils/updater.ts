@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { Settings } from "@api/Settings";
+
 import gitHash from "~git-hash";
 
 import { Logger } from "./Logger";
@@ -38,7 +40,7 @@ async function Unwrap<T>(p: Promise<IpcRes<T>>) {
 }
 
 export async function checkForUpdates() {
-    changes = await Unwrap(VencordNative.updater.getUpdates());
+    changes = await Unwrap(VencordNative.updater.getUpdates(Settings.updateChannel));
 
     // we only want to check this for the git updater, not the http updater
     if (!IS_STANDALONE) {
@@ -54,7 +56,7 @@ export async function checkForUpdates() {
 export async function update() {
     if (!isOutdated) return true;
 
-    const res = await Unwrap(VencordNative.updater.update());
+    const res = await Unwrap(VencordNative.updater.update(Settings.updateChannel));
 
     if (res) {
         isOutdated = false;

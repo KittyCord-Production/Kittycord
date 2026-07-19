@@ -29,7 +29,7 @@ import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
 import { Margins } from "@utils/margins";
 import { useAwaiter } from "@utils/react";
 import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
-import { React } from "@webpack/common";
+import { React, Select } from "@webpack/common";
 
 import gitHash from "~git-hash";
 
@@ -69,7 +69,7 @@ function EquibopSection() {
 }
 
 function Updater() {
-    const settings = useSettings(["autoUpdate", "autoUpdateNotification"]);
+    const settings = useSettings(["autoUpdate", "autoUpdateNotification", "updateChannel"]);
 
     const [repo, err, repoPending] = useAwaiter(getRepo, { fallbackValue: "Loading..." });
 
@@ -106,6 +106,27 @@ function Updater() {
                 disabled={!settings.autoUpdate}
                 hideBorder
             />
+
+            {IS_STANDALONE && (
+                <>
+                    <Divider className={Margins.top20} />
+
+                    <Heading className={Margins.top20}>Release Channel</Heading>
+                    <Paragraph className={Margins.bottom8}>
+                        Stable gets the polished releases. Beta gets new features first, but is more likely to have rough edges. After switching, check for updates below to move to that channel's build.
+                    </Paragraph>
+                    <Select
+                        options={[
+                            { label: "Stable", value: "stable" },
+                            { label: "Beta (new features first)", value: "beta" }
+                        ]}
+                        closeOnSelect={true}
+                        select={(v: string) => settings.updateChannel = v as "stable" | "beta"}
+                        isSelected={(v: string) => v === settings.updateChannel}
+                        serialize={(v: string) => v}
+                    />
+                </>
+            )}
 
             <Divider className={Margins.top20} />
 

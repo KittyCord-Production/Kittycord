@@ -43,6 +43,7 @@ export type SettingsPluginUiElements = {
 export interface Settings {
     autoUpdate: boolean;
     autoUpdateNotification: boolean;
+    updateChannel: "stable" | "beta";
     useQuickCss: boolean;
     eagerPatches: boolean;
     enabledThemes: string[];
@@ -109,6 +110,7 @@ export interface Settings {
 const DefaultSettings: Settings = {
     autoUpdate: true,
     autoUpdateNotification: true,
+    updateChannel: "stable",
     useQuickCss: true,
     themeLinks: [],
     eagerPatches: false, // Eagerly patching no longer works due to module factories with the same id being able to have different sources now.
