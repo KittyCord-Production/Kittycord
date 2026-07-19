@@ -1,0 +1,19 @@
+.vc-commandStudio-card {
+    padding: 0.5em;
+    padding-left: 1em;
+    display: grid;
+    grid-template-columns: 1fr min-content min-content;
+    align-items: center;
+    gap: 0.25em;
+}
+
+.vc-commandStudio-info {
+    min-width: 0;
+}
+
+.vc-commandStudio-preview {
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
