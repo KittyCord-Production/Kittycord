@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { useSettings } from "@api/Settings";
+import { DEFAULT_CLOUD_URL, useSettings } from "@api/Settings";
 import { authorizeCloud, deauthorizeCloud } from "@api/SettingsSync/cloudSetup";
 import { deleteCloudSettings, eraseAllCloudData, getCloudSettings, putCloudSettings } from "@api/SettingsSync/cloudSync";
 import { Button } from "@components/Button";
@@ -57,8 +57,11 @@ function validateUrl(url: string) {
     }
 }
 
+const CUSTOM_BACKEND = "custom";
+
 const cloudBackendOptions = [
-    { label: "Kittycord Cloud", value: "https://cloud.kittycord.dev/" }
+    { label: "Kittycord Cloud", value: DEFAULT_CLOUD_URL },
+    { label: "Self-hosted", value: CUSTOM_BACKEND }
 ];
 
 const syncDirectionOptions = [
@@ -77,7 +80,15 @@ function CloudTab() {
     const isAuthenticated = cloud.authenticated;
     const syncEnabled = isAuthenticated && cloud.settingsSync;
 
+    const [isSelfHosted, setIsSelfHosted] = useState(cloud.url !== DEFAULT_CLOUD_URL);
+
     async function changeUrl(url: string) {
+        if (url === CUSTOM_BACKEND) {
+            setIsSelfHosted(true);
+            return;
+        }
+
+        setIsSelfHosted(false);
         cloud.url = url;
         cloud.authenticated = false;
 
@@ -95,8 +106,8 @@ function CloudTab() {
             </Paragraph>
 
             <Notice.Info className={Margins.bottom16}>
-                Your settings are stored on the cloud backend you select below. Check that backend's own privacy policy
-                to see what is stored and how it is used. The backend is open-source, so you can self-host your own instead.
+                Your settings are stored on Kittycord's own cloud. We only ever store your settings and themes, never your
+                Discord login or your messages, and you can erase everything again at any time below. Prefer your own server? Pick Self-hosted.
             </Notice.Info>
 
             <FormSwitch
@@ -122,7 +133,7 @@ function CloudTab() {
             <div className={Margins.bottom8}>
                 <SearchableSelect
                     options={cloudBackendOptions}
-                    value={cloudBackendOptions.find(o => o.value === cloud.url)?.value}
+                    value={isSelfHosted ? CUSTOM_BACKEND : DEFAULT_CLOUD_URL}
                     onChange={v => changeUrl(v)}
                     closeOnSelect={true}
                     renderOptionPrefix={() => <CloudIcon />}
@@ -130,18 +141,20 @@ function CloudTab() {
             </div>
 
             <Flex gap="8px" alignItems="center">
-                <div style={{ flex: 1 }}>
-                    <CheckedTextInput
-                        key={`backendUrl-${inputKey}`}
-                        initialValue={cloud.url}
-                        onChange={async v => {
-                            cloud.url = v;
-                            cloud.authenticated = false;
-                            await deauthorizeCloud();
-                        }}
-                        validate={validateUrl}
-                    />
-                </div>
+                {isSelfHosted && (
+                    <div style={{ flex: 1 }}>
+                        <CheckedTextInput
+                            key={`backendUrl-${inputKey}`}
+                            initialValue={cloud.url}
+                            onChange={async v => {
+                                cloud.url = v;
+                                cloud.authenticated = false;
+                                await deauthorizeCloud();
+                            }}
+                            validate={validateUrl}
+                        />
+                    </div>
+                )}
                 <Button
                     disabled={!isAuthenticated}
                     onClick={async () => {

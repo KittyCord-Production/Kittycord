@@ -107,6 +107,8 @@ export interface Settings {
     ignoreResetWarning: boolean;
 }
 
+export const DEFAULT_CLOUD_URL = "https://kittycord-analytics.hell-bullet-hb.workers.dev/";
+
 const DefaultSettings: Settings = {
     autoUpdate: true,
     autoUpdateNotification: true,
@@ -148,7 +150,7 @@ const DefaultSettings: Settings = {
 
     cloud: {
         authenticated: false,
-        url: "https://cloud.kittycord.dev/",
+        url: DEFAULT_CLOUD_URL,
         settingsSync: false,
         settingsSyncVersion: 0
     },
@@ -159,8 +161,8 @@ const DefaultSettings: Settings = {
 const settings = !IS_REPORTER ? VencordNative.settings.get() : {} as Settings;
 mergeDefaults(settings, DefaultSettings);
 
-if (settings.cloud && !settings.cloud.authenticated && !settings.cloud.url?.includes("kittycord.dev")) {
-    settings.cloud.url = DefaultSettings.cloud.url;
+if (settings.cloud && !settings.cloud.authenticated && settings.cloud.url !== DEFAULT_CLOUD_URL) {
+    settings.cloud.url = DEFAULT_CLOUD_URL;
 }
 
 export const SettingsStore = new SettingsStoreClass(settings, {
