@@ -58,8 +58,7 @@ function validateUrl(url: string) {
 }
 
 const cloudBackendOptions = [
-    { label: "Default Cloud", value: "https://cloud.equicord.org/" },
-    { label: "Alternate Cloud", value: "https://api.vencord.dev/" }
+    { label: "Kittycord Cloud", value: "https://cloud.kittycord.dev/" }
 ];
 
 const syncDirectionOptions = [

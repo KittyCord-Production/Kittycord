@@ -148,7 +148,7 @@ const DefaultSettings: Settings = {
 
     cloud: {
         authenticated: false,
-        url: "https://cloud.equicord.org/",
+        url: "https://cloud.kittycord.dev/",
         settingsSync: false,
         settingsSyncVersion: 0
     },
@@ -158,6 +158,10 @@ const DefaultSettings: Settings = {
 
 const settings = !IS_REPORTER ? VencordNative.settings.get() : {} as Settings;
 mergeDefaults(settings, DefaultSettings);
+
+if (settings.cloud && !settings.cloud.authenticated && !settings.cloud.url?.includes("kittycord.dev")) {
+    settings.cloud.url = DefaultSettings.cloud.url;
+}
 
 export const SettingsStore = new SettingsStoreClass(settings, {
     readOnly: true,
