@@ -65,7 +65,7 @@ function SupportTab() {
                 {status?.supporter ? (
                     <>
                         <Text variant="text-md/semibold">You're a Kittycord supporter 💖</Text>
-                        <Text variant="text-sm/normal" style={{ color: "var(--text-muted)" }}>
+                        <Text variant="text-sm/normal">
                             {status.since ? `Supporting since ${new Date(status.since).toLocaleDateString()}. ` : ""}Thank you — it genuinely helps keep Kittycord going.
                         </Text>
                     </>
