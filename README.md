@@ -24,16 +24,20 @@ features to Discord while keeping it lightweight and privacy-friendly.
 
 ## 🌸 Features
 
-- **350+ built-in plugins** covering chat, appearance, voice, moderation and utility — toggle
+- **400+ built-in plugins** covering chat, appearance, voice, moderation and utility — toggle
   anything on or off in seconds, no extra downloads needed.
 - **Themes & QuickCSS** — restyle your whole client, or live-edit your own CSS right inside
-  Discord.
-- **Kittycord exclusives** — Modes (one-click setting profiles), Quiet Hours, Message Tags,
-  Settings Sharing with friends, and the Kittycord Toolbox.
+  Discord. Kittycord Studio lets you design a theme with a visual editor and publish it to a
+  community gallery.
+- **Kittycord exclusives** — a desktop cat companion (KittyPet), animated avatar decorations,
+  custom profile badges and name colors, Modes (one-click setting profiles), CommandStudio
+  (build your own text commands and share them as packs), Message Reminders, Quiet Hours,
+  Message Tags, and Settings Sharing with friends.
 - **Custom plugin folder** — drop in your own plugins and they build right alongside the
   built-in ones.
-- **Safe auto-updates** — Kittycord keeps itself current in the background, and every download
-  is verified against a published SHA-256 checksum before it's applied.
+- **Safe auto-updates** — Kittycord keeps itself current in the background on your choice of a
+  Stable or Beta channel, and every download is verified against a published SHA-256 checksum
+  before it's applied.
 - **A cute installer in your language** — English, Deutsch, Español, Français and Русский,
   auto-detected from your system.
 
