@@ -170,6 +170,21 @@ Note: The Firefox extension zip requires Firefox for Developers.
 
 </details>
 
+## 📜 License & Branding
+
+Kittycord's code is free software under the [GPL-3.0 license](./LICENSE). You're welcome to
+use, study, change and redistribute it under that license's terms: keep the license and the
+copyright notices intact, and make your source code available.
+
+The Kittycord **name**, **logo**, **cat artwork** and the **kittycord.dev** brand are not part
+of that license. If you publish a modified version, give it its own name and its own artwork,
+and don't present it as official Kittycord or as affiliated with us. A short credit line like
+"based on Kittycord" is appreciated, but the naming rule is not optional.
+
+Official builds come only from [this repository's releases](https://github.com/KittyCord-Production/Kittycord/releases)
+and [kittycord.dev](https://kittycord.dev) — anything else is somebody else's build, and we
+can't vouch for what's in it.
+
 ## ⚠️ Disclaimer
 
 Discord is a trademark of Discord Inc., and is solely mentioned here for the sake of descriptivity.
