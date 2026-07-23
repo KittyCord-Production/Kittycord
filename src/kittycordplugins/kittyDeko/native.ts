@@ -6,7 +6,7 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
-import { CATALOG } from "./catalog";
+import { CATALOG, PRICED_IDS } from "./catalog";
 
 const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
 const SNOWFLAKE_RE = /^\d{17,20}$/;
@@ -15,6 +15,43 @@ const DEKO_IDS = new Set(CATALOG.map(d => d.id));
 export interface DekoEntry {
     id: string;
     deco: string;
+}
+
+export interface CoinStatus {
+    balance: number;
+    owned: string[];
+}
+
+export async function getCoins(_: IpcMainInvokeEvent, id: unknown): Promise<CoinStatus> {
+    if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { balance: 0, owned: [] };
+    try {
+        const res = await fetch(`${ENDPOINT}/coins?id=${encodeURIComponent(id)}`);
+        if (!res.ok) return { balance: 0, owned: [] };
+        const body = await res.json() as { balance?: unknown; owned?: unknown; };
+        const owned = Array.isArray(body.owned)
+            ? body.owned.filter((o): o is string => typeof o === "string" && DEKO_IDS.has(o))
+            : [];
+        return { balance: Number(body.balance) || 0, owned };
+    } catch {
+        return { balance: 0, owned: [] };
+    }
+}
+
+export async function buyDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown): Promise<{ ok: true; balance: number; } | { ok: false; error: string; }> {
+    if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
+    if (typeof deco !== "string" || !PRICED_IDS.has(deco)) return { ok: false, error: "That frame isn't for sale." };
+    try {
+        const res = await fetch(`${ENDPOINT}/deko/buy`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, deco })
+        });
+        const body = await res.json().catch(() => ({})) as { balance?: unknown; error?: string; };
+        if (res.ok) return { ok: true, balance: Number(body.balance) || 0 };
+        return { ok: false, error: typeof body.error === "string" ? body.error : "Could not buy that frame." };
+    } catch {
+        return { ok: false, error: "Offline" };
+    }
 }
 
 export async function setDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {

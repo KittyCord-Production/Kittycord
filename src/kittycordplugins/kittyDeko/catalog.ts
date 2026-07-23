@@ -14,6 +14,7 @@ export interface Deko {
     animated?: boolean;
     minInvites?: number;
     supporterOnly?: boolean;
+    price?: number;
 }
 
 export const CATALOG: Deko[] = [
@@ -39,10 +40,15 @@ export const CATALOG: Deko[] = [
     { id: "palms", label: "Palms", file: "palms", minInvites: 15 },
     { id: "halo", label: "Golden halo", file: "halo", animated: true, supporterOnly: true },
     { id: "goldheart", label: "Golden hearts", file: "goldheart", supporterOnly: true },
-    { id: "celestial", label: "Celestial", file: "celestial", animated: true, supporterOnly: true }
+    { id: "celestial", label: "Celestial", file: "celestial", animated: true, supporterOnly: true },
+    { id: "comet", label: "Comet", file: "comet", animated: true, price: 1500 },
+    { id: "koi", label: "Koi pond", file: "koi", animated: true, price: 2500 },
+    { id: "aurora", label: "Aurora", file: "aurora", animated: true, price: 5000 },
+    { id: "cosmos", label: "Cosmos", file: "cosmos", animated: true, price: 10000 }
 ];
 
 export const byId = new Map(CATALOG.map(d => [d.id, d]));
+export const PRICED_IDS = new Set(CATALOG.filter(d => d.price !== undefined).map(d => d.id));
 
 const ASSET_VERSION = "2";
 export const assetUrl = (deco: string) => `${DEKO_CDN}/${byId.get(deco)?.file ?? deco}?v=${ASSET_VERSION}`;

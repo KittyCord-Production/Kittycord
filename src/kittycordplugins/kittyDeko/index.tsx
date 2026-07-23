@@ -11,7 +11,7 @@ import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import { isOverlayWindow } from "@utils/overlay";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
 
 import { assetUrl, byId, CATALOG, Deko, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
@@ -57,6 +57,8 @@ function DekoShop() {
     const [saving, setSaving] = React.useState<string | null>(null);
     const [invites, setInvites] = React.useState(0);
     const [supporter, setSupporter] = React.useState(false);
+    const [coins, setCoins] = React.useState(0);
+    const [owned, setOwned] = React.useState<string[]>([]);
     const me = UserStore.getCurrentUser();
     const equipped = me ? deko.get(me.id) : undefined;
     const avatar = avatarUrl();
@@ -65,10 +67,40 @@ function DekoShop() {
         if (!me) return;
         if (InvitesNative) InvitesNative.getMe(me.id).then(m => setInvites(m.invites)).catch(() => { });
         if (SupportNative) SupportNative.getStatus(me.id).then(s => setSupporter(s.supporter)).catch(() => { });
+        if (Native) Native.getCoins(me.id).then(c => { setCoins(c.balance); setOwned(c.owned); }).catch(() => { });
     }, []);
 
     const inviteLock = (id: string) => Math.max(0, (byId.get(id)?.minInvites ?? 0) - invites);
-    const isLocked = (d: Deko) => d.supporterOnly ? !supporter : inviteLock(d.id) > 0;
+    const isLocked = (d: Deko) => d.supporterOnly ? !supporter : d.price === undefined && inviteLock(d.id) > 0;
+    const needsBuying = (d: Deko) => d.price !== undefined && !owned.includes(d.id);
+
+    function confirmBuy(d: Deko, price: number) {
+        Alerts.show({
+            title: `Buy ${d.label}?`,
+            body: `This frame costs ${price.toLocaleString()} KittyCoins. You have ${coins.toLocaleString()}.`,
+            confirmText: "Buy and equip",
+            cancelText: "Cancel",
+            onConfirm: async () => {
+                if (!Native || !me) return;
+                setSaving(d.id);
+                try {
+                    const res = await Native.buyDeko(me.id, d.id);
+                    if (res.ok) {
+                        setCoins(res.balance);
+                        setOwned(prev => [...prev, d.id]);
+                        deko.set(me.id, d.id);
+                        showToast(`${d.label} is yours — equipped!`, Toasts.Type.SUCCESS);
+                    } else {
+                        showToast(res.error, Toasts.Type.FAILURE);
+                    }
+                } finally {
+                    setSaving(null);
+                    emit();
+                    forceUpdate();
+                }
+            }
+        });
+    }
 
     async function equip(id: string | null) {
         if (!Native || !me) return;
@@ -110,40 +142,56 @@ function DekoShop() {
     }
 
     return (
-        <div className="kc-deko-grid">
-            <div className="kc-deko-tile">
-                <div className="kc-deko-preview">
-                    <img className="kc-deko-avatar" src={avatar} alt="" />
-                </div>
-                <Button
-                    size={Button.Sizes.SMALL}
-                    color={equipped == null ? Button.Colors.BRAND : Button.Colors.PRIMARY}
-                    disabled={saving != null}
-                    onClick={() => equip(null)}
-                >
-                    None
-                </Button>
+        <>
+            <div className="kc-deko-wallet">
+                <Text variant="text-md/semibold">🪙 {coins.toLocaleString()} KittyCoins</Text>
+                <Text variant="text-xs/normal" style={{ color: "var(--text-muted)" }}>
+                    Earn coins with the bot in the Kittycord Discord, then send them here with !transfer.
+                </Text>
             </div>
-            {CATALOG.map(d => {
-                const locked = isLocked(d);
-                return (
-                    <div className="kc-deko-tile" key={d.id}>
-                        <div className="kc-deko-preview">
-                            <img className="kc-deko-avatar" src={avatar} alt="" />
-                            <img className="kc-deko-frame" src={assetUrl(d.id)} alt="" />
-                        </div>
-                        <Button
-                            size={Button.Sizes.SMALL}
-                            color={equipped === d.id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
-                            disabled={saving != null || locked}
-                            onClick={() => equip(d.id)}
-                        >
-                            {equipped === d.id ? "Equipped" : locked ? (d.supporterOnly ? "💖 Supporters" : `🔒 ${d.minInvites} invites`) : d.label}
-                        </Button>
+            <div className="kc-deko-grid">
+                <div className="kc-deko-tile">
+                    <div className="kc-deko-preview">
+                        <img className="kc-deko-avatar" src={avatar} alt="" />
                     </div>
-                );
-            })}
-        </div>
+                    <Button
+                        size={Button.Sizes.SMALL}
+                        color={equipped == null ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                        disabled={saving != null}
+                        onClick={() => equip(null)}
+                    >
+                        None
+                    </Button>
+                </div>
+                {CATALOG.map(d => {
+                    const locked = isLocked(d);
+                    const { price } = d;
+                    const forSale = price !== undefined && needsBuying(d);
+                    return (
+                        <div className="kc-deko-tile" key={d.id}>
+                            <div className="kc-deko-preview">
+                                <img className="kc-deko-avatar" src={avatar} alt="" />
+                                <img className="kc-deko-frame" src={assetUrl(d.id)} alt="" />
+                            </div>
+                            <Button
+                                size={Button.Sizes.SMALL}
+                                color={equipped === d.id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                                disabled={saving != null || locked}
+                                onClick={() => (forSale && price !== undefined ? confirmBuy(d, price) : equip(d.id))}
+                            >
+                                {equipped === d.id
+                                    ? "Equipped"
+                                    : locked
+                                        ? (d.supporterOnly ? "💖 Supporters" : `🔒 ${d.minInvites} invites`)
+                                        : forSale
+                                            ? `🪙 ${price.toLocaleString()}`
+                                            : d.label}
+                            </Button>
+                        </div>
+                    );
+                })}
+            </div>
+        </>
     );
 }
 
@@ -151,7 +199,7 @@ function DekoTab() {
     return (
         <ErrorBoundary noop>
             <Text variant="text-md/normal" style={{ marginBottom: 16, color: "var(--text-muted)" }}>
-                Pick a free decoration for your avatar — everyone on Kittycord will see it. Some frames unlock as you invite friends with your creator code, and a few golden ones are a thank-you for Kittycord supporters.
+                Pick a decoration for your avatar — everyone on Kittycord will see it. Most are free, some unlock as you invite friends with your creator code, a few golden ones are a thank-you for supporters, and the rest you can buy with KittyCoins you earn in our Discord.
             </Text>
             <DekoShop />
         </ErrorBoundary>

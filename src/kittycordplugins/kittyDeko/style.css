@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+.kc-deko-wallet {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: var(--background-secondary);
+}
+
 .kc-deko-grid {
     display: flex;
     flex-wrap: wrap;
