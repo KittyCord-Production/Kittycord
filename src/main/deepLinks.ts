@@ -12,7 +12,7 @@ const CODE_RE = /^[a-z0-9_-]{3,20}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface DeepLinkAction {
-    kind: "claim" | "theme";
+    kind: "claim" | "theme" | "pack";
     value: string;
 }
 
@@ -36,6 +36,7 @@ function parse(url: string): DeepLinkAction | null {
 
     if (kind === "claim" && CODE_RE.test(value.toLowerCase())) return { kind: "claim", value: value.toLowerCase() };
     if (kind === "theme" && UUID_RE.test(value)) return { kind: "theme", value };
+    if (kind === "pack" && UUID_RE.test(value)) return { kind: "pack", value };
     return null;
 }
 

@@ -9,7 +9,7 @@ import { get } from "@api/DataStore";
 export const ONBOARDING_SEEN_KEY = "Kittycord_OnboardingSeen";
 
 export interface FriendAction {
-    kind: "claim" | "theme";
+    kind: "claim" | "theme" | "pack";
     value: string;
 }
 

@@ -12,6 +12,7 @@ import { Paragraph } from "@components/Paragraph";
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import definePlugin from "@utils/types";
 
+import { openPackGallery, packsAvailable } from "./PackGallery";
 import { getCommand, settings } from "./settings";
 
 function resolvePlaceholders(template: string, args: string, channelId: string) {
@@ -50,6 +51,10 @@ export default definePlugin({
     tags: ["Chat", "Utility"],
     settings,
     settingsAboutComponent: PlaceholderReference,
+
+    toolboxActions: packsAvailable()
+        ? { "Browse Command Packs": openPackGallery }
+        : undefined,
 
     onBeforeMessageSend(channelId, msg, options) {
         const prefix = settings.store.prefix.trim() || ".";

@@ -9,6 +9,7 @@ import definePlugin, { type PluginNative } from "@utils/types";
 import { showToast, Toasts, UserStore } from "@webpack/common";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, onboardingPending, stashFriendAction } from "../_shared/friendLink";
+import { openPackImport } from "../commandStudio/PackGallery";
 import { applyGalleryThemeById } from "../kittycordStudio/store";
 
 const Invites = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeof import("../kittyInvites/native")> | undefined;
@@ -41,9 +42,19 @@ async function openTheme(id: string) {
     }
 }
 
+async function openPack(id: string) {
+    showToast("Opening that command pack…", Toasts.Type.MESSAGE);
+    try {
+        await openPackImport(id);
+    } catch {
+        showToast("That command pack couldn't be opened.", Toasts.Type.FAILURE);
+    }
+}
+
 function normalize(action: { kind: string; value: string; }): FriendAction | null {
     if (action.kind === "claim" && CODE_RE.test(action.value)) return { kind: "claim", value: action.value };
     if (action.kind === "theme") return { kind: "theme", value: action.value };
+    if (action.kind === "pack") return { kind: "pack", value: action.value };
     return null;
 }
 
@@ -58,12 +69,13 @@ async function handle(action: { kind: string; value: string; } | null) {
     }
 
     if (friend.kind === "claim") claim(friend.value);
+    else if (friend.kind === "pack") openPack(friend.value);
     else openTheme(friend.value);
 }
 
 export default definePlugin({
     name: "DeepLinks",
-    description: "Opens kittycord:// links in the client: claim a friend's invite code or open a shared theme with one click.",
+    description: "Opens kittycord:// links in the client: claim a friend's invite code, open a shared theme or add a shared command pack with one click.",
     authors: [{ name: "Kittycord", id: 0n }],
     enabledByDefault: true,
 

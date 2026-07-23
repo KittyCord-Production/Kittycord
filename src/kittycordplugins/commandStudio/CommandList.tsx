@@ -15,6 +15,7 @@ import { classNameFactory } from "@utils/css";
 import { copyWithToast } from "@utils/discord";
 
 import { openCommandModal, openImportModal } from "./CommandModal";
+import { openPackGallery, openPackPublish, packsAvailable } from "./PackGallery";
 import { exportCommands, removeCommand, settings } from "./settings";
 
 const cl = classNameFactory("vc-commandStudio-");
@@ -55,6 +56,14 @@ export function CommandList() {
                         </Button>
                     )}
                 </Flex>
+                {packsAvailable() && (
+                    <Flex gap="0.5em">
+                        <Button variant="secondary" onClick={openPackGallery}>Browse packs</Button>
+                        {commandValues.length > 0 && (
+                            <Button variant="secondary" onClick={() => openPackPublish(commandValues)}>Publish a pack</Button>
+                        )}
+                    </Flex>
+                )}
             </Flex>
         </section>
     );

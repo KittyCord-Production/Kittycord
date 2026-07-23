@@ -50,21 +50,25 @@ export function exportCommands(commands: CustomCommand[]): string {
     return SHARE_PREFIX + btoa(encodeURIComponent(JSON.stringify(commands)));
 }
 
+export function sanitizeCommands(data: unknown): CustomCommand[] {
+    if (!Array.isArray(data)) return [];
+
+    const out: CustomCommand[] = [];
+    for (const c of data) {
+        if (!c || typeof c !== "object") continue;
+        const trigger = typeof c.trigger === "string" ? c.trigger.trim() : "";
+        const message = typeof c.message === "string" ? c.message : "";
+        if (!trigger || /\s/.test(trigger) || !message) continue;
+        out.push({ trigger, message, mode: c.mode === "insert" ? "insert" : "send" });
+    }
+    return out;
+}
+
 export function importCommands(code: string): CustomCommand[] | null {
     const trimmed = code.trim();
     if (!trimmed.startsWith(SHARE_PREFIX)) return null;
     try {
-        const data = JSON.parse(decodeURIComponent(atob(trimmed.slice(SHARE_PREFIX.length))));
-        if (!Array.isArray(data)) return null;
-
-        const out: CustomCommand[] = [];
-        for (const c of data) {
-            if (!c || typeof c !== "object") continue;
-            const trigger = typeof c.trigger === "string" ? c.trigger.trim() : "";
-            const message = typeof c.message === "string" ? c.message : "";
-            if (!trigger || /\s/.test(trigger) || !message) continue;
-            out.push({ trigger, message, mode: c.mode === "insert" ? "insert" : "send" });
-        }
+        const out = sanitizeCommands(JSON.parse(decodeURIComponent(atob(trimmed.slice(SHARE_PREFIX.length)))));
         return out.length ? out : null;
     } catch {
         return null;
