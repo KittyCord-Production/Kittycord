@@ -39,6 +39,26 @@ sudo_hint() {
     esac
 }
 
+probe_write() {
+    if touch "$1/.kc-write-probe" 2>/dev/null; then
+        rm -f "$1/.kc-write-probe"
+        return 0
+    fi
+    return 1
+}
+
+no_write_help() {
+    local res="$1"
+    fail "No write access to $res"
+    if [ "$(id -u)" = "0" ] || [ "$(stat -f %u "$res" 2>/dev/null)" = "$(id -u)" ]; then
+        fail "macOS is blocking your terminal app from modifying other apps (sudo does not help here)."
+        fail "Open System Settings > Privacy & Security > App Management, turn on your terminal app, then run this installer again."
+    else
+        fail "Discord may be owned by another user. Re-run this installer with: $(sudo_hint)"
+    fi
+    exit 1
+}
+
 APP_NAMES=("Discord" "Discord PTB" "Discord Canary")
 
 discover_targets() {
@@ -94,11 +114,7 @@ patch_target() {
     local name="$1" res="$2"
     local asar="$res/app.asar" backup="$res/_app.asar" appdir="$res/app"
 
-    if [ ! -w "$res" ]; then
-        fail "No write access to $res"
-        fail "Discord may be owned by another user. Re-run this installer with: $(sudo_hint)"
-        exit 1
-    fi
+    probe_write "$res" || no_write_help "$res"
 
     quit_discord "$name"
 
@@ -138,10 +154,7 @@ unpatch_target() {
     local name="$1" res="$2"
     local asar="$res/app.asar" backup="$res/_app.asar" appdir="$res/app"
 
-    if [ ! -w "$res" ]; then
-        fail "No write access to $res. Re-run this installer with: $(sudo_hint)"
-        exit 1
-    fi
+    probe_write "$res" || no_write_help "$res"
 
     quit_discord "$name"
 

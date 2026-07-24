@@ -90,6 +90,18 @@ out="$(KC_ACTION=install KC_RESOURCES_DIR="$ROOT/not-writable" KC_ASAR_SOURCE="$
 check "piped no-write exits 1" "$rc" "1"
 case "$out" in *'sudo sh -c "$(curl -fsSL'*) echo "PASS  piped run suggests sudo curl one-liner"; pass=$((pass+1));; *) echo "FAIL  piped run suggests sudo curl one-liner (got: $out)"; fail=$((fail+1));; esac
 
+echo "== app management hint when the dir is ours but locked =="
+BLK="$ROOT/blocked"
+mkdir -p "$BLK"; chmod 555 "$BLK"
+if touch "$BLK/.probe" 2>/dev/null; then
+    rm -f "$BLK/.probe"; echo "SKIP  filesystem ignores chmod, cannot simulate"
+else
+    out="$(KC_ACTION=install KC_RESOURCES_DIR="$BLK" KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= bash "$SCRIPT" 2>&1)" && rc=0 || rc=$?
+    check "locked dir exits 1" "$rc" "1"
+    case "$out" in *"App Management"*) echo "PASS  app management hint shown"; pass=$((pass+1));; *) echo "FAIL  app management hint shown (got: $out)"; fail=$((fail+1));; esac
+fi
+chmod 755 "$BLK"
+
 echo ""
 echo "$pass passed, $fail failed"
 [ "$fail" = "0" ]
