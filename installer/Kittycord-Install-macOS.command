@@ -41,6 +41,7 @@ discover_targets() {
             [ -d "$res" ] && printf '%s\t%s\n' "$name" "$res"
         done
     done
+    return 0
 }
 
 quit_discord() {

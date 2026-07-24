@@ -68,6 +68,20 @@ run install
 check "reused vanilla backup" "$(cat "$RES/_app.asar")" "VANILLA_ASAR_CONTENT"
 grepok "$RES/app/index.js" "require(\"$DATA/desktop.asar\")" "our shim took over"
 
+echo "== discovery path under sh =="
+DISC="$ROOT/disc"
+mkdir -p "$DISC/apps/Discord.app/Contents/Resources" "$DISC/none"
+printf 'VANILLA_ASAR_CONTENT' > "$DISC/apps/Discord.app/Contents/Resources/app.asar"
+sed "s#\"/Applications\" \"\$HOME/Applications\"#\"$DISC/apps\" \"$DISC/none\"#" "$SCRIPT" > "$DISC/inst.sh"
+out="$(KC_ACTION=install KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$DISC/inst.sh" 2>&1)"
+check "sh discovery install exits 0" "$?" "0"
+grepok "$DISC/apps/Discord.app/Contents/Resources/app/index.js" "require(\"$DATA/desktop.asar\")" "sh discovery patched the fixture"
+
+rm -rf "$DISC/apps"; mkdir -p "$DISC/apps"
+out="$(KC_ACTION=install KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$DISC/inst.sh" 2>&1)" && rc=0 || rc=$?
+check "sh discovery no-Discord exits 1" "$rc" "1"
+case "$out" in *"No Discord installation"*) echo "PASS  no-Discord message shown"; pass=$((pass+1));; *) echo "FAIL  no-Discord message shown"; fail=$((fail+1));; esac
+
 echo ""
 echo "$pass passed, $fail failed"
 [ "$fail" = "0" ]
