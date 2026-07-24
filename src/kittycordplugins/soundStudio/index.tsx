@@ -5,7 +5,6 @@
  */
 
 import { type PreprocessAudioData } from "@api/AudioPlayer";
-import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import definePlugin from "@utils/types";
 import { Menu, UserStore } from "@webpack/common";
 import type { ReactElement } from "react";
@@ -29,9 +28,8 @@ const CONTEXT_WINDOW_MS = 2000;
 
 let lastContext: { authorId: string; channelId: string; guildId?: string; at: number; } | null = null;
 
-function SoundSubmenu({ scope, targetId }: { scope: RuleScope; targetId: string; }) {
+function soundMenu(scope: RuleScope, targetId: string) {
     const current = findRule(scope, targetId);
-    const files = listAudio();
 
     return (
         <Menu.MenuItem id="kc-sound-studio" label="Notification sound">
@@ -42,7 +40,6 @@ function SoundSubmenu({ scope, targetId }: { scope: RuleScope; targetId: string;
                 checked={!current}
                 action={() => current && removeRule(current.id)}
             />
-            <Menu.MenuSeparator />
             {CURATED.map(sound => (
                 <Menu.MenuRadioItem
                     key={sound.id}
@@ -53,8 +50,7 @@ function SoundSubmenu({ scope, targetId }: { scope: RuleScope; targetId: string;
                     action={() => addRule({ scope, targetId, sound: { kind: "curated", id: sound.id }, volume: 100 })}
                 />
             ))}
-            {files.length > 0 && <Menu.MenuSeparator />}
-            {files.map(file => (
+            {listAudio().map(file => (
                 <Menu.MenuRadioItem
                     key={file.fileId}
                     id={`kc-sound-file-${file.fileId}`}
@@ -71,10 +67,7 @@ function SoundSubmenu({ scope, targetId }: { scope: RuleScope; targetId: string;
 type MenuChildren = Array<ReactElement<any> | null | undefined>;
 
 function insert(children: MenuChildren, scope: RuleScope, targetId: string) {
-    const group = findGroupChildrenByChildId("mute-channel", children)
-        ?? findGroupChildrenByChildId("privacy", children)
-        ?? children;
-    group.push(<SoundSubmenu scope={scope} targetId={targetId} />);
+    children.push(soundMenu(scope, targetId));
 }
 
 export default definePlugin({
