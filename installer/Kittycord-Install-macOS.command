@@ -14,6 +14,7 @@ set -euo pipefail
 
 REPO="KittyCord-Production/Kittycord"
 ASAR_URL="https://github.com/$REPO/releases/latest/download/desktop.asar"
+INSTALLER_URL="https://github.com/$REPO/releases/latest/download/Kittycord-Install-macOS.command"
 DATA_DIR="${KC_DATA_DIR:-$HOME/Library/Application Support/Kittycord}"
 ASAR_PATH="$DATA_DIR/desktop.asar"
 
@@ -29,6 +30,13 @@ prompt() {
         read -r answer < /dev/tty || answer=""
     fi
     printf '%s' "$answer"
+}
+
+sudo_hint() {
+    case "$0" in
+        *.command) printf 'sudo bash "%s"' "$0" ;;
+        *) printf 'sudo sh -c "$(curl -fsSL %s)"' "$INSTALLER_URL" ;;
+    esac
 }
 
 APP_NAMES=("Discord" "Discord PTB" "Discord Canary")
@@ -88,7 +96,7 @@ patch_target() {
 
     if [ ! -w "$res" ]; then
         fail "No write access to $res"
-        fail "Discord may be owned by another user. Re-run this installer with: sudo bash \"$0\""
+        fail "Discord may be owned by another user. Re-run this installer with: $(sudo_hint)"
         exit 1
     fi
 
@@ -131,7 +139,7 @@ unpatch_target() {
     local asar="$res/app.asar" backup="$res/_app.asar" appdir="$res/app"
 
     if [ ! -w "$res" ]; then
-        fail "No write access to $res. Re-run this installer with: sudo bash \"$0\""
+        fail "No write access to $res. Re-run this installer with: $(sudo_hint)"
         exit 1
     fi
 
@@ -237,6 +245,9 @@ main() {
                 exit 1
             fi
             save_creator_code
+            if [ -n "${SUDO_USER:-}" ]; then
+                chown -R "$SUDO_USER" "$DATA_DIR"
+            fi
             printf '\033[35m%s\033[0m\n' "Kittycord installed. Start Discord again to see it."
             ;;
         uninstall)

@@ -82,6 +82,14 @@ out="$(KC_ACTION=install KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=
 check "sh discovery no-Discord exits 1" "$rc" "1"
 case "$out" in *"No Discord installation"*) echo "PASS  no-Discord message shown"; pass=$((pass+1));; *) echo "FAIL  no-Discord message shown"; fail=$((fail+1));; esac
 
+echo "== sudo hint matches how the installer was started =="
+out="$(KC_ACTION=install KC_RESOURCES_DIR="$ROOT/not-writable" KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= bash "$SCRIPT" 2>&1)" && rc=0 || rc=$?
+check "no-write exits 1" "$rc" "1"
+case "$out" in *'sudo bash "'*'.command"'*) echo "PASS  file run suggests sudo bash"; pass=$((pass+1));; *) echo "FAIL  file run suggests sudo bash"; fail=$((fail+1));; esac
+out="$(KC_ACTION=install KC_RESOURCES_DIR="$ROOT/not-writable" KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh -c "$(cat "$SCRIPT")" 2>&1)" && rc=0 || rc=$?
+check "piped no-write exits 1" "$rc" "1"
+case "$out" in *'sudo sh -c "$(curl -fsSL'*) echo "PASS  piped run suggests sudo curl one-liner"; pass=$((pass+1));; *) echo "FAIL  piped run suggests sudo curl one-liner (got: $out)"; fail=$((fail+1));; esac
+
 echo ""
 echo "$pass passed, $fail failed"
 [ "$fail" = "0" ]
