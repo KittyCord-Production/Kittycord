@@ -12,9 +12,19 @@
 
 import { ACCENT_PRESETS, AccentPreset } from "@shared/accentPresets";
 import { app } from "electron";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 import { KITTY_ICON_DATA_URL } from "./iconData";
 import { RendererSettings } from "./settings";
+
+const releaseChannel = (() => {
+    try {
+        return JSON.parse(readFileSync(join(process.resourcesPath, "build_info.json"), "utf8")).releaseChannel as string;
+    } catch {
+        return "stable";
+    }
+})();
 
 // The Kittycord logo as an <img> filling its rounded container (the real app icon as a data URL).
 const KITTY_IMG = '<img src="' + KITTY_ICON_DATA_URL + '" alt="Kittycord" style="width:100%;height:100%;display:block">';
@@ -167,7 +177,7 @@ const REMOVE_OVERLAY_JS = `
     } catch (e) {}
 })();`;
 
-app.on("browser-window-created", (_, win) => {
+if (releaseChannel === "stable") app.on("browser-window-created", (_, win) => {
     try {
         if (win.webContents.isOffscreen()) return;
         win.on("always-on-top-changed", (_e, isAlwaysOnTop) => {
