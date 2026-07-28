@@ -42,7 +42,7 @@ import { PluginMeta } from "~plugins";
 
 import { OptionComponentMap } from "./components";
 import { openContributorModal } from "./ContributorModal";
-import { GithubButton } from "./LinkIconButton";
+import { FavoriteButton, GithubButton } from "./PluginModalButtons";
 
 const cl = classNameFactory("vc-plugin-modal-");
 
@@ -257,6 +257,10 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
                         ) : <div />}
                         {!pluginMeta.userPlugin && (
                             <div className={cl("links")}>
+                                <FavoriteButton
+                                    isFavorite={pluginSettings.isFavorite ?? false}
+                                    onClick={() => pluginSettings.isFavorite = !pluginSettings.isFavorite}
+                                />
                                 <GithubButton
                                     text="Source Code"
                                     href={`https://github.com/${gitRemote}/tree/main/${pluginMeta.folderName}`}
