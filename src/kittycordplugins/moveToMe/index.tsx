@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { NavContextMenuPatchCallback } from "@api/ContextMenu";
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
 import type { User } from "@vencord/discord-types";
@@ -38,13 +38,17 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
     if (!PermissionStore.can(PermissionsBits.MOVE_MEMBERS, myChannel)) return;
     if (!PermissionStore.can(PermissionsBits.MOVE_MEMBERS, ChannelStore.getChannel(theirChannelId))) return;
 
-    children.splice(-1, 0, (
+    const item = (
         <Menu.MenuItem
             id="kc-move-to-me"
             label="Move to my channel"
             action={() => void moveToMe(myChannel.guild_id, user, myChannelId)}
         />
-    ));
+    );
+
+    const group = findGroupChildrenByChildId("roles", children);
+    if (group) group.push(item);
+    else children.splice(-1, 0, item);
 };
 
 export default definePlugin({
