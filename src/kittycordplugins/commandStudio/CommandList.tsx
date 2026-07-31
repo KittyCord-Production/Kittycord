@@ -8,15 +8,15 @@ import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import { Card } from "@components/Card";
 import { Flex } from "@components/Flex";
-import { DeleteIcon, PencilIcon } from "@components/Icons";
+import { DeleteIcon, LinkIcon, PencilIcon } from "@components/Icons";
 import { Margins } from "@components/margins";
 import { Paragraph } from "@components/Paragraph";
 import { classNameFactory } from "@utils/css";
-import { copyWithToast } from "@utils/discord";
 
 import { openCommandModal, openImportModal } from "./CommandModal";
 import { openPackGallery, openPackPublish, packsAvailable } from "./PackGallery";
-import { exportCommands, removeCommand, settings } from "./settings";
+import { removeCommand, settings } from "./settings";
+import { openShareModal } from "./ShareModal";
 
 const cl = classNameFactory("vc-commandStudio-");
 
@@ -36,6 +36,14 @@ export function CommandList() {
                             <Paragraph size="sm" className={cl("preview")}>{command.message.replaceAll("\\n", "\n").split("\n")[0]}</Paragraph>
                         </div>
 
+                        <Button
+                            variant="secondary"
+                            size="iconOnly"
+                            aria-label="Share Command"
+                            onClick={() => openShareModal([command], `${activePrefix}${command.trigger}`)}
+                        >
+                            <LinkIcon width={20} height={20} />
+                        </Button>
                         <Button variant="secondary" size="iconOnly" onClick={() => openCommandModal(command)}>
                             <PencilIcon aria-label="Edit Command" width={20} height={20} />
                         </Button>
@@ -48,10 +56,7 @@ export function CommandList() {
                     <Button onClick={() => openCommandModal()}>Create Command</Button>
                     <Button variant="secondary" onClick={() => openImportModal()}>Import</Button>
                     {commandValues.length > 0 && (
-                        <Button
-                            variant="secondary"
-                            onClick={() => copyWithToast(exportCommands(commandValues), "Command pack copied — share it with anyone.")}
-                        >
+                        <Button variant="secondary" onClick={() => openShareModal(commandValues, "all your commands")}>
                             Share all
                         </Button>
                     )}

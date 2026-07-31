@@ -100,13 +100,25 @@ async function publishPack(name: string, authorName: string, commands: CustomCom
     const me = UserStore.getCurrentUser();
     if (!me) throw new Error("Could not read your account.");
 
-    const result = await Native.publishPack(me.id, authorName, name, commands);
+    const result = await Native.publishPack(me.id, authorName, name, commands, false);
     if (!result.ok) throw new Error(result.error);
 
     const tokens = await getTokens();
     tokens[result.id] = result.ownerToken;
     await set(TOKENS_KEY, tokens);
     return result.id;
+}
+
+export async function quickShare(name: string, commands: CustomCommand[]): Promise<string> {
+    if (!Native) throw new Error("Links need the Kittycord desktop app.");
+    const me = UserStore.getCurrentUser();
+    if (!me) throw new Error("Could not read your account.");
+
+    const authorName = (me.globalName as string) || me.username || "Someone";
+    const result = await Native.publishPack(me.id, authorName, name, commands, true);
+    if (!result.ok) throw new Error(result.error);
+
+    return packShareUrl(result.id);
 }
 
 async function copyShareLink(id: string) {

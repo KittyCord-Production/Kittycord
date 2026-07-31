@@ -44,10 +44,13 @@ export function removeCommand(trigger: string) {
     delete settings.store.commands[trigger.toLowerCase()];
 }
 
-const SHARE_PREFIX = "KCMD1:";
+const LEGACY_PREFIX = "KCMD1:";
+const SHARE_PREFIX = "KCMD2:";
 
 export function exportCommands(commands: CustomCommand[]): string {
-    return SHARE_PREFIX + btoa(encodeURIComponent(JSON.stringify(commands)));
+    let binary = "";
+    for (const byte of new TextEncoder().encode(JSON.stringify(commands))) binary += String.fromCharCode(byte);
+    return SHARE_PREFIX + btoa(binary);
 }
 
 export function sanitizeCommands(data: unknown): CustomCommand[] {
@@ -66,9 +69,19 @@ export function sanitizeCommands(data: unknown): CustomCommand[] {
 
 export function importCommands(code: string): CustomCommand[] | null {
     const trimmed = code.trim();
-    if (!trimmed.startsWith(SHARE_PREFIX)) return null;
+
     try {
-        const out = sanitizeCommands(JSON.parse(decodeURIComponent(atob(trimmed.slice(SHARE_PREFIX.length)))));
+        let json: string;
+        if (trimmed.startsWith(SHARE_PREFIX)) {
+            const binary = atob(trimmed.slice(SHARE_PREFIX.length));
+            json = new TextDecoder().decode(Uint8Array.from(binary, c => c.charCodeAt(0)));
+        } else if (trimmed.startsWith(LEGACY_PREFIX)) {
+            json = decodeURIComponent(atob(trimmed.slice(LEGACY_PREFIX.length)));
+        } else {
+            return null;
+        }
+
+        const out = sanitizeCommands(JSON.parse(json));
         return out.length ? out : null;
     } catch {
         return null;
