@@ -13,6 +13,7 @@ import { getUniqueUsername, openUserProfile } from "@utils/discord";
 import definePlugin from "@utils/types";
 import type { User } from "@vencord/discord-types";
 import { lodash, Menu, PresenceStore, showToast, Toasts, UserStore, UserUtils } from "@webpack/common";
+import type { DebouncedFunc } from "lodash";
 
 import { loadHistory, record } from "./history";
 import { openHistoryModal } from "./HistoryModal";
@@ -59,7 +60,7 @@ function runDiff() {
     }
 }
 
-const check = lodash.debounce(runDiff, 3000, { maxWait: 10_000 });
+let check: DebouncedFunc<typeof runDiff> | null = null;
 
 function seed() {
     lastNotified.clear();
@@ -135,12 +136,16 @@ export default definePlugin({
     async start() {
         await loadHistory();
         rearm();
+        check = lodash.debounce(runDiff, 3000, { maxWait: 10_000 });
         PresenceStore.addChangeListener(check);
     },
 
     stop() {
-        PresenceStore.removeChangeListener(check);
-        check.cancel();
+        if (check) {
+            PresenceStore.removeChangeListener(check);
+            check.cancel();
+            check = null;
+        }
         if (armTimer) {
             clearTimeout(armTimer);
             armTimer = null;
