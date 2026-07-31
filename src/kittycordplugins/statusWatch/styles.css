@@ -1,0 +1,41 @@
+.vc-statusWatch-card {
+    padding: 0.5em 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.vc-statusWatch-who {
+    display: grid;
+    grid-template-columns: min-content 1fr min-content;
+    align-items: center;
+    gap: 0.75em;
+}
+
+.vc-statusWatch-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.vc-statusWatch-info {
+    min-width: 0;
+}
+
+.vc-statusWatch-status {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.vc-statusWatch-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.vc-statusWatch-empty {
+    color: var(--text-muted);
+}
