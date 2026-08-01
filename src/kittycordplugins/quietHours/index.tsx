@@ -12,6 +12,8 @@ import definePlugin, { OptionType } from "@utils/types";
 const StatusSetting = getUserSettingLazy<string>("status", "status");
 
 let savedStatus: string | null = null;
+let forcedStatus: string | null = null;
+let overridden = false;
 let timer: ReturnType<typeof setInterval> | null = null;
 
 const settings = definePluginSettings({
@@ -33,7 +35,10 @@ const settings = definePluginSettings({
             { label: "Idle", value: "idle" },
             { label: "Do Not Disturb", value: "dnd", default: true },
             { label: "Invisible", value: "invisible" }
-        ]
+        ],
+        onChange() {
+            forcedStatus = null;
+        }
     },
     restore: {
         type: OptionType.SELECT,
@@ -74,12 +79,31 @@ function tick() {
     const cur = StatusSetting.getSetting?.() ?? "online";
 
     if (isQuietNow()) {
+        if (overridden) return;
+
         const want = settings.store.quietStatus;
-        if (cur !== want) {
-            if (savedStatus == null) savedStatus = cur;
-            StatusSetting.updateSetting(want);
+        if (cur === want) {
+            forcedStatus = want;
+            return;
         }
-    } else if (savedStatus != null) {
+
+        if (forcedStatus != null) {
+            overridden = true;
+            forcedStatus = null;
+            savedStatus = null;
+            return;
+        }
+
+        if (savedStatus == null) savedStatus = cur;
+        forcedStatus = want;
+        StatusSetting.updateSetting(want);
+        return;
+    }
+
+    overridden = false;
+    forcedStatus = null;
+
+    if (savedStatus != null) {
         const target = settings.store.restore === "previous" ? savedStatus : settings.store.restore;
         savedStatus = null;
         if (cur !== target) StatusSetting.updateSetting(target);
@@ -94,6 +118,8 @@ export default definePlugin({
     settings,
 
     start() {
+        overridden = false;
+        forcedStatus = null;
         tick();
         timer = setInterval(tick, 30_000);
     },
@@ -101,6 +127,8 @@ export default definePlugin({
     stop() {
         if (timer) clearInterval(timer);
         timer = null;
+        overridden = false;
+        forcedStatus = null;
         // Restore status if we changed it and the plugin is being turned off mid-window.
         if (savedStatus != null && StatusSetting) {
             const cur = StatusSetting.getSetting?.() ?? "online";
