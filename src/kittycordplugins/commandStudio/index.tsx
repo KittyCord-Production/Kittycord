@@ -12,6 +12,7 @@ import { Paragraph } from "@components/Paragraph";
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import definePlugin from "@utils/types";
 
+import { findShare, ImportCard } from "./ImportCard";
 import { openPackGallery, packsAvailable } from "./PackGallery";
 import { getCommand, settings } from "./settings";
 
@@ -49,12 +50,18 @@ export default definePlugin({
     description: "Create custom text commands like .termin that expand into full message templates when you send them.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Chat", "Utility"],
+    dependencies: ["MessageAccessoriesAPI"],
     settings,
     settingsAboutComponent: PlaceholderReference,
 
     toolboxActions: packsAvailable()
         ? { "Browse Command Packs": openPackGallery }
         : undefined,
+
+    renderMessageAccessory({ message }) {
+        if (!findShare(message.content ?? "")) return null;
+        return <ImportCard message={message} />;
+    },
 
     onBeforeMessageSend(channelId, msg, options) {
         const prefix = settings.store.prefix.trim() || ".";

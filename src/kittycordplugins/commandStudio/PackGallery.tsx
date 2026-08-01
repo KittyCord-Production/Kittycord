@@ -182,6 +182,11 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: any; pack: Gal
     );
 }
 
+export function openCommandsImport(commands: CustomCommand[], name: string, authorName: string) {
+    const pack: GalleryPack = { id: "", name, authorName, likes: 0, created: 0, featured: false, commandCount: commands.length };
+    openModal(props => <ImportDialog rootProps={props} pack={pack} commands={commands} />);
+}
+
 export async function openPackImport(id: string) {
     const result = await fetchPack(id);
     if (!result) {
