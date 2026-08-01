@@ -35,8 +35,7 @@ export const patchResourcesDir = (resources: string, patcherJsPath: string): boo
     const _asar = join(resources, "_app.asar");
     const shim = join(resources, "app");
 
-    if (isAlreadyPatched(resources)) return false;
-    if (!existsSync(asar)) return false;
+    if (isAlreadyPatched(resources) || !existsSync(asar)) return false;
     try {
         if (lstatSync(asar).isDirectory()) return false;
     } catch {
