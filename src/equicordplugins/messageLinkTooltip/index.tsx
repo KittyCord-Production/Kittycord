@@ -169,7 +169,7 @@ function useMessage(channelId, messageId) {
                 const message = MessageStore.getMessages(channelId)
                     .receiveMessage(rawMessage)
                     .get(messageId);
-                setMessage(message);
+                if (message) setMessage(message);
             })();
     });
     return message;

@@ -5,14 +5,11 @@
  */
 
 import { isNonNullish } from "@utils/guards";
-import { findStoreLazy } from "@webpack";
-import { showToast, Toasts } from "@webpack/common";
+import { showToast, Toasts, UserProfileSettingsStore } from "@webpack/common";
 
 import { getCurrentProfile } from "./profile";
 import { addPreset, movePresetInArray, presets, PresetSection, type ProfilePresetEx, removePreset, replaceAllPresets, savePresetsData, updatePreset } from "./storage";
 import { ProfilePreset } from "./types";
-
-const UserProfileSettingsStore = findStoreLazy("UserProfileSettingsStore");
 
 function isImageInput(value: unknown): value is string | { imageUri: string; } {
     if (typeof value === "string") return value.length > 0;

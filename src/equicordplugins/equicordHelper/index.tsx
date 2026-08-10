@@ -14,8 +14,8 @@ import customRPC from "@plugins/customRPC";
 import { Devs, EquicordDevs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { StandingState } from "@vencord/discord-types/enums";
-import { findByCodeLazy, findStoreLazy } from "@webpack";
-import { ApplicationCommandIndexStore, React, SettingsRouter, UserGuildSettingsStore, UserStore, useStateFromStores, VoiceStateStore } from "@webpack/common";
+import { findByCodeLazy } from "@webpack";
+import { ApplicationCommandIndexStore, React, SafetyHubStore, SettingsRouter, UserGuildSettingsStore, UserStore, useStateFromStores, VoiceStateStore } from "@webpack/common";
 import { ComponentType } from "react";
 
 import { PluginButtons } from "./pluginButtons";
@@ -25,7 +25,6 @@ migratePluginToSettings(true, "EquicordHelper", "NoBulletPoints", "noBulletPoint
 migratePluginToSettings(true, "EquicordHelper", "NoModalAnimation", "noModalAnimation");
 migratePluginToSettings(true, "EquicordHelper", "GuildTagSettings", "disableAdoptTagPrompt");
 
-const SafetyHubStore = findStoreLazy("SafetyHubStore");
 const fetchSafetyHub: () => Promise<void> = findByCodeLazy("SAFETY_HUB_FETCH_START");
 
 const StandingConfig: Record<number, { label: string; hoverColor: string; Icon: ComponentType<any>; }> = {
