@@ -333,7 +333,7 @@ export class GhostController {
         const r = Math.random();
         if (cfg.sleepWhenIdle && now - this.idleSince > SLEEP_AFTER && r < 0.3) {
             this.sleeping = true;
-        } else if (r < 0.85) {
+        } else if (r < 0.85 && !cfg.stayPut) {
             this.targetX = this.minX + Math.random() * Math.max(0, this.maxX - this.minX);
             this.targetY = this.minY + Math.random() * Math.max(0, this.maxY - this.minY);
             this.state = "fly";

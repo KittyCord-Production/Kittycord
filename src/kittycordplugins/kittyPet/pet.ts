@@ -15,6 +15,7 @@ export interface PetConfig {
     reactions: boolean;
     sleepWhenIdle: boolean;
     followCursor: boolean;
+    stayPut: boolean;
 }
 
 export interface PetHooks {
@@ -100,7 +101,7 @@ export class PetController {
         this.measure();
         this.x = this.minX + (this.maxX - this.minX) * (0.3 + Math.random() * 0.4);
         this.targetX = this.minX + Math.random() * Math.max(0, this.maxX - this.minX);
-        this.setState("walk");
+        this.setState(this.hooks.getConfig().stayPut ? "idle" : "walk");
         window.addEventListener("resize", this.onResize);
         document.addEventListener("click", this.onClick);
         document.body.appendChild(this.container);
@@ -359,13 +360,13 @@ export class PetController {
 
         this.idleTicks++;
         if (this.idleTicks < 30) return;
-        if (this.idleTicks > 60 && this.tick >= this.nextZoomAt && Math.random() < 0.004) {
+        if (this.idleTicks > 60 && !cfg.stayPut && this.tick >= this.nextZoomAt && Math.random() < 0.004) {
             this.startZoom();
             return;
         }
         if (Math.random() > 0.03) return;
 
-        const roll = Math.random();
+        const roll = cfg.stayPut ? 0.55 + Math.random() * 0.45 : Math.random();
         if (roll < 0.55) {
             this.targetX = this.minX + Math.random() * Math.max(0, this.maxX - this.minX);
             this.setState("walk");

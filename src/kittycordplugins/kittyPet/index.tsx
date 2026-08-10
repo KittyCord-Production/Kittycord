@@ -107,6 +107,11 @@ const settings = definePluginSettings({
         default: false,
         onChange: () => updateCursorTracking()
     },
+    stayPut: {
+        type: OptionType.BOOLEAN,
+        description: "Let your pet settle down in one spot instead of roaming around",
+        default: false
+    },
     reactions: {
         type: OptionType.BOOLEAN,
         description: "React to pings, new messages and typing",
@@ -165,7 +170,8 @@ function buildController(): PetController | GhostController {
         speed: settings.store.speed,
         reactions: settings.store.reactions,
         sleepWhenIdle: settings.store.sleepWhenIdle,
-        followCursor: settings.store.followCursor
+        followCursor: settings.store.followCursor,
+        stayPut: settings.store.stayPut
     });
     if (settings.store.style === "ghost") return new GhostController({ getConfig, onPet });
     if (settings.store.style === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: TEDDY_ACCESSORIES });
