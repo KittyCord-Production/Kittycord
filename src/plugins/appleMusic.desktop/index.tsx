@@ -6,7 +6,7 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Paragraph } from "@components/Paragraph";
-import { Devs, IS_MAC } from "@utils/constants";
+import { Devs, IS_MAC, IS_WINDOWS } from "@utils/constants";
 import definePlugin, { OptionType, PluginNative, ReporterTestable } from "@utils/types";
 import { Activity, ActivityAssets, ActivityButton } from "@vencord/discord-types";
 import { ActivityFlags, ActivityStatusDisplayType, ActivityType } from "@vencord/discord-types/enums";
@@ -210,7 +210,8 @@ export default definePlugin({
     description: "Discord rich presence for your Apple Music!",
     tags: ["Activity", "Media"],
     authors: [Devs.RyanCaoDev],
-    hidden: !IS_MAC,
+    isModified: true,
+    hidden: !IS_MAC && !IS_WINDOWS,
     reporterTestable: ReporterTestable.None,
 
     settingsAboutComponent() {
@@ -232,6 +233,7 @@ export default definePlugin({
     stop() {
         clearInterval(updateInterval);
         updateInterval = undefined;
+        Native.stopHelper();
         FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null });
     },
 
