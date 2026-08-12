@@ -77,6 +77,7 @@ export interface Settings {
     disableMinSize: boolean;
     winNativeTitleBar: boolean;
     kittycordAccent: KittycordAccent;
+    enableCustomPlugins: boolean;
     plugins: {
         [plugin: string]: {
             enabled: boolean;
@@ -134,6 +135,7 @@ const DefaultSettings: Settings = {
     disableMinSize: false,
     winNativeTitleBar: false,
     kittycordAccent: "pink",
+    enableCustomPlugins: false,
     plugins: {},
 
     uiElements: {

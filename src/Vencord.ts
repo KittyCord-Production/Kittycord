@@ -45,6 +45,7 @@ import { NotificationData, showNotification } from "./api/Notifications";
 import { initPluginManager, isPluginEnabled, PMLogger, startAllPlugins } from "./api/PluginManager";
 import { PlainSettings, Settings, SettingsStore } from "./api/Settings";
 import { areLocalSettingsDirty, getCloudSettings, getCloudSyncDirection, markLocalSettingsDirty, putCloudSettings, shouldCloudSync } from "./api/SettingsSync/cloudSync";
+import { loadCustomPlugins } from "./customPlugins";
 import { relaunch } from "./utils/native";
 import { checkForUpdates, isOutdated as getIsOutdated, update, UpdateLogger } from "./utils/updater";
 import { onceReady } from "./webpack";
@@ -297,6 +298,7 @@ async function init() {
     }
 }
 
+loadCustomPlugins();
 initPluginManager();
 initStyles();
 

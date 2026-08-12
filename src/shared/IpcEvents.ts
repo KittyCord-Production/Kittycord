@@ -45,7 +45,10 @@ export const enum IpcEvents {
     CSP_REMOVE_OVERRIDE = "VencordCspRemoveOverride",
     CSP_REQUEST_ADD_OVERRIDE = "VencordCspRequestAddOverride",
 
+    GET_CUSTOM_PLUGINS = "VencordGetCustomPlugins",
+
     OPEN_THEMES_FOLDER = "VencordOpenThemesFolder",
+    OPEN_CUSTOM_PLUGINS_FOLDER = "VencordOpenCustomPluginsFolder",
     OPEN_SETTINGS_FOLDER = "VencordOpenSettingsFolder",
     GET_RENDERER_CSS = "VencordGetRendererCss",
     RENDERER_CSS_UPDATE = "VencordRendererCssUpdate",

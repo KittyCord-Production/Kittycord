@@ -30,15 +30,17 @@ import { release } from "os";
 import { join } from "path";
 
 import { registerCspIpcHandlers } from "./csp/manager";
+import { ensureCustomPluginsDir, listCustomPlugins } from "./customPlugins";
 import { repatchNow } from "./retainPatch";
 import { getThemeInfo, stripBOM, UserThemeHeader } from "./themes";
-import { ALLOWED_PROTOCOLS, QUICK_CSS_PATH, SETTINGS_DIR, THEMES_DIR } from "./utils/constants";
+import { ALLOWED_PROTOCOLS, CUSTOM_PLUGINS_DIR, QUICK_CSS_PATH, SETTINGS_DIR, THEMES_DIR } from "./utils/constants";
 import { ensureSafePath } from "./utils/ensureSafePath";
 import { makeLinksOpenExternally } from "./utils/externalLinks";
 
 const RENDERER_CSS_PATH = join(__dirname, "renderer.css");
 
 mkdirSync(THEMES_DIR, { recursive: true });
+ensureCustomPluginsDir();
 
 registerCspIpcHandlers();
 
@@ -109,7 +111,15 @@ ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, () => {
     };
 });
 
+ipcMain.on(IpcEvents.GET_CUSTOM_PLUGINS, e => {
+    e.returnValue = listCustomPlugins();
+});
+
 ipcMain.handle(IpcEvents.OPEN_THEMES_FOLDER, () => shell.openPath(THEMES_DIR));
+ipcMain.handle(IpcEvents.OPEN_CUSTOM_PLUGINS_FOLDER, () => {
+    ensureCustomPluginsDir();
+    return shell.openPath(CUSTOM_PLUGINS_DIR);
+});
 ipcMain.handle(IpcEvents.OPEN_SETTINGS_FOLDER, () => shell.openPath(SETTINGS_DIR));
 
 let fsWatchers = [] as FSWatcher[];

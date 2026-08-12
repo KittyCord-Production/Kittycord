@@ -6,6 +6,7 @@
 
 import type { Settings } from "@api/Settings";
 import type { CspRequestResult } from "@main/csp/manager";
+import type { CustomPluginFile } from "@main/customPlugins";
 import type { PluginIpcMappings } from "@main/ipcPlugins";
 import { UserThemeHeader } from "@main/themes";
 import { IpcEvents } from "@shared/IpcEvents";
@@ -43,6 +44,12 @@ export default {
         getSystemValues: () => invoke<Record<string, string>>(IpcEvents.GET_THEME_SYSTEM_VALUES),
 
         openFolder: () => invoke<void>(IpcEvents.OPEN_THEMES_FOLDER),
+    },
+
+    customPlugins: {
+        getAll: () => sendSync<CustomPluginFile[]>(IpcEvents.GET_CUSTOM_PLUGINS),
+
+        openFolder: () => invoke<void>(IpcEvents.OPEN_CUSTOM_PLUGINS_FOLDER),
     },
 
     updater: {

@@ -75,6 +75,36 @@ console alternatives.
 
 > A standalone Kittycord desktop client and a Linux installer are on the roadmap.
 
+## 🧩 Writing your own plugin
+
+You don't need to build Kittycord from source to run your own plugin. Open
+**Settings → Plugins**, switch on **Custom Plugins**, then click **Open plugins folder**. Inside
+you'll find `example.plugin.js` — a commented, working plugin you can copy and rework. After every
+change reload Discord with <kbd>Ctrl</kbd>+<kbd>R</kbd>; your plugin then appears in the plugin
+list under the **Show Custom** filter, switched off until you enable it.
+
+A file is plain JavaScript, no TypeScript and no JSX, and everything it needs comes from the
+`Kittycord` object that gets handed to it — `Kittycord.Webpack`, `Kittycord.Webpack.Common`,
+`Kittycord.Api`, `Kittycord.Util` and `Kittycord.Components`. `import` and `require` are not
+available.
+
+```js
+module.exports = definePlugin({
+    name: "ExamplePlugin",
+    description: "Shows a toast whenever you send a message.",
+    authors: [{ name: "you", id: 0n }],
+
+    onBeforeMessageSend(channelId, message) {
+        Kittycord.Webpack.Common.showToast("You said: " + message.content);
+    }
+});
+```
+
+> [!WARNING]
+> A custom plugin runs with full access to your account, your messages and your token. Only add
+> code you have read and understand. If somebody sends you a file and tells you to drop it in this
+> folder, they are trying to steal your account.
+
 ## ❓ FAQ & Troubleshooting
 
 <details>

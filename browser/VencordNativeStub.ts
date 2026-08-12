@@ -53,6 +53,11 @@ window.VencordNative = {
         openFolder: async () => Promise.reject("themes:openFolder is not supported on web"),
     },
 
+    customPlugins: {
+        getAll: () => [],
+        openFolder: async () => Promise.reject("customPlugins:openFolder is not supported on web"),
+    },
+
     native: {
         getVersions: () => ({}),
         supportsWindowsMaterial: () => false,

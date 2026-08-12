@@ -29,6 +29,9 @@
             "@components/*": [
                 "./src/components/*"
             ],
+            "@customPlugins": [
+                "./src/customPlugins"
+            ],
             "@debug/*": [
                 "./src/debug/*"
             ],

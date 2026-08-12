@@ -25,9 +25,12 @@ import { Button } from "@components/Button";
 import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { FormSwitch } from "@components/FormSwitch";
 import { HeadingTertiary } from "@components/Heading";
+import { Notice } from "@components/Notice";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab } from "@components/settings";
+import { customPluginErrors } from "@customPlugins";
 import { debounce } from "@shared/debounce";
 import { ChangeList } from "@utils/ChangeList";
 import { classNameFactory } from "@utils/css";
@@ -97,6 +100,47 @@ function ReloadRequiredCard({ required, enabledPlugins, openWarningModal, resetC
     );
 }
 
+function CustomPluginsCard({ enabled, onChange }: { enabled: boolean; onChange(value: boolean): void; }) {
+    return (
+        <Card className={cl("info-card")}>
+            <HeadingTertiary>Custom Plugins</HeadingTertiary>
+            <FormSwitch
+                title="Load plugins from your plugins folder"
+                description={
+                    <>
+                        Drop <code>.js</code> files into the folder and they show up here under the Custom filter. The
+                        folder already contains a commented example to start from.
+                        <Notice.Warning className={Margins.top8} style={{ width: "100%" }}>
+                            A custom plugin runs with full access to your account, your messages and your token. Only
+                            add code you have read and trust. Never paste in a file someone sent you.
+                        </Notice.Warning>
+                    </>
+                }
+                value={enabled}
+                onChange={onChange}
+                hideBorder
+            />
+            <Button
+                variant="secondary"
+                size="small"
+                onClick={() => VencordNative.customPlugins.openFolder()}
+            >
+                Open plugins folder
+            </Button>
+            {customPluginErrors.length > 0 && (
+                <Card className={classes(cl("info-card"), "vc-warning-card", Margins.top8)}>
+                    <HeadingTertiary>These files could not be loaded</HeadingTertiary>
+                    {customPluginErrors.map(({ fileName, message }) => (
+                        <Paragraph key={fileName} className={cl("dep-text")}>
+                            {fileName}: {message}
+                        </Paragraph>
+                    ))}
+                </Card>
+            )}
+        </Card>
+    );
+}
+
 const enum SearchStatus {
     ALL,
     FAVORITES,
@@ -106,7 +150,8 @@ const enum SearchStatus {
     VENCORD,
     NEW,
     USER_PLUGINS,
-    API_PLUGINS
+    API_PLUGINS,
+    CUSTOM
 }
 
 export const ExcludedReasons: Record<"web" | "discordDesktop" | "vesktop" | "equibop" | "desktop" | "dev", string> = {
@@ -205,6 +250,7 @@ export default function PluginSettings() {
         .toSorted((a, b) => Number(settings.plugins[b.name]?.isFavorite ?? false) - Number(settings.plugins[a.name]?.isFavorite ?? false));
 
     const hasUserPlugins = useMemo(() => !IS_STANDALONE && Object.values(PluginMeta).some(m => m.userPlugin), []);
+    const hasCustomPlugins = useMemo(() => Object.values(PluginMeta).some(m => m.customPlugin), []);
 
     const [searchValue, setSearchValue] = useState({ value: "", tags: [] as PluginTag[], status: SearchStatus.ALL });
 
@@ -242,6 +288,9 @@ export default function PluginSettings() {
                 break;
             case SearchStatus.API_PLUGINS:
                 if (!plugin.name.endsWith("API")) return false;
+                break;
+            case SearchStatus.CUSTOM:
+                if (!PluginMeta[plugin.name]?.customPlugin) return false;
                 break;
         }
 
@@ -396,6 +445,24 @@ export default function PluginSettings() {
         <SettingsTab>
             <ReloadRequiredCard required={changes.hasChanges} enabledPlugins={enabledPlugins} openWarningModal={openWarningModal} resetCheckAndDo={resetCheckAndDo} />
 
+            {!IS_WEB && (
+                <ErrorBoundary noop>
+                    <CustomPluginsCard
+                        enabled={settings.enableCustomPlugins}
+                        onChange={value => {
+                            settings.enableCustomPlugins = value;
+                            Alerts.show({
+                                title: "Restart Required",
+                                body: "A restart is required to apply this change",
+                                confirmText: "Restart now",
+                                cancelText: "Later!",
+                                onConfirm: () => location.reload()
+                            });
+                        }}
+                    />
+                </ErrorBoundary>
+            )}
+
             <div className={cl("stats-container")}>
                 <StockPluginsCard
                     totalStockPlugins={totalStockPlugins}
@@ -437,6 +504,7 @@ export default function PluginSettings() {
                             { label: "Show Built-in", value: SearchStatus.VENCORD },
                             { label: "Show New", value: SearchStatus.NEW },
                             hasUserPlugins && { label: "Show UserPlugins", value: SearchStatus.USER_PLUGINS },
+                            hasCustomPlugins && { label: "Show Custom", value: SearchStatus.CUSTOM },
                             { label: "Show API Plugins", value: SearchStatus.API_PLUGINS },
                         ].filter(isTruthy)}
                         serialize={String}
