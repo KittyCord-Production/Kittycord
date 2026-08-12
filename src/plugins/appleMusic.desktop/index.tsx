@@ -59,8 +59,8 @@ const settings = definePluginSettings({
         type: OptionType.SELECT,
         description: "Which type of activity",
         options: [
-            { label: "Playing", value: ActivityType.PLAYING, default: true },
-            { label: "Listening", value: ActivityType.LISTENING }
+            { label: "Playing", value: ActivityType.PLAYING },
+            { label: "Listening", value: ActivityType.LISTENING, default: true }
         ],
     },
     statusDisplayType: {
@@ -69,8 +69,7 @@ const settings = definePluginSettings({
         options: [
             {
                 label: "Don't show (shows generic listening message)",
-                value: "off",
-                default: true
+                value: "off"
             },
             {
                 label: "Show artist name",
@@ -78,7 +77,8 @@ const settings = definePluginSettings({
             },
             {
                 label: "Show track name",
-                value: "track"
+                value: "track",
+                default: true
             }
         ]
     },
