@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { eyesFor, GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS, GhostExpression } from "./ghostArt";
+import { eyesFor, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 
 const FUR = "#c98a5a";
 const FUR_DARK = "#a86f44";
@@ -39,7 +39,3 @@ export function buildTeddyUri({ expression, accessory }: { expression: GhostExpr
     uriCache.set(key, uri);
     return uri;
 }
-
-export const TEDDY_ACCESSORIES = GHOST_ACCESSORIES;
-export const TEDDY_ACCESSORY_LEVELS = GHOST_ACCESSORY_LEVELS;
-export const TEDDY_ACCESSORY_THUMBS = GHOST_ACCESSORY_THUMBS;

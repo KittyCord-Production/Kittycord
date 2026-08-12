@@ -6,13 +6,21 @@
 
 import { get, set } from "@api/DataStore";
 
-export type PetProfile = "cat" | "ghost" | "teddy" | "raccoon";
+export const PET_PROFILES = ["cat", "ghost", "teddy", "raccoon", "dog", "pig", "cow", "bunny", "fox", "penguin"] as const;
+
+export type PetProfile = typeof PET_PROFILES[number];
 
 const KEYS: Record<PetProfile, string> = {
     cat: "Kittycord_KittyPet",
     ghost: "Kittycord_KittyGhost",
     teddy: "Kittycord_KittyTeddy",
-    raccoon: "Kittycord_KittyRaccoon"
+    raccoon: "Kittycord_KittyRaccoon",
+    dog: "Kittycord_KittyDog",
+    pig: "Kittycord_KittyPig",
+    cow: "Kittycord_KittyCow",
+    bunny: "Kittycord_KittyBunny",
+    fox: "Kittycord_KittyFox",
+    penguin: "Kittycord_KittyPenguin"
 };
 
 export interface PetSave {
@@ -52,7 +60,7 @@ export function nextLevelXp(level: number): number | null {
 
 const defaults = (): PetSave => ({ xp: 0, pets: 0, equipped: null, msgDay: "", msgXp: 0, notifiedLevel: 1, name: "", tint: "pink", aura: "pink", lastPetDay: "", streak: 0, playDay: "", playXp: 0 });
 
-const saves: Record<PetProfile, PetSave> = { cat: defaults(), ghost: defaults(), teddy: defaults(), raccoon: defaults() };
+const saves = Object.fromEntries(PET_PROFILES.map(p => [p, defaults()])) as Record<PetProfile, PetSave>;
 let writeQueue: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(fn: () => Promise<T>): Promise<T> {

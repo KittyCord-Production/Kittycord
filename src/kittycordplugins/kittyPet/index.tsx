@@ -11,16 +11,17 @@ import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRa
 import definePlugin, { OptionType } from "@utils/types";
 import { Button, React, SelectedChannelStore, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 
+import { animalArt } from "./animalArt";
 import { startCursorTracking, stopCursorTracking } from "./cursor";
 import { GhostController } from "./ghost";
 import { GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS } from "./ghostArt";
 import { startHearts, stopHearts } from "./hearts";
 import { PetController } from "./pet";
-import { buildRaccoonUri, RACCOON_ACCESSORIES, RACCOON_ACCESSORY_LEVELS, RACCOON_ACCESSORY_THUMBS } from "./raccoonArt";
+import { buildRaccoonUri } from "./raccoonArt";
 import { ACCESSORIES, ACCESSORY_URIS } from "./sprites";
-import { addXp, DAILY_MSG_XP_CAP, DAILY_PET_XP, getSave, grantPlayXp, levelFor, loadSave, MAX_LEVEL, nextLevelXp, PetProfile, updateSave } from "./state";
+import { addXp, DAILY_MSG_XP_CAP, DAILY_PET_XP, getSave, grantPlayXp, levelFor, loadSave, MAX_LEVEL, nextLevelXp, PET_PROFILES, PetProfile, updateSave } from "./state";
 import style from "./style.css?managed";
-import { buildTeddyUri, TEDDY_ACCESSORIES, TEDDY_ACCESSORY_LEVELS, TEDDY_ACCESSORY_THUMBS } from "./teddyArt";
+import { buildTeddyUri } from "./teddyArt";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
 const ModalRoot = ModalRootRaw as React.ComponentType<any>;
@@ -56,7 +57,13 @@ const PET_COPY: Record<PetProfile, { title: string; grown: string; play: string;
     cat: { title: "KittyPet", grown: "Fully grown — what a good kitty.", play: "🍪 Play", namePlaceholder: "Name your kitty…", who: "Your kitty" },
     ghost: { title: "KittyGhost", grown: "Fully grown — what a lovely little spirit.", play: "🎾 Play", namePlaceholder: "Name your ghost…", who: "Your ghost" },
     teddy: { title: "KittyTeddy", grown: "Fully grown — what a cuddly bear.", play: "🍯 Play", namePlaceholder: "Name your teddy…", who: "Your teddy" },
-    raccoon: { title: "KittyRaccoon", grown: "Fully grown — what a cheeky little trash panda.", play: "🍇 Play", namePlaceholder: "Name your raccoon…", who: "Your raccoon" }
+    raccoon: { title: "KittyRaccoon", grown: "Fully grown — what a cheeky little trash panda.", play: "🍇 Play", namePlaceholder: "Name your raccoon…", who: "Your raccoon" },
+    dog: { title: "KittyDog", grown: "Fully grown — who's a good boy? You are.", play: "🦴 Play", namePlaceholder: "Name your dog…", who: "Your dog" },
+    pig: { title: "KittyPig", grown: "Fully grown — a very well fed piglet.", play: "🍎 Play", namePlaceholder: "Name your pig…", who: "Your pig" },
+    cow: { title: "KittyCow", grown: "Fully grown — the happiest cow on the server.", play: "🌾 Play", namePlaceholder: "Name your cow…", who: "Your cow" },
+    bunny: { title: "KittyBunny", grown: "Fully grown — all ears, all the time.", play: "🥕 Play", namePlaceholder: "Name your bunny…", who: "Your bunny" },
+    fox: { title: "KittyFox", grown: "Fully grown — sly, fluffy and yours.", play: "🍓 Play", namePlaceholder: "Name your fox…", who: "Your fox" },
+    penguin: { title: "KittyPenguin", grown: "Fully grown — waddles with purpose.", play: "🐟 Play", namePlaceholder: "Name your penguin…", who: "Your penguin" }
 };
 
 interface AccessorySet {
@@ -66,11 +73,19 @@ interface AccessorySet {
     pixel: boolean;
 }
 
+const GHOST_SET: AccessorySet = { registry: GHOST_ACCESSORIES, levels: GHOST_ACCESSORY_LEVELS, thumbs: GHOST_ACCESSORY_THUMBS, pixel: false };
+
 const ACCESSORY_SETS: Record<PetProfile, AccessorySet> = {
     cat: { registry: ACCESSORIES, levels: CAT_ACCESSORY_LEVELS, thumbs: ACCESSORY_URIS, pixel: true },
-    ghost: { registry: GHOST_ACCESSORIES, levels: GHOST_ACCESSORY_LEVELS, thumbs: GHOST_ACCESSORY_THUMBS, pixel: false },
-    teddy: { registry: TEDDY_ACCESSORIES, levels: TEDDY_ACCESSORY_LEVELS, thumbs: TEDDY_ACCESSORY_THUMBS, pixel: false },
-    raccoon: { registry: RACCOON_ACCESSORIES, levels: RACCOON_ACCESSORY_LEVELS, thumbs: RACCOON_ACCESSORY_THUMBS, pixel: false }
+    ghost: GHOST_SET,
+    teddy: GHOST_SET,
+    raccoon: GHOST_SET,
+    dog: GHOST_SET,
+    pig: GHOST_SET,
+    cow: GHOST_SET,
+    bunny: GHOST_SET,
+    fox: GHOST_SET,
+    penguin: GHOST_SET
 };
 
 const settings = definePluginSettings({
@@ -81,7 +96,13 @@ const settings = definePluginSettings({
             { label: "Cat — walks along the bottom", value: "cat", default: true },
             { label: "Ghost — drifts around the screen", value: "ghost" },
             { label: "Teddy — drifts around the screen", value: "teddy" },
-            { label: "Raccoon — drifts around the screen", value: "raccoon" }
+            { label: "Raccoon — drifts around the screen", value: "raccoon" },
+            { label: "Dog — drifts around the screen", value: "dog" },
+            { label: "Pig — drifts around the screen", value: "pig" },
+            { label: "Cow — drifts around the screen", value: "cow" },
+            { label: "Bunny — drifts around the screen", value: "bunny" },
+            { label: "Fox — drifts around the screen", value: "fox" },
+            { label: "Penguin — drifts around the screen", value: "penguin" }
         ],
         onChange: () => restartController()
     },
@@ -134,7 +155,7 @@ let controller: PetController | GhostController | null = null;
 
 const currentProfile = (): PetProfile => {
     const s = settings.store.style;
-    return s === "ghost" || s === "teddy" || s === "raccoon" ? s : "cat";
+    return PET_PROFILES.find(p => p === s) ?? "cat";
 };
 
 function onPet() {
@@ -173,10 +194,12 @@ function buildController(): PetController | GhostController {
         followCursor: settings.store.followCursor,
         stayPut: settings.store.stayPut
     });
-    if (settings.store.style === "ghost") return new GhostController({ getConfig, onPet });
-    if (settings.store.style === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: TEDDY_ACCESSORIES });
-    if (settings.store.style === "raccoon") return new GhostController({ getConfig, onPet }, { build: buildRaccoonUri, accessories: RACCOON_ACCESSORIES });
-    return new PetController({ getConfig, onPet });
+    const profile = currentProfile();
+    if (profile === "cat") return new PetController({ getConfig, onPet });
+    if (profile === "ghost") return new GhostController({ getConfig, onPet });
+    if (profile === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: GHOST_ACCESSORIES });
+    if (profile === "raccoon") return new GhostController({ getConfig, onPet }, { build: buildRaccoonUri, accessories: GHOST_ACCESSORIES });
+    return new GhostController({ getConfig, onPet }, animalArt(profile));
 }
 
 function startController() {
@@ -341,7 +364,7 @@ function PetModal({ rootProps }: { rootProps: any; }) {
 
 export default definePlugin({
     name: "KittyPet",
-    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost, teddy bear or raccoon that drifts around the screen on its own. It reacts to pings, can be petted, and levels up to unlock accessories. Each pet keeps its own level and accessories.",
+    description: "A tiny pet that lives in your Discord — pick a pixel cat that walks around the bottom, or a ghost, teddy bear, raccoon, dog, pig, cow, bunny, fox or penguin that drifts around the screen on its own. It reacts to pings, can be petted, and levels up to unlock accessories. Each pet keeps its own level and accessories.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Fun", "Customisation"],
     settings,
@@ -399,10 +422,7 @@ export default definePlugin({
     async start() {
         enableStyle(style);
         startHearts();
-        await loadSave("cat");
-        await loadSave("ghost");
-        await loadSave("teddy");
-        await loadSave("raccoon");
+        for (const profile of PET_PROFILES) await loadSave(profile);
         updateCursorTracking();
         startController();
     },

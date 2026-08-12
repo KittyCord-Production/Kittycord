@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { eyesFor, GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS, GhostExpression } from "./ghostArt";
+import { eyesFor, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 
 const FUR = "#9ba1aa";
 const FUR_DARK = "#6f757e";
@@ -44,7 +44,3 @@ export function buildRaccoonUri({ expression, accessory }: { expression: GhostEx
     uriCache.set(key, uri);
     return uri;
 }
-
-export const RACCOON_ACCESSORIES = GHOST_ACCESSORIES;
-export const RACCOON_ACCESSORY_LEVELS = GHOST_ACCESSORY_LEVELS;
-export const RACCOON_ACCESSORY_THUMBS = GHOST_ACCESSORY_THUMBS;
