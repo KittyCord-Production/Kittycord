@@ -5,7 +5,7 @@
  */
 
 import { del, get, set } from "@api/DataStore";
-import { Channel, Message } from "@vencord/discord-types";
+import { Channel } from "@vencord/discord-types";
 import { findCssClassesLazy } from "@webpack";
 import { MessageStore, SelectedChannelStore, useEffect, UserStore, useState, useStateFromStores } from "@webpack/common";
 
@@ -131,9 +131,7 @@ export function Boo({ channel }: { channel: Channel; }) {
 
     const currentUserId = useStateFromStores([UserStore], () => UserStore.getCurrentUser()?.id);
     const selectedChannelId = useStateFromStores([SelectedChannelStore], () => SelectedChannelStore.getChannelId());
-    const lastMessage: Message = useStateFromStores([MessageStore], () =>
-        MessageStore.getMessages(id)?.last()
-    );
+    const lastMessage = useStateFromStores([MessageStore], () => MessageStore.getMessages(id)?.last());
     const isViewing = selectedChannelId === id;
 
     const [state, setState] = useState({
@@ -207,7 +205,7 @@ export function Boo({ channel }: { channel: Channel; }) {
         }
 
         // if exempted, bot (if setting enabled) or currently open, remove from ghost tracking
-        if (isExempted || (settings.store.ignoreBots && lastMessage.author.bot) || isInactive || isViewing) {
+        if (isExempted || (settings.store.ignoreBots && lastMessage?.author.bot) || isInactive || isViewing) {
             if (countedChannels.has(id)) {
                 countedChannels.delete(id);
                 setBooCount(getBooCount() - 1);
