@@ -81,6 +81,7 @@ function ContextCallback(name: "guild" | "user" | "channel"): NavContextMenuPatc
                     id={`status-${name}-bypass`}
                     label={`${enabled ? "Remove" : "Add"} Status Bypass`}
                     icon={() => Icon(enabled)}
+                    leadingAccessory={{ type: "icon", icon: () => Icon(enabled) }}
                     action={() => {
                         let bypasses: string[] = settings.store[`${name}s`].split(", ");
                         if (enabled) bypasses = bypasses.filter(id => id !== type.id);

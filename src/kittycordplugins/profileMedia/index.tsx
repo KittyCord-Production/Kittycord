@@ -60,12 +60,14 @@ const userContextPatch: NavContextMenuPatchCallback = (children, { user }: { use
                 id="profile-media-view-avatar"
                 label="View Avatar"
                 icon={ImageIcon}
+                leadingAccessory={{ type: "icon", icon: ImageIcon }}
                 action={() => openImageModal({ url: getAvatarUrl(user, 1024), original: avatarUrl, width: 512, height: 512 })}
             />
             <Menu.MenuItem
                 id="profile-media-download-avatar"
                 label="Download Avatar"
                 icon={CloudDownloadIcon}
+                leadingAccessory={{ type: "icon", icon: CloudDownloadIcon }}
                 action={() => downloadImage(avatarUrl, `avatar_${safeName(user)}.${extFromUrl(avatarUrl)}`)}
             />
             {bannerUrl && (
@@ -73,6 +75,7 @@ const userContextPatch: NavContextMenuPatchCallback = (children, { user }: { use
                     id="profile-media-view-banner"
                     label="View Banner"
                     icon={ImageIcon}
+                    leadingAccessory={{ type: "icon", icon: ImageIcon }}
                     action={() => openImageModal({ url: bannerUrl, original: bannerUrl, width: 1024 })}
                 />
             )}
@@ -81,6 +84,7 @@ const userContextPatch: NavContextMenuPatchCallback = (children, { user }: { use
                     id="profile-media-download-banner"
                     label="Download Banner"
                     icon={CloudDownloadIcon}
+                    leadingAccessory={{ type: "icon", icon: CloudDownloadIcon }}
                     action={() => downloadImage(bannerUrl, `banner_${safeName(user)}.${extFromUrl(bannerUrl)}`)}
                 />
             )}

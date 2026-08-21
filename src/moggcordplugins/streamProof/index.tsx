@@ -276,7 +276,7 @@ function syncHeaderButton() {
 function StreamProofMenu(channelId: string) {
     const mode = channelMode(channelId);
     return (
-        <Menu.MenuItem id="stream-proof" label="StreamProof" icon={EyeSlashIcon}>
+        <Menu.MenuItem id="stream-proof" label="StreamProof" icon={EyeSlashIcon} leadingAccessory={{ type: "icon", icon: EyeSlashIcon }}>
             <Menu.MenuRadioItem
                 id="stream-proof-default"
                 group="stream-proof-mode"

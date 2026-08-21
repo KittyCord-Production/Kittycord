@@ -156,6 +156,7 @@ function BookmarkFolderOpenMenu(props: BookmarkProps) {
                         </div>
                     }
                     icon={() => <BookmarkIcon bookmark={b} />}
+                    leadingAccessory={{ type: "icon", icon: () => <BookmarkIcon bookmark={b} /> }}
                     showIconFirst={true}
                     action={() => switchChannel(b)}
                 >

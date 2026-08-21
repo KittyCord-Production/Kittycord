@@ -102,6 +102,7 @@ export function buildExtraRoleContextMenuItems(role: Role, guild: Guild, popoutR
                     GuildSettingsActions.selectRole(role.id);
                 }}
                 icon={PencilIcon}
+                leadingAccessory={{ type: "icon", icon: PencilIcon }}
             />
         ),
         role.colorString && (
@@ -111,6 +112,7 @@ export function buildExtraRoleContextMenuItems(role: Role, guild: Guild, popoutR
                 label="Copy Role Color"
                 action={() => copyToClipboard(role.colorString!)}
                 icon={AppearanceIcon}
+                leadingAccessory={{ type: "icon", icon: AppearanceIcon }}
             />
         )
     ].filter(isTruthy);
@@ -129,6 +131,7 @@ export function buildExtraRoleContextMenuItems(role: Role, guild: Guild, popoutR
                     });
                 }}
                 icon={ImageIcon}
+                leadingAccessory={{ type: "icon", icon: ImageIcon }}
             />
         ),
         popoutRef && (
@@ -197,6 +200,7 @@ export function openRoleContextMenu(event: React.MouseEvent<HTMLElement>, { guil
                     id="vc-better-role-context-copy-role-id"
                     label={getIntlMessage("COPY_ID_ROLE")}
                     icon={CopyIdIcon}
+                    leadingAccessory={{ type: "icon", icon: CopyIdIcon }}
                     action={() => copyToClipboard(role.id)}
                 />
             </Menu.Menu>
@@ -246,6 +250,7 @@ export default definePlugin({
                         label="Copy Role Color"
                         action={() => copyToClipboard(role.colorString!)}
                         icon={AppearanceIcon}
+                        leadingAccessory={{ type: "icon", icon: AppearanceIcon }}
                     />
                 );
             }
@@ -260,6 +265,7 @@ export default definePlugin({
                             GuildSettingsActions.selectRole(id);
                         }}
                         icon={PencilIcon}
+                        leadingAccessory={{ type: "icon", icon: PencilIcon }}
                     />
                 );
             }
@@ -272,6 +278,7 @@ export default definePlugin({
                         label="View Role Icon"
                         action={() => openRoleIconModal(role.id, roleIcon, role.name)}
                         icon={ImageIcon}
+                        leadingAccessory={{ type: "icon", icon: ImageIcon }}
                     />
 
                 );

@@ -80,17 +80,21 @@ const StatusSubMenuComponent = () => {
 
     return (
         <Menu.Menu navId="sp-custom-status-submenu" onClose={() => { }}>
-            {Object.entries((settings.store.StatusPresets as { [k: string]: DiscordStatus | undefined; })).map(([index, status]) =>
-                status != null ? (
+            {Object.entries((settings.store.StatusPresets as { [k: string]: DiscordStatus | undefined; })).map(([index, status]) => {
+                if (status == null) return null;
+
+                const icon = status.emojiInfo != null
+                    ? () => <EmojiComponent emoji={status.emojiInfo} animate={false} hideTooltip={false} />
+                    : undefined;
+
+                return (
                     <Menu.MenuItem
                         key={"status-presets-" + index}
                         id={"status-presets-" + index}
                         label={status.text}
                         action={() => (status.emojiInfo?.id == null || premiumType > 0) && setStatus(status)}
-                        icon={status.emojiInfo != null
-                            ? () => <EmojiComponent emoji={status.emojiInfo} animate={false} hideTooltip={false} />
-                            : undefined
-                        }
+                        icon={icon}
+                        leadingAccessory={icon != null ? { type: "icon", icon } : undefined}
                         disabled={status.emojiInfo?.id != null && premiumType === 0}
                     >
                         <Menu.MenuItem
@@ -104,8 +108,8 @@ const StatusSubMenuComponent = () => {
                             }}
                         />
                     </Menu.MenuItem>
-                ) : null
-            )}
+                );
+            })}
         </Menu.Menu>
     );
 };

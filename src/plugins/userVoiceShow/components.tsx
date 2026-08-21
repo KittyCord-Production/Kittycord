@@ -124,7 +124,7 @@ export type VoiceChannelIndicatorProps = {
 
 const clickTimers = new Map<string, any>();
 
-export const VoiceChannelIndicator = ErrorBoundary.wrap(({ userId, isProfile, isActionButton, shouldHighlight }: VoiceChannelIndicatorProps) => {
+export const VoiceChannelIndicator = ErrorBoundary.wrap(({ userId, isProfile, isMessageIndicator, isActionButton, shouldHighlight }: VoiceChannelIndicatorProps) => {
     const channelId = useStateFromStores([VoiceStateStore], () => VoiceStateStore.getVoiceStateForUser(userId)?.channelId);
 
     const { isMuted, isDeaf } = useStateFromStores([VoiceStateStore], () => {
@@ -194,7 +194,7 @@ export const VoiceChannelIndicator = ErrorBoundary.wrap(({ userId, isProfile, is
                         isActionButton && shouldHighlight && ActionButtonClasses.highlight,
                         cl(isProfile && "profile-speaker")
                     )}
-                    size={isActionButton ? 20 : 16}
+                    size={(isActionButton || isMessageIndicator) ? 20 : 16}
                 />
             )}
         </Tooltip>

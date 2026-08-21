@@ -118,6 +118,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="pin-theme"
                         label={isPinned ? "Unpin" : "Pin"}
                         icon={PinIcon}
+                        leadingAccessory={{ type: "icon", icon: PinIcon }}
                         action={onPin}
                     />
                 )}
@@ -126,6 +127,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="open-website"
                         label="Open Website"
                         icon={HomeIcon}
+                        leadingAccessory={{ type: "icon", icon: HomeIcon }}
                         action={() => window.open(theme.website, "_blank")}
                     />
                 )}
@@ -134,6 +136,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="join-discord"
                         label="Join Discord"
                         icon={DiscordIcon}
+                        leadingAccessory={{ type: "icon", icon: DiscordIcon }}
                         action={() => {
                             openInviteModal(theme.invite!).catch(() =>
                                 showToast("Invalid or expired invite")
@@ -146,6 +149,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="copy-url"
                         label="Copy URL"
                         icon={LinkIcon}
+                        leadingAccessory={{ type: "icon", icon: LinkIcon }}
                         action={onCopyUrl}
                     />
                 )}
@@ -154,6 +158,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="download-theme"
                         label="Download"
                         icon={DownloadIcon}
+                        leadingAccessory={{ type: "icon", icon: DownloadIcon }}
                         action={onDownload}
                     />
                 )}
@@ -162,6 +167,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="open-folder"
                         label="Open in Folder"
                         icon={FolderIcon}
+                        leadingAccessory={{ type: "icon", icon: FolderIcon }}
                         action={onOpenFolder}
                     />
                 )}
@@ -170,6 +176,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                         id="refresh-theme"
                         label="Refresh"
                         icon={RefreshIcon}
+                        leadingAccessory={{ type: "icon", icon: RefreshIcon }}
                         action={onRefresh}
                     />
                 )}
@@ -181,6 +188,7 @@ export function ThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton
                             label="Delete"
                             color="danger"
                             icon={DeleteIcon}
+                            leadingAccessory={{ type: "icon", icon: DeleteIcon }}
                             action={() => onDelete()}
                         />
                     </>
