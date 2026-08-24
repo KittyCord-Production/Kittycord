@@ -38,6 +38,7 @@ import { isTruthy } from "@utils/guards";
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
+import { PluginTarget } from "@utils/pluginTargets";
 import { useAwaiter, useCleanupEffect, useIntersection } from "@utils/react";
 import { PluginTag, PluginTags } from "@utils/types";
 import { Alerts, ConfirmModal, lodash, openModal, Parser, React, SearchableSelect, Select, TextInput, Toasts, Tooltip, useCallback, useMemo, useRef, useState } from "@webpack/common";
@@ -154,13 +155,14 @@ const enum SearchStatus {
     CUSTOM
 }
 
-export const ExcludedReasons: Record<"web" | "discordDesktop" | "vesktop" | "equibop" | "desktop" | "dev", string> = {
+export const ExcludedReasons: Record<PluginTarget, string> = {
     desktop: "Discord Desktop app or the Kittycord app",
     discordDesktop: "Discord Desktop app",
     vesktop: "the Kittycord app",
     equibop: "the Kittycord app",
     web: "the Kittycord app & Discord web",
-    dev: "Developer version of Kittycord"
+    dev: "Developer version of Kittycord",
+    browser: "Web Browser version of Kittycord"
 };
 
 function ExcludedPluginsList({ search }: { search: string; }) {
