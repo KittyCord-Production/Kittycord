@@ -26,7 +26,7 @@ import { proxyLazy } from "@utils/lazy";
 import { useForceUpdater } from "@utils/react";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 import { extractAndLoadChunksLazy, findComponentByCodeLazy, findModuleId, wreq } from "@webpack";
-import { Menu, openModalLazy,OverridePremiumTypeStore, Toasts } from "@webpack/common";
+import { Menu, openModalLazy, OverridePremiumTypeStore, Toasts } from "@webpack/common";
 
 interface Emoji {
     animated: boolean;
