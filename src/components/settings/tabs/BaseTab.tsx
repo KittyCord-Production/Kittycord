@@ -43,14 +43,17 @@ export function wrapTab(component: ComponentType<any>, tab: string) {
 }
 
 export function openSettingsTabModal(Tab: ComponentType<any>) {
-    Tab = wrapTab(Tab, Tab.displayName || "SettingsTab");
+    const name = Tab.displayName?.replaceAll("SettingsTab", "").trim();
+
+    if (!Tab.displayName?.endsWith("SettingsTab"))
+        Tab = wrapTab(Tab, name || "Settings");
 
     try {
         openModal(props => (
             <Modal
                 {...props}
                 size="lg"
-                title={Tab.displayName?.replace("SettingsTab", "") || "Settings"}
+                title={name || "Settings"}
             >
                 <Tab />
             </Modal>

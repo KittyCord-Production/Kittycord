@@ -19,7 +19,7 @@
 import "./PluginModal.css";
 
 import { generateId } from "@api/Commands";
-import { hasAnyVisibleSettings, isSettingHidden } from "@api/PluginManager";
+import { hasAnyVisibleSettings, isPluginEnabled, isSettingHidden } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
@@ -112,6 +112,13 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
     function handleResetClick() {
         openWarningModal(plugin, onRestartNeeded);
     }
+
+    const actions = useMemo(() => {
+        const { toolboxActions } = plugin;
+        if (!toolboxActions || typeof toolboxActions === "function" || !isPluginEnabled(plugin.name)) return [];
+
+        return Object.entries(toolboxActions).filter(([, action]) => typeof action === "function");
+    }, [plugin.name]);
 
     function renderSettings() {
         const { settings } = plugin;
@@ -230,6 +237,24 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
                         </ErrorBoundary>
                     </div>
                 </section>
+
+                {actions.length > 0 && (
+                    <section>
+                        <BaseText size="lg" weight="semibold" color="text-strong" className={classes(Margins.top16, Margins.bottom8)}>Open</BaseText>
+                        <Flex style={{ flexWrap: "wrap", gap: 8 }}>
+                            {actions.map(([label, action]) => (
+                                <Button
+                                    key={label}
+                                    size="small"
+                                    variant="secondary"
+                                    onClick={() => { onClose(); action(); }}
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                        </Flex>
+                    </section>
+                )}
 
                 <section>
                     <BaseText size="lg" weight="semibold" color="text-strong" className={classes(Margins.top16, Margins.bottom8)}>Settings</BaseText>
