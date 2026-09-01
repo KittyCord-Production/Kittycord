@@ -75,6 +75,7 @@ export const CspPolicies: PolicyMap = {
     "*.tenor.co": ImageAndMediaSrc,
 
     "kittycord-analytics.hell-bullet-hb.workers.dev": ImageAndMediaSrc,
+    "i.scdn.co": ImageSrc,
 };
 
 const findHeader = (headers: PolicyMap, headerName: Lowercase<string>) => {
