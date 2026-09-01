@@ -8,7 +8,8 @@ import "./style.css";
 
 import { isPluginEnabled, isSettingHidden, plugins } from "@api/PluginManager";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { openPluginModal } from "@components/settings";
+import { BackupAndRestoreTab, ChangelogTab, CloudTab, openPluginModal, openSettingsTabModal, PluginsTab, ThemesTab, UpdaterTab, VencordTab } from "@components/settings";
+import SettingsPlugin from "@plugins/_core/settings";
 import { classNameFactory } from "@utils/css";
 import { closeModal, ModalContent as ModalContentRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
@@ -28,8 +29,30 @@ interface Entry {
 
 const brand = (s: string) => s.replace(/vencord|equicord|moggcord/gi, "Kittycord");
 
+const CORE_ENTRIES: { label: string; sublabel: string; tab: ComponentType<any> | null; }[] = [
+    { label: "Kittycord settings", sublabel: "Accent color, quick actions and client settings", tab: VencordTab },
+    { label: "Accent color", sublabel: "Pick the colour Kittycord's own panels use", tab: VencordTab },
+    { label: "Plugins", sublabel: "Turn features on or off", tab: PluginsTab },
+    { label: "Themes", sublabel: "Manage your themes and QuickCSS", tab: ThemesTab },
+    { label: "Quick CSS", sublabel: "Write your own CSS", tab: ThemesTab },
+    { label: "Updates", sublabel: "Check for updates and pick your update channel", tab: UpdaterTab },
+    { label: "Changelog", sublabel: "See what changed in the last updates", tab: ChangelogTab },
+    { label: "Cloud", sublabel: "Sync your settings across devices", tab: CloudTab },
+    { label: "Backup & restore", sublabel: "Save your setup to a file or load one back", tab: BackupAndRestoreTab }
+];
+
 function buildIndex(): Entry[] {
     const out: Entry[] = [];
+
+    for (const entry of CORE_ENTRIES) {
+        const { tab } = entry;
+        if (!tab) continue;
+        out.push({ label: entry.label, sublabel: entry.sublabel, run: () => openSettingsTabModal(tab) });
+    }
+
+    for (const entry of SettingsPlugin.customEntries)
+        out.push({ label: entry.title, sublabel: "Kittycord settings", run: () => openSettingsTabModal(entry.Component) });
+
     for (const p of Object.values(plugins)) {
         if (p.name.endsWith("API") || p.required || p.hidden || !isPluginEnabled(p.name)) continue;
 

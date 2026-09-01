@@ -7,7 +7,8 @@
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { isPluginEnabled, plugins } from "@api/PluginManager";
-import { openSettingsTabModal, PluginsTab } from "@components/settings";
+import { openSettingsTabModal, PluginsTab, VencordTab } from "@components/settings";
+import SettingsPlugin from "@plugins/_core/settings";
 import definePlugin from "@utils/types";
 import { Menu, Popout, useRef, useState } from "@webpack/common";
 
@@ -60,9 +61,33 @@ function resolveAction(feature: Feature): (() => void) | null {
 
 const CURATED_PLUGINS = new Set(FEATURES.map(feature => feature.plugin));
 
+function buildSettingsEntries(onClose: () => void) {
+    return (
+        <Menu.MenuGroup label="Settings">
+            <Menu.MenuItem
+                id="kittycord-menu-settings"
+                label="Kittycord settings"
+                action={() => { onClose(); openSettingsTabModal(VencordTab); }}
+            />
+            {SettingsPlugin.customEntries.map(entry => (
+                <Menu.MenuItem
+                    id={`kittycord-menu-entry-${entry.key}`}
+                    key={entry.key}
+                    label={entry.title}
+                    action={() => { onClose(); openSettingsTabModal(entry.Component); }}
+                />
+            ))}
+        </Menu.MenuGroup>
+    );
+}
+
 function renderMenu(onClose: () => void) {
     return (
         <Menu.Menu navId="kittycord-menu" onClose={onClose}>
+            {buildSettingsEntries(onClose)}
+
+            <Menu.MenuSeparator />
+
             <Menu.MenuGroup label="Kittycord">
                 {FEATURES.map(feature => {
                     const action = resolveAction(feature);
@@ -129,7 +154,7 @@ function KittycordMenuButton() {
 
 export default definePlugin({
     name: "KittycordMenu",
-    description: "Adds one Kittycord button to the channel header that opens your Kittycord features — Modes, Tagged messages, Bookmarks, Share setup and the setup wizard — all in one place.",
+    description: "Adds one Kittycord button to the channel header that opens all your Kittycord settings and features, from the accent colour to Modes, Bookmarks and the setup wizard.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Utility"],
     enabledByDefault: true,

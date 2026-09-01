@@ -101,6 +101,39 @@ function ReloadRequiredCard({ required, enabledPlugins, openWarningModal, resetC
     );
 }
 
+const SETTINGS_HINT_KEY = "Kittycord_SettingsHintSeen";
+
+function SettingsHint() {
+    const [seen, setSeen] = useState(true);
+
+    React.useEffect(() => {
+        DataStore.get<boolean>(SETTINGS_HINT_KEY).then(v => setSeen(Boolean(v)));
+    }, []);
+
+    if (seen) return null;
+
+    return (
+        <Notice.Info
+            className={Margins.bottom16}
+            action={
+                <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => {
+                        setSeen(true);
+                        DataStore.set(SETTINGS_HINT_KEY, true);
+                    }}
+                >
+                    Got it
+                </Button>
+            }
+        >
+            Looking for the accent colour, your themes or the update channel? Those live in Kittycord settings, next to
+            this page in the sidebar and under the cat icon in the channel header.
+        </Notice.Info>
+    );
+}
+
 function CustomPluginsCard({ enabled, onChange }: { enabled: boolean; onChange(value: boolean): void; }) {
     return (
         <Card className={cl("info-card")}>
@@ -446,6 +479,8 @@ export default function PluginSettings() {
     return (
         <SettingsTab>
             <ReloadRequiredCard required={changes.hasChanges} enabledPlugins={enabledPlugins} openWarningModal={openWarningModal} resetCheckAndDo={resetCheckAndDo} />
+
+            <SettingsHint />
 
             {!IS_WEB && (
                 <ErrorBoundary noop>

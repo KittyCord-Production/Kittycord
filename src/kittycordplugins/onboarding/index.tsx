@@ -261,6 +261,11 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
                 )}
 
                 <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
+                    Everything you turn on here can be changed later: click the cat icon in the channel header and pick
+                    Kittycord settings.
+                </Text>
+
+                <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
                     New here? Find guides and more at{" "}
                     <a role="button" onClick={() => VencordNative.native.openExternal(BRAND_WEBSITE)} style={{ cursor: "pointer", color: "var(--text-link)" }}>kittycord.dev</a>.
                 </Text>
