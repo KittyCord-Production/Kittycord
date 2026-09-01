@@ -51,10 +51,22 @@ async function openPack(id: string) {
     }
 }
 
+async function openKit(id: string) {
+    showToast("Opening that server kit…", Toasts.Type.MESSAGE);
+    const { fetchKit } = await import("../serverKits");
+    const kit = await fetchKit(id);
+
+    if (!kit) return showToast("That server kit couldn't be opened.", Toasts.Type.FAILURE);
+
+    const { openOfferModal } = await import("../serverKits/OfferModal");
+    openOfferModal(kit, () => { });
+}
+
 function normalize(action: { kind: string; value: string; }): FriendAction | null {
     if (action.kind === "claim" && CODE_RE.test(action.value)) return { kind: "claim", value: action.value };
     if (action.kind === "theme") return { kind: "theme", value: action.value };
     if (action.kind === "pack") return { kind: "pack", value: action.value };
+    if (action.kind === "kit") return { kind: "kit", value: action.value };
     return null;
 }
 
@@ -70,6 +82,7 @@ async function handle(action: { kind: string; value: string; } | null) {
 
     if (friend.kind === "claim") claim(friend.value);
     else if (friend.kind === "pack") openPack(friend.value);
+    else if (friend.kind === "kit") openKit(friend.value);
     else openTheme(friend.value);
 }
 
