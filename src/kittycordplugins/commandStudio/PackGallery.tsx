@@ -162,7 +162,7 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: any; pack: Gal
                                 overflowWrap: "anywhere"
                             }}
                         >
-                            {prefix}{c.trigger}
+                            {prefix}{c.trigger}{c.description ? ` — ${c.description}` : ""}
                         </span>
                     ))}
                 </div>

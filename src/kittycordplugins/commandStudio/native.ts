@@ -14,6 +14,9 @@ export interface GalleryPackCommand {
     trigger: string;
     message: string;
     mode: "send" | "insert";
+    description?: string;
+    aliases?: string[];
+    category?: string;
 }
 
 export interface GalleryPack {

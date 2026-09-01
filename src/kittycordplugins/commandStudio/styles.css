@@ -17,3 +17,14 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.vc-commandStudio-category {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25em;
+}
+
+.vc-commandStudio-meta {
+    color: var(--text-muted);
+}
