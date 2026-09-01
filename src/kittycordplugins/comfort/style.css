@@ -1,0 +1,33 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+.kc-comfort-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.kc-comfort-times {
+    display: flex;
+    gap: 12px;
+    margin: 4px 0 12px;
+}
+
+.kc-comfort-times label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 140px;
+}
+
+.kc-comfort-select {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 4px 0 12px;
+    max-width: 260px;
+}
