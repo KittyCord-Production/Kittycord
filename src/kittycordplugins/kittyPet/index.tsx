@@ -145,9 +145,13 @@ const settings = definePluginSettings({
     },
     nametag: {
         type: OptionType.BOOLEAN,
-        description: "Show a name tag above your pet (set the name in the pet menu)",
+        description: "Show a name tag above your pet",
         default: false,
         onChange: () => restartController()
+    },
+    panel: {
+        type: OptionType.COMPONENT,
+        component: () => <PetPanel />
     }
 });
 
@@ -232,7 +236,7 @@ function notifyLevel(level: number | null) {
     showToast(`🎉 Level ${level}!${note}`, Toasts.Type.SUCCESS);
 }
 
-function PetModal({ rootProps }: { rootProps: any; }) {
+function PetPanel() {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const profile = currentProfile();
     const copy = PET_COPY[profile];
@@ -256,13 +260,7 @@ function PetModal({ rootProps }: { rootProps: any; }) {
     }
 
     return (
-        <ModalRoot {...rootProps} size={ModalSize.SMALL}>
-            <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Your {copy.title}</Text>
-                <ModalCloseButton onClick={rootProps.onClose} />
-            </ModalHeader>
-            <ModalContent>
-                <div style={{ margin: "12px 0" }}>
+        <div style={{ margin: "12px 0" }}>
                     <Text variant="heading-md/semibold">Level {level}{level >= MAX_LEVEL ? " (max)" : ""}</Text>
                     <div style={{ height: 8, borderRadius: 999, background: "var(--background-tertiary)", margin: "8px 0" }}>
                         <div style={{ height: "100%", width: `${Math.round(progress * 100)}%`, borderRadius: 999, background: "linear-gradient(90deg, #ff5fa6, #ff8ac4)" }} />
@@ -325,7 +323,7 @@ function PetModal({ rootProps }: { rootProps: any; }) {
                     />
                     {!settings.store.nametag && (
                         <Text variant="text-sm/normal" style={{ opacity: 0.6, marginTop: 4 }}>
-                            Turn on the name tag in this plugin's settings to show it above your pet.
+                            Turn on the name tag above to show this name over your pet.
                         </Text>
                     )}
 
@@ -356,7 +354,21 @@ function PetModal({ rootProps }: { rootProps: any; }) {
                             </Button>
                         ))}
                     </Flex>
-                </div>
+        </div>
+    );
+}
+
+function PetModal({ rootProps }: { rootProps: any; }) {
+    const copy = PET_COPY[currentProfile()];
+
+    return (
+        <ModalRoot {...rootProps} size={ModalSize.SMALL}>
+            <ModalHeader>
+                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Your {copy.title}</Text>
+                <ModalCloseButton onClick={rootProps.onClose} />
+            </ModalHeader>
+            <ModalContent>
+                <PetPanel />
             </ModalContent>
         </ModalRoot>
     );
