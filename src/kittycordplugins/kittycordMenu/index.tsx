@@ -7,7 +7,7 @@
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { isPluginEnabled, plugins } from "@api/PluginManager";
-import { openSettingsTabModal, PluginsTab, VencordTab } from "@components/settings";
+import { openPluginModal, openSettingsTabModal, PluginsTab, VencordTab } from "@components/settings";
 import SettingsPlugin from "@plugins/_core/settings";
 import definePlugin from "@utils/types";
 import { Menu, Popout, useRef, useState } from "@webpack/common";
@@ -91,14 +91,25 @@ function renderMenu(onClose: () => void) {
             <Menu.MenuGroup label="Kittycord">
                 {FEATURES.map(feature => {
                     const action = resolveAction(feature);
+                    const plugin = plugins[feature.plugin];
                     return (
                         <Menu.MenuItem
                             id={`kittycord-menu-${feature.plugin}-${feature.label}`}
                             key={`${feature.plugin}-${feature.label}`}
                             label={action ? feature.label : `${feature.label} (off)`}
-                            disabled={!action}
-                            action={action ? () => { onClose(); action(); } : undefined}
-                        />
+                            disabled={!plugin}
+                            action={plugin
+                                ? () => { onClose(); action ? action() : openPluginModal(plugin); }
+                                : undefined}
+                        >
+                            {plugin && (
+                                <Menu.MenuItem
+                                    id={`kittycord-menu-${feature.plugin}-${feature.label}-settings`}
+                                    label={action ? "Settings" : "Turn it on"}
+                                    action={() => { onClose(); openPluginModal(plugin); }}
+                                />
+                            )}
+                        </Menu.MenuItem>
                     );
                 })}
             </Menu.MenuGroup>
