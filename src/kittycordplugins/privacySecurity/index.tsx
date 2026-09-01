@@ -8,11 +8,13 @@ import { disableStyle, enableStyle } from "@api/Styles";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
 import { ShieldIcon } from "@components/Icons";
+import { openSettingsTabModal } from "@components/settings";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
 import { Button, React, Text } from "@webpack/common";
 
+import { RequestLog } from "./RequestLog";
 import style from "./style.css?managed";
 
 const REPO = "https://github.com/KittyCord-Production/Kittycord";
@@ -60,6 +62,9 @@ function PrivacyTab() {
                 <div className="kc-priv-yes">✅ Only if you turn it on: an anonymous install ID + version, plus any public cosmetics you choose to show (name color, avatar decoration, creator code).</div>
                 <div className="kc-priv-no">❌ Never: your login token, your password, your keystrokes, your messages, or your IP address.</div>
 
+                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>What Kittycord sent</Text>
+                <RequestLog />
+
                 <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Your data, your choice</Text>
                 <ConsentToggle
                     bridge={VencordNative.kittycordTelemetry}
@@ -69,7 +74,7 @@ function PrivacyTab() {
                 <ConsentToggle
                     bridge={VencordNative.kittycordShare}
                     title="Let friends find you on Kittycord"
-                    description="Stores only a scrambled, one-way hash of your Discord ID so friends who also use Kittycord can find each other. Off unless you enable it."
+                    description="Your Discord ID travels over an encrypted connection and is turned into a one-way hash before it is stored, so friends who also use Kittycord can find each other. Off unless you enable it."
                 />
                 <ConsentToggle
                     bridge={VencordNative.kittycordCrash}
@@ -96,6 +101,12 @@ export default definePlugin({
     description: "A clear, in-app overview of exactly what Kittycord does and doesn't do with your data — with links to verify it yourself.",
     authors: [{ name: "Kittycord", id: 0n }],
     enabledByDefault: true,
+
+    toolboxActions: {
+        "Open privacy monitor"() {
+            openSettingsTabModal(PrivacyTab);
+        }
+    },
 
     start() {
         enableStyle(style);

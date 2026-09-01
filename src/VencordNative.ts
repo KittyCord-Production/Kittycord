@@ -139,6 +139,14 @@ export default {
         friendsCheck: (ids: string[]) => invoke<string[]>(IpcEvents.SHARE_FRIENDS_CHECK, ids),
     },
 
+    kittycordPrivacy: {
+        getRequestLog: () => invoke<{
+            entries: { at: number; kind: string; method: string; host: string; path: string; status: number; bytesOut: number; purpose: string; plugin: string | null; }[];
+            totals: Record<string, number>;
+        }>(IpcEvents.GET_REQUEST_LOG),
+        clearRequestLog: () => invoke<void>(IpcEvents.CLEAR_REQUEST_LOG),
+    },
+
     kittycordBadges: {
         getBadges: () => invoke<{ id: string; emoji: string; label: string; slot: number; }[]>(IpcEvents.GET_CUSTOM_BADGES),
         setBadge: (id: string, emoji: string, label: string, slot: number) => invoke<{ ok: boolean; error?: string; }>(IpcEvents.SET_CUSTOM_BADGE, id, emoji, label, slot),

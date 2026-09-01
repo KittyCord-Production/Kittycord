@@ -45,6 +45,12 @@ if (!IS_VANILLA) {
     patchTrayMenu();
 
     try {
+        require("./requestLog").installRequestLog();
+    } catch (err) {
+        console.error("[Kittycord] Failed to set up the request log", err);
+    }
+
+    try {
         require("./styleSeed");
     } catch (err) {
         console.error("[Kittycord] Failed to apply style seed", err);

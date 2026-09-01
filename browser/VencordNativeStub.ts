@@ -151,6 +151,14 @@ window.VencordNative = {
         report: NOOP_ASYNC,
     },
 
+    kittycordPrivacy: {
+        getRequestLog: async () => ({
+            entries: [] as { at: number; kind: string; method: string; host: string; path: string; status: number; bytesOut: number; purpose: string; plugin: string | null; }[],
+            totals: {} as Record<string, number>
+        }),
+        clearRequestLog: NOOP_ASYNC,
+    },
+
     kittycordDeepLinks: {
         onLink: NOOP,
         poll: async () => null,

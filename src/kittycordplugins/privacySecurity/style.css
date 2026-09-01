@@ -36,3 +36,68 @@
     gap: 12px;
     margin-top: 24px;
 }
+
+.kc-priv-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.kc-priv-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--background-secondary);
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.kc-priv-chip b {
+    color: var(--text-normal);
+}
+
+.kc-priv-log {
+    margin-top: 12px;
+    max-height: 320px;
+    overflow: auto;
+    border-radius: 8px;
+    background: var(--background-secondary);
+}
+
+.kc-priv-log-row {
+    display: grid;
+    grid-template-columns: 78px 130px 110px minmax(0, 1fr) 90px;
+    gap: 10px;
+    align-items: center;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--text-normal);
+    border-bottom: 1px solid var(--background-modifier-accent);
+}
+
+.kc-priv-log-row:last-child {
+    border-bottom: none;
+}
+
+.kc-priv-log-time,
+.kc-priv-log-plugin,
+.kc-priv-log-meta {
+    color: var(--text-muted);
+}
+
+.kc-priv-log-meta {
+    text-align: right;
+}
+
+.kc-priv-log-path,
+.kc-priv-log-purpose,
+.kc-priv-log-plugin {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kc-priv-log-path {
+    font-family: var(--font-code, monospace);
+    overflow-wrap: anywhere;
+}

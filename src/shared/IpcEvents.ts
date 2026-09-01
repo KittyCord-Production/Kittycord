@@ -77,6 +77,9 @@ export const enum IpcEvents {
     SHARE_UNREGISTER = "KittycordShareUnregister",
     SHARE_FRIENDS_CHECK = "KittycordShareFriendsCheck",
 
+    GET_REQUEST_LOG = "KittycordGetRequestLog",
+    CLEAR_REQUEST_LOG = "KittycordClearRequestLog",
+
     GET_CUSTOM_BADGES = "KittycordGetCustomBadges",
     SET_CUSTOM_BADGE = "KittycordSetCustomBadge",
     CLEAR_CUSTOM_BADGE = "KittycordClearCustomBadge",
