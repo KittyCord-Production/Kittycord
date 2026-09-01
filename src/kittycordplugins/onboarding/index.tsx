@@ -20,6 +20,7 @@ import type { ComponentType } from "react";
 import { BRAND_WEBSITE } from "../../branding";
 import { type FriendAction, friendConsumed, markFriendConsumed, ONBOARDING_SEEN_KEY as SEEN_KEY, subscribeFriendAction, takeFriendAction } from "../_shared/friendLink";
 import { applyGalleryThemeById } from "../kittycordStudio/store";
+import { SourceList, useDetectedSources } from "../setupImport";
 import { applyShare, parseEnvelope, type ShareEnvelope } from "../shareSetup/utils";
 
 // The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
@@ -46,6 +47,23 @@ function parseFriendInput(raw: string): FriendAction | null {
 }
 
 const InvitesNative = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeof import("../kittyInvites/native")> | undefined;
+
+function ImportSection() {
+    const sources = useDetectedSources();
+
+    if (!sources?.length) return null;
+
+    return (
+        <div style={{ margin: "4px 0 12px" }}>
+            <Text variant="text-md/semibold">Already using another client mod?</Text>
+            <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+                Kittycord found a setup on this computer. Bring your plugins, themes and custom CSS along instead of
+                starting over.
+            </Text>
+            <SourceList compact />
+        </div>
+    );
+}
 
 interface Pack {
     id: string;
@@ -214,6 +232,8 @@ function OnboardingModal({ rootProps }: { rootProps: any; }) {
                         </Flex>
                     </div>
                 )}
+
+                <ImportSection />
 
                 <div style={{ margin: "4px 0 12px" }}>
                     <Text variant="text-md/semibold">Coming from a friend?</Text>
