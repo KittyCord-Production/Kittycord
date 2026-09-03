@@ -107,10 +107,10 @@ function createEquicordMenuItems(): MenuItemConstructorOptions[] {
                     label: cachedUpdateAvailable ? `Update ${BRAND_NAME}` : "Check for Updates",
                     click: () => sendToRenderer(IpcEvents.TRAY_CHECK_UPDATES)
                 },
-                {
+                ...(process.platform === "darwin" ? [] : [{
                     label: `Repair ${BRAND_NAME}`,
                     click: () => sendToRenderer(IpcEvents.TRAY_REPAIR)
-                },
+                }]),
                 { type: "separator" },
                 {
                     label: "Open Settings Folder",

@@ -205,7 +205,10 @@ function initTrayIpc() {
 
     VencordNative.tray.onRepair(async () => {
         try {
-            await VencordNative.tray.repairHost();
+            if (!await VencordNative.tray.repairHost()) {
+                showNotice("Nothing to repair. If features are missing, run the Kittycord installer and choose Repair.", "OK", popNotice);
+                return;
+            }
             await update();
             relaunch();
         } catch (err) {
