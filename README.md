@@ -60,7 +60,9 @@ features to Discord while keeping it lightweight and privacy-friendly.
 
 1. **Download** `Kittycord-Installer-macOS.zip` from the [latest release](https://github.com/KittyCord-Production/Kittycord/releases/latest) and unzip it.
 2. **Right-click** `Kittycord-Install-macOS.command` and choose **Open**, then confirm. (The
-   installer isn't signed, so a plain double-click is blocked the first time.)
+   installer isn't signed, so a plain double-click is blocked the first time. If macOS refuses the
+   right-click route as well, open **System Settings → Privacy & Security**, scroll to the blocked
+   file and click **Open Anyway**.)
 3. Follow the prompts. Discord gets patched — start it again to see Kittycord.
 
 Prefer the Terminal? One line does the same thing:
@@ -119,9 +121,10 @@ is built automatically from this repository by CI, so you can verify exactly wha
 <details>
 <summary><b>Discord updated and Kittycord is gone</b></summary>
 
-Big Discord host updates occasionally replace the patched files. Just run
-`Kittycord-Installer.exe` again and click **Reinstall / Repair** — your plugins, themes and
-settings are kept.
+Big Discord host updates occasionally replace the patched files. On Windows, run
+`Kittycord-Installer.exe` again and click **Reinstall / Repair**. On macOS, run
+`Kittycord-Install-macOS.command` again (or the one-line Terminal command above) and choose
+**Install or repair**. Your plugins, themes and settings are kept either way.
 </details>
 
 <details>

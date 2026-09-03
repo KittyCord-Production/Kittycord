@@ -68,6 +68,14 @@ run install
 check "reused vanilla backup" "$(cat "$RES/_app.asar")" "VANILLA_ASAR_CONTENT"
 grepok "$RES/app/index.js" "require(\"$DATA/desktop.asar\")" "our shim took over"
 
+echo "== discord updated underneath us =="
+printf 'NEW_VANILLA_ASAR' > "$RES/app.asar"
+rm -rf "$RES/app"
+run install
+check "backup follows the new discord" "$(cat "$RES/_app.asar")" "NEW_VANILLA_ASAR"
+checknofile "$RES/app.asar"
+grepok "$RES/app/index.js" "require(\"$DATA/desktop.asar\")" "shim is back after a host update"
+
 echo "== discovery path under sh =="
 DISC="$ROOT/disc"
 mkdir -p "$DISC/apps/Discord.app/Contents/Resources" "$DISC/none"

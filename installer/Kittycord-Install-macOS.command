@@ -118,8 +118,8 @@ patch_target() {
 
     quit_discord "$name"
 
-    if [ -f "$asar" ] && [ ! -e "$backup" ]; then
-        mv "$asar" "$backup"
+    if [ -f "$asar" ] && { [ ! -e "$backup" ] || [ ! -d "$appdir" ]; }; then
+        mv -f "$asar" "$backup"
     fi
     if [ ! -e "$backup" ]; then
         warn "Could not find app.asar in $res, skipping $name."

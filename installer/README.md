@@ -11,19 +11,39 @@
 
 ## macOS
 
-Discord must be the standard app from [discord.com](https://discord.com/download) in `/Applications`
-(or `~/Applications`), launched once. Because the script isn't signed, the first launch needs
-**right-click → Open** rather than a double-click; after that macOS remembers your choice. From the
-Terminal you can run it directly:
+Download `Kittycord-Installer-macOS.zip` from the latest release and unzip it — the zip keeps the
+executable bit that a plain browser download strips. Discord must be the standard app from
+[discord.com](https://discord.com/download) in `/Applications` (or `~/Applications`), launched once;
+Stable, PTB and Canary are all supported and can be patched in one run. Because the script isn't
+signed, the first launch needs **right-click → Open** rather than a double-click; after that macOS
+remembers your choice. If macOS refuses that too, open **System Settings → Privacy & Security**,
+scroll to the blocked file and click **Open Anyway**. From the Terminal you can run it directly:
 
 ```sh
 sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"
 ```
 
-If Discord lives somewhere the script can't write, it tells you to re-run with `sudo`. The build is
-cached under `~/Library/Application Support/Kittycord/` and verified against its SHA-256 checksum.
+If Discord lives somewhere the script can't write, it tells you to re-run with `sudo`. When the
+folder belongs to you and macOS still blocks the write, your terminal app needs **App Management**
+permission under System Settings → Privacy & Security. The build is cached under
+`~/Library/Application Support/Kittycord/` and verified against its SHA-256 checksum.
+
+A big Discord update replaces the patched files. Run the script again and choose **Install or
+repair** to bring Kittycord back; your plugins, themes and settings stay where they are.
 
 ## System requirements
+
+### macOS
+
+- **macOS with the standard Discord app** from [discord.com](https://discord.com/download) in
+  `/Applications` or `~/Applications`, launched at least once. Discord Stable, PTB and Canary all work.
+- **An internet connection** (the script downloads the build over HTTPS and verifies it against the
+  SHA-256 checksum published with each release).
+- Administrator is usually **not required**. If Discord belongs to another user, the script tells you
+  to re-run it with `sudo`; if macOS itself blocks the write, grant your terminal app **App
+  Management** permission instead.
+
+### Windows
 
 - **Windows 10 (version 1803 or newer) or Windows 11.** Everything the installer needs — .NET
   Framework, Windows PowerShell and `curl` — is already built into these, so there's **nothing

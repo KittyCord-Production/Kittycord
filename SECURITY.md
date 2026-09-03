@@ -57,6 +57,8 @@ each file:
 | File | Checksum file |
 |------|---------------|
 | `Kittycord-Installer.exe` | `Kittycord-Installer.exe.sha256` |
+| `Kittycord-Installer-macOS.zip` | `Kittycord-Installer-macOS.zip.sha256` |
+| `Kittycord-Install-macOS.command` | `Kittycord-Install-macOS.command.sha256` |
 | `desktop.asar` | `desktop.asar.sha256` |
 | `equibop.asar` | `equibop.asar.sha256` |
 
@@ -66,7 +68,13 @@ each file:
 Get-FileHash .\Kittycord-Installer.exe -Algorithm SHA256
 ```
 
-Compare the printed hash with the contents of `Kittycord-Installer.exe.sha256` from the
+**On macOS (Terminal):**
+
+```sh
+shasum -a 256 Kittycord-Installer-macOS.zip
+```
+
+Compare the printed hash with the contents of the matching `.sha256` file from the
 [latest release](https://github.com/KittyCord-Production/Kittycord/releases/latest). They should match
 (hashes are case-insensitive). If they don't, **do not run the file** — re-download it from the
 official release page, and if it still doesn't match, report it.
