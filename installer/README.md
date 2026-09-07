@@ -3,7 +3,6 @@
 | Script | Platform | For whom | What it does |
 |---|---|---|---|
 | `Kittycord-Installer-GUI.ps1` | Windows | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Graphical installer: downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
-| `Kittycord-Online-Install.ps1` | Windows | **End users (console)** | Same job as the GUI, as a plain console script. |
 | `Kittycord-Install.ps1` | Windows | **Developers** | Patches Discord to load your local `dist/desktop` build (run `pnpm build` first). |
 | `Kittycord-Install-macOS.command` | macOS | **End users** | Downloads the latest `desktop.asar` and patches Discord.app. Double-click (right-click → Open the first time) or run over `curl`. Has Install / Repair / Uninstall built in. |
 

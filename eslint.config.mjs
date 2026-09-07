@@ -39,17 +39,6 @@ export default defineConfig(
             "simple-import-sort": simpleImportSort,
             "unused-imports": unusedImports
         },
-        settings: {
-            "import/resolver": {
-                map: [
-                    ["@webpack", "./src/webpack"],
-                    ["@webpack/common", "./src/webpack/common"],
-                    ["@utils", "./src/utils"],
-                    ["@api", "./src/api"],
-                    ["@components", "./src/components"]
-                ]
-            }
-        },
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {

@@ -2,7 +2,6 @@ packages:
     - packages/*
 peerDependencyRules:
     ignoreMissing:
-        - eslint-plugin-import
         - eslint
 allowedDeprecatedVersions:
     source-map-resolve: "*"

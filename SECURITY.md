@@ -88,6 +88,7 @@ roadmap to remove this friction.
 
 ## Supported versions
 
-Kittycord ships a single rolling release tagged `latest`, and the built-in updater keeps you on the
-newest build. Always run the latest version — security fixes land there, and only the latest release
-is supported.
+Kittycord ships two rolling releases and the built-in updater keeps you on the newest build of the
+channel you picked. `latest` is the stable channel and the default; `beta` is a prerelease channel you
+can switch to under Settings > Updater to get new features first. Security fixes land on both, stable
+included, and only the newest build of each channel is supported.

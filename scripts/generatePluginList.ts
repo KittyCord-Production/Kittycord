@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { existsSync, readdirSync, writeFileSync } from "fs";
+import { readdirSync, writeFileSync } from "fs";
 import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, PluginData } from "./utils";
 
 (async () => {
@@ -37,15 +37,13 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
     } else if (vencordFlag) {
         dirs = ["src/plugins", "src/plugins/_core"];
     } else if (kittycordFlag) {
-        dirs = ["src/kittycordplugins/_core", "src/kittycordplugins"];
+        dirs = ["src/kittycordplugins"];
     } else if (moggcordFlag) {
-        dirs = ["src/moggcordplugins/_core", "src/moggcordplugins"];
+        dirs = ["src/moggcordplugins"];
     } else {
-        dirs = ["src/plugins", "src/plugins/_core", "src/equicordplugins/_core", "src/equicordplugins", "src/moggcordplugins/_core", "src/moggcordplugins", "src/kittycordplugins/_core", "src/kittycordplugins"];
+        dirs = ["src/plugins", "src/plugins/_core", "src/equicordplugins/_core", "src/equicordplugins", "src/moggcordplugins", "src/kittycordplugins"];
     }
 
-    // The moggcord/kittycord folders (and their _core subfolders) may not exist yet; skip missing dirs.
-    dirs = dirs.filter(dir => existsSync(dir));
 
     const outputPath = args.find(a => !a.startsWith("--")) ?? null;
 

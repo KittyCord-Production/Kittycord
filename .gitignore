@@ -39,5 +39,9 @@ ExtensionCache/
 # Claude Code local settings (personal, per-user - not committed)
 .claude/settings.local.json
 
+# Local tool output
+.playwright-mcp/
+.impeccable/
+
 # Standalone analytics backend (separate Cloudflare Worker infra, deployed by hand - not part of the public build)
 analytics-worker/
