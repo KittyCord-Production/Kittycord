@@ -10,12 +10,15 @@ import { FormSwitch } from "@components/FormSwitch";
 import { ShieldIcon } from "@components/Icons";
 import { openSettingsTabModal } from "@components/settings";
 import SettingsPlugin from "@plugins/_core/settings";
+import { Logger } from "@utils/Logger";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
 import { Button, React, Text } from "@webpack/common";
 
 import { RequestLog } from "./RequestLog";
 import style from "./style.css?managed";
+
+const logger = new Logger("PrivacySecurity");
 
 const REPO = "https://github.com/KittyCord-Production/Kittycord";
 const open = (url: string) => VencordNative.native.openExternal(url);
@@ -27,13 +30,13 @@ interface ConsentBridge {
 
 function ConsentToggle({ bridge, title, description }: { bridge: ConsentBridge; title: string; description: string; }) {
     const [consent, setConsent] = React.useState<boolean | null>(null);
-    React.useEffect(() => { bridge.getConsent().then(s => setConsent(s.consent)).catch(() => { }); }, []);
+    React.useEffect(() => { bridge.getConsent().then(s => setConsent(s.consent)).catch(err => logger.warn("Could not read the consent state", err)); }, []);
     return (
         <FormSwitch
             title={title}
             description={description}
             value={consent === true}
-            onChange={v => { setConsent(v); bridge.setConsent(v).catch(() => { }); }}
+            onChange={v => { setConsent(v); bridge.setConsent(v).catch(err => logger.warn("Could not save the consent state", err)); }}
             hideBorder
         />
     );

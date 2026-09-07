@@ -4,10 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Logger } from "@utils/Logger";
+
 import { getCursor } from "./cursor";
 import { burst, spawnHearts } from "./hearts";
 import { ACCESSORIES, ACCESSORY_URIS, AnimationName, ANIMATIONS, SHEET, SITTING, SPRITE_SIZE } from "./sprites";
-import { watchSuspend } from "./suspend";
+import { isSuspended, watchSuspend } from "./suspend";
+
+const logger = new Logger("KittyPet");
 
 export interface PetConfig {
     size: number;
@@ -131,7 +135,9 @@ export class PetController {
         this.timer = setInterval(() => {
             try {
                 this.onTick();
-            } catch { /* never break the client over the cat */ }
+            } catch (err) {
+                logger.error("Cat frame failed", err);
+            }
         }, TICK_MS);
     }
 
@@ -270,8 +276,7 @@ export class PetController {
     }
 
     private onTick() {
-        if (document.hidden) return;
-        if (document.documentElement.matches(".kc-perf-noanim, .kc-idle")) {
+        if (isSuspended()) {
             this.container.style.display = "none";
             return;
         }

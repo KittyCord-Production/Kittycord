@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Logger } from "@utils/Logger";
+
 import { COL } from "../_shared/canvasKit";
+import { isSuspended } from "./suspend";
+
+const logger = new Logger("KittyPet");
 
 interface Heart {
     x: number;
@@ -38,7 +43,9 @@ function sizeCanvas() {
 const onResize = () => {
     try {
         sizeCanvas();
-    } catch { /* never break the client over a heart */ }
+    } catch (err) {
+        logger.error("Heart frame failed", err);
+    }
 };
 
 export function startHearts() {
@@ -115,7 +122,7 @@ function tick(now: number) {
         const dt = Math.min(0.1, (now - last) / 1000);
         last = now;
 
-        if (document.documentElement.matches(".kc-perf-noanim, .kc-idle")) {
+        if (isSuspended()) {
             hearts.length = 0;
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             raf = null;

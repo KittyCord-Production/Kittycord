@@ -4,11 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Logger } from "@utils/Logger";
+
 import { getCursor } from "./cursor";
 import { buildGhostUri, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 import { burst, spawnHearts } from "./hearts";
 import { PetConfig, PetHooks } from "./pet";
-import { watchSuspend } from "./suspend";
+import { isSuspended, watchSuspend } from "./suspend";
+
+const logger = new Logger("KittyPet");
 
 export interface PetArt {
     build(opts: { expression: GhostExpression; accessory: string | null; }): string;
@@ -237,7 +241,9 @@ export class GhostController {
         this.raf = requestAnimationFrame(this.loop);
         try {
             this.frame();
-        } catch { /* never break the client over the ghost */ }
+        } catch (err) {
+            logger.error("Ghost frame failed", err);
+        }
     };
 
     private measure() {
@@ -266,8 +272,7 @@ export class GhostController {
         const dt = Math.min(0.1, (now - this.lastFrame) / 1000);
         this.lastFrame = now;
 
-        if (document.hidden) return;
-        if (document.documentElement.matches(".kc-perf-noanim, .kc-idle")) {
+        if (isSuspended()) {
             this.container.style.display = "none";
             return;
         }

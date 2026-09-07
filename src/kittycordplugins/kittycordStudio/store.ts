@@ -6,10 +6,13 @@
 
 import { get, set } from "@api/DataStore";
 import { Settings } from "@api/Settings";
+import { Logger } from "@utils/Logger";
 import type { PluginNative } from "@utils/types";
 import { UserStore } from "@webpack/common";
 
 import { generateCss, sanitizeParams, type StudioParams, themeFileName } from "./template";
+
+const logger = new Logger("KittycordStudio");
 
 const KEY = "Kittycord_StudioThemes";
 const TOKENS_KEY = "Kittycord_StudioTokens";
@@ -60,7 +63,9 @@ export async function saveTheme(params: StudioParams, previousFileName?: string)
 export async function removeTheme(fileName: string) {
     try {
         await VencordNative.themes.deleteTheme(fileName);
-    } catch { }
+    } catch (err) {
+        logger.warn(`Could not delete ${fileName} from disk`, err);
+    }
     Settings.enabledThemes = Settings.enabledThemes.filter(t => t !== fileName);
     const { [fileName]: _, ...rest } = themes;
     themes = rest;
@@ -101,7 +106,9 @@ export async function browseGallery(sort: GallerySort): Promise<GalleryTheme[]> 
                 featured: Boolean(t.featured),
                 params: sanitizeParams(t.params)
             });
-        } catch { }
+        } catch (err) {
+            logger.warn("Skipped a gallery entry that could not be read", err);
+        }
     }
     return out;
 }

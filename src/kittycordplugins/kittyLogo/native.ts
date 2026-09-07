@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Logger } from "@utils/Logger";
 import { app, BrowserWindow, type IpcMainInvokeEvent, nativeImage } from "electron";
 import { writeFileSync } from "fs";
 import { tmpdir } from "os";
@@ -20,8 +21,10 @@ let icoPath: string | null = null;
 let catImage: Electron.NativeImage | null = null;
 let originalIcon: Electron.NativeImage | null = null;
 
+const logger = new Logger("KittyLogo");
+
 function log(msg: string, err?: unknown) {
-    console.error("[KittyLogo] " + msg, err ?? "");
+    logger.error(msg, err ?? "");
 }
 
 function ensureAssets() {
@@ -100,21 +103,23 @@ function captureOriginal() {
     try {
         app.getFileIcon(process.execPath, { size: "large" })
             .then(img => { originalIcon = img; })
-            .catch(() => { });
-    } catch { }
+            .catch(err => log("Could not read the original window icon", err));
+    } catch (err) {
+        log("Could not read the original window icon", err);
+    }
 }
 
 app.on("browser-window-created", (_, win) => {
     win.once("ready-to-show", () => applyToWindow(win));
     win.on("show", () => applyToWindow(win));
-    win.on("focus", () => applyToWindow(win));
-    win.webContents.on("did-finish-load", () => applyToWindow(win));
 });
 
 try {
     if (app.isReady()) captureOriginal();
     else app.once("ready", captureOriginal);
-} catch { }
+} catch (err) {
+    log("Could not hook app startup", err);
+}
 
 export function enableAppIcon(_: IpcMainInvokeEvent) {
     captureOriginal();

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-const isSuspended = () =>
+export const isSuspended = () =>
     document.hidden || document.documentElement.matches(".kc-perf-noanim, .kc-idle");
 
 export function watchSuspend(onChange: (suspended: boolean) => void): () => void {

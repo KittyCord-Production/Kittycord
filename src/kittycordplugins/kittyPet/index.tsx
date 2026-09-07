@@ -19,11 +19,9 @@ import { GhostController } from "./ghost";
 import { GHOST_ACCESSORIES, GHOST_ACCESSORY_LEVELS, GHOST_ACCESSORY_THUMBS } from "./ghostArt";
 import { startHearts, stopHearts } from "./hearts";
 import { PetController } from "./pet";
-import { buildRaccoonUri } from "./raccoonArt";
 import { ACCESSORIES, ACCESSORY_URIS } from "./sprites";
 import { addXp, DAILY_MSG_XP_CAP, DAILY_PET_XP, getSave, grantPlayXp, levelFor, loadSave, MAX_LEVEL, nextLevelXp, PET_PROFILES, PetProfile, updateSave } from "./state";
 import style from "./style.css?managed";
-import { buildTeddyUri } from "./teddyArt";
 
 const CAT_ACCESSORY_LEVELS: Record<string, number> = { bow: 2, scarf: 3, hat: 4, crown: 5, flower: 6, glasses: 7, bell: 8, wizardHat: 9, star: 10, bowtie: 3, topHat: 5, headphones: 7 };
 
@@ -197,8 +195,6 @@ function buildController(): PetController | GhostController {
     const profile = currentProfile();
     if (profile === "cat") return new PetController({ getConfig, onPet });
     if (profile === "ghost") return new GhostController({ getConfig, onPet });
-    if (profile === "teddy") return new GhostController({ getConfig, onPet }, { build: buildTeddyUri, accessories: GHOST_ACCESSORIES });
-    if (profile === "raccoon") return new GhostController({ getConfig, onPet }, { build: buildRaccoonUri, accessories: GHOST_ACCESSORIES });
     return new GhostController({ getConfig, onPet }, animalArt(profile));
 }
 

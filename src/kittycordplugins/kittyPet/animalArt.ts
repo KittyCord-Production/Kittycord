@@ -7,7 +7,7 @@
 import type { PetArt } from "./ghost";
 import { eyesFor, GHOST_ACCESSORIES, GhostExpression } from "./ghostArt";
 
-export type AnimalSpecies = "dog" | "pig" | "cow" | "bunny" | "fox" | "penguin";
+export type AnimalSpecies = "dog" | "pig" | "cow" | "bunny" | "fox" | "penguin" | "teddy" | "raccoon";
 
 const torso = (fur: string, dark: string, light: string) =>
     `<ellipse cx="16" cy="27.5" rx="8" ry="4.5" fill="${fur}" stroke="${dark}" stroke-width="1.2"/><ellipse cx="16" cy="28.4" rx="4.2" ry="3" fill="${light}"/>`;
@@ -105,7 +105,46 @@ const PENGUIN = `<ellipse cx="12.2" cy="30.6" rx="3.4" ry="1.7" fill="${PENGUIN_
     + `<ellipse cx="16" cy="16.2" rx="7.8" ry="7.2" fill="${PENGUIN_BELLY}"/>`
     + `<path d="M13 18.4 L19 18.4 L16 22 Z" fill="${PENGUIN_BEAK}" stroke="${PENGUIN_BEAK_DARK}" stroke-width="0.6" stroke-linejoin="round"/>`;
 
-const BODIES: Record<AnimalSpecies, string> = { dog: DOG, pig: PIG, cow: COW, bunny: BUNNY, fox: FOX, penguin: PENGUIN };
+const TEDDY_FUR = "#c98a5a";
+const TEDDY_FUR_DARK = "#a86f44";
+const TEDDY_CREAM = "#f3dcc2";
+const TEDDY_NOSE = "#5a3a2a";
+
+const TEDDY_EARS = `<circle cx="8.5" cy="7.5" r="3.6" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1"/><circle cx="8.5" cy="7.9" r="1.7" fill="${TEDDY_CREAM}"/><circle cx="23.5" cy="7.5" r="3.6" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1"/><circle cx="23.5" cy="7.9" r="1.7" fill="${TEDDY_CREAM}"/>`;
+
+const TEDDY_BODY = `<ellipse cx="16" cy="27.5" rx="8" ry="4.5" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1.2"/><ellipse cx="16" cy="28.4" rx="4.2" ry="3" fill="${TEDDY_CREAM}"/><ellipse cx="7.6" cy="24.5" rx="2.6" ry="3.4" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1"/><ellipse cx="24.4" cy="24.5" rx="2.6" ry="3.4" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1"/>`;
+
+const TEDDY_HEAD = `<circle cx="16" cy="14" r="10.5" fill="${TEDDY_FUR}" stroke="${TEDDY_FUR_DARK}" stroke-width="1.2"/>`;
+
+const TEDDY_MUZZLE = `<ellipse cx="16" cy="18.6" rx="5" ry="3.8" fill="${TEDDY_CREAM}"/><ellipse cx="16" cy="16.9" rx="1.7" ry="1.2" fill="${TEDDY_NOSE}"/><path d="M16 18 Q16 19.5 14.5 19.7" fill="none" stroke="${TEDDY_NOSE}" stroke-width="0.7" stroke-linecap="round"/><path d="M16 18 Q16 19.5 17.5 19.7" fill="none" stroke="${TEDDY_NOSE}" stroke-width="0.7" stroke-linecap="round"/>`;
+
+const TEDDY_CHEEKS = "<circle cx=\"9\" cy=\"16.6\" r=\"1.5\" fill=\"#ff8ac4\" opacity=\"0.55\"/><circle cx=\"23\" cy=\"16.6\" r=\"1.5\" fill=\"#ff8ac4\" opacity=\"0.55\"/>";
+
+const TEDDY = TEDDY_EARS + TEDDY_BODY + TEDDY_HEAD + TEDDY_MUZZLE + TEDDY_CHEEKS;
+
+const RACCOON_FUR = "#9ba1aa";
+const RACCOON_FUR_DARK = "#6f757e";
+const RACCOON_MASK = "#38323d";
+const RACCOON_LIGHT = "#eef0f3";
+const RACCOON_NOSE = "#2e2730";
+
+const RACCOON_TAIL = `<g transform="rotate(26 25 27)"><rect x="22.4" y="20.5" width="6.6" height="12.5" rx="3.3" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1"/><rect x="22.4" y="23.5" width="6.6" height="2.5" fill="${RACCOON_MASK}"/><rect x="22.4" y="27.5" width="6.6" height="2.5" fill="${RACCOON_MASK}"/><rect x="22.4" y="31.5" width="6.6" height="1.5" fill="${RACCOON_MASK}"/></g>`;
+
+const RACCOON_EARS = `<circle cx="8.5" cy="7.2" r="3.5" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1"/><circle cx="8.5" cy="7.5" r="1.7" fill="${RACCOON_LIGHT}"/><circle cx="23.5" cy="7.2" r="3.5" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1"/><circle cx="23.5" cy="7.5" r="1.7" fill="${RACCOON_LIGHT}"/>`;
+
+const RACCOON_BODY = `<ellipse cx="16" cy="27.5" rx="8" ry="4.5" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1.2"/><ellipse cx="16" cy="28.4" rx="4.2" ry="3" fill="${RACCOON_LIGHT}"/><ellipse cx="7.6" cy="24.5" rx="2.6" ry="3.4" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1"/><ellipse cx="24.4" cy="24.5" rx="2.6" ry="3.4" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1"/>`;
+
+const RACCOON_HEAD = `<circle cx="16" cy="14" r="10.5" fill="${RACCOON_FUR}" stroke="${RACCOON_FUR_DARK}" stroke-width="1.2"/>`;
+
+const MASK_BAND = `<ellipse cx="12" cy="14.6" rx="4" ry="3.6" fill="${RACCOON_MASK}"/><ellipse cx="20" cy="14.6" rx="4" ry="3.6" fill="${RACCOON_MASK}"/><rect x="13.4" y="13" width="5.2" height="2.8" fill="${RACCOON_MASK}"/><path d="M6 12.5 Q5 10 7 9.2" fill="none" stroke="${RACCOON_MASK}" stroke-width="1.4" stroke-linecap="round"/><path d="M26 12.5 Q27 10 25 9.2" fill="none" stroke="${RACCOON_MASK}" stroke-width="1.4" stroke-linecap="round"/>`;
+
+const WHITES = "<ellipse cx=\"12.5\" cy=\"15\" rx=\"2.5\" ry=\"3\" fill=\"#ffffff\"/><ellipse cx=\"19.5\" cy=\"15\" rx=\"2.5\" ry=\"3\" fill=\"#ffffff\"/>";
+
+const SNOUT = `<ellipse cx="16" cy="19.4" rx="4.4" ry="3.4" fill="${RACCOON_LIGHT}"/><ellipse cx="16" cy="17.8" rx="1.6" ry="1.1" fill="${RACCOON_NOSE}"/><path d="M16 18.8 Q16 20.1 14.7 20.3" fill="none" stroke="${RACCOON_NOSE}" stroke-width="0.7" stroke-linecap="round"/><path d="M16 18.8 Q16 20.1 17.3 20.3" fill="none" stroke="${RACCOON_NOSE}" stroke-width="0.7" stroke-linecap="round"/>`;
+
+const RACCOON = RACCOON_TAIL + RACCOON_EARS + RACCOON_BODY + RACCOON_HEAD + MASK_BAND + WHITES + SNOUT;
+
+const BODIES: Record<AnimalSpecies, string> = { dog: DOG, pig: PIG, cow: COW, bunny: BUNNY, fox: FOX, penguin: PENGUIN, teddy: TEDDY, raccoon: RACCOON };
 
 const uriCache = new Map<string, string>();
 
