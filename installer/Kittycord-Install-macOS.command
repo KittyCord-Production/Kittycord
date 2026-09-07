@@ -13,7 +13,7 @@
 set -euo pipefail
 
 REPO="KittyCord-Production/Kittycord"
-ASAR_URL="https://github.com/$REPO/releases/latest/download/desktop.asar"
+ASAR_URL="${KC_ASAR_URL:-https://github.com/$REPO/releases/latest/download/desktop.asar}"
 INSTALLER_URL="https://github.com/$REPO/releases/latest/download/Kittycord-Install-macOS.command"
 DATA_DIR="${KC_DATA_DIR:-$HOME/Library/Application Support/Kittycord}"
 ASAR_PATH="$DATA_DIR/desktop.asar"
@@ -62,8 +62,12 @@ no_write_help() {
 APP_NAMES=("Discord" "Discord PTB" "Discord Canary")
 
 discover_targets() {
-    local base name res
-    for base in "/Applications" "$HOME/Applications"; do
+    local base name res bases
+    bases="${KC_APP_BASES:-/Applications:$HOME/Applications}"
+    IFS=':'
+    set -- $bases
+    unset IFS
+    for base in "$@"; do
         for name in "${APP_NAMES[@]}"; do
             res="$base/$name.app/Contents/Resources"
             [ -d "$res" ] && printf '%s\t%s\n' "$name" "$res"
@@ -83,31 +87,35 @@ quit_discord() {
 
 download_asar() {
     mkdir -p "$DATA_DIR"
+    local tmp="$ASAR_PATH.download"
     if [ -n "${KC_ASAR_SOURCE:-}" ]; then
         info "Using local build: $KC_ASAR_SOURCE"
-        cp "$KC_ASAR_SOURCE" "$ASAR_PATH"
-        return 0
-    fi
-    info "Downloading the latest Kittycord build..."
-    if ! curl -fL "$ASAR_URL" -o "$ASAR_PATH"; then
-        fail "Could not download the build from $ASAR_URL"
-        fail "Make sure a release with a desktop.asar asset exists, then try again."
-        exit 1
-    fi
-    local expected actual
-    expected="$(curl -fsSL "$ASAR_URL.sha256" 2>/dev/null | tr -d '[:space:]' | tr 'A-F' 'a-f' || true)"
-    if printf '%s' "$expected" | grep -Eq '^[0-9a-f]{64}$'; then
-        actual="$(shasum -a 256 "$ASAR_PATH" | awk '{print $1}')"
-        if [ "$actual" != "$expected" ]; then
-            rm -f "$ASAR_PATH"
-            fail "Checksum mismatch. The download may be corrupted, or a new release is publishing right now."
-            fail "Please try again in a minute."
+        cp "$KC_ASAR_SOURCE" "$tmp"
+    else
+        info "Downloading the latest Kittycord build..."
+        if ! curl -fL "$ASAR_URL" -o "$tmp"; then
+            rm -f "$tmp"
+            fail "Could not download the build from $ASAR_URL"
+            fail "Make sure a release with a desktop.asar asset exists, then try again."
             exit 1
         fi
-        ok "Checksum verified (SHA-256 OK)."
-    else
-        warn "No checksum published for this release, skipping verification."
+        local expected actual
+        expected="$(curl -fsSL "$ASAR_URL.sha256" 2>/dev/null | tr -d '[:space:]' | tr 'A-F' 'a-f' || true)"
+        if printf '%s' "$expected" | grep -Eq '^[0-9a-f]{64}$'; then
+            actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"
+            if [ "$actual" != "$expected" ]; then
+                rm -f "$tmp"
+                fail "Checksum mismatch. The download may be corrupted, or a new release is publishing right now."
+                fail "Please try again in a minute. Your current build was left untouched."
+                exit 1
+            fi
+            ok "Checksum verified (SHA-256 OK)."
+        else
+            warn "No checksum published for this release, skipping verification."
+        fi
     fi
+    mv -f "$tmp" "$ASAR_PATH"
+    return 0
 }
 
 patch_target() {
@@ -129,19 +137,13 @@ patch_target() {
     rm -rf "$appdir"
     mkdir -p "$appdir"
 
-    cat > "$appdir/package.json" <<'JSON'
-{
-    "name": "discord",
-    "main": "index.js",
-    "private": true
-}
-JSON
+    printf '%s' '{"name":"discord","main":"index.js","private":true}' > "$appdir/package.json"
 
     cat > "$appdir/index.js" <<JS
 try {
     require("$ASAR_PATH");
 } catch (err) {
-    console.error("[Kittycord] Failed to load, starting vanilla Discord:", err);
+    console.error("[Kittycord] Failed to load patcher, starting vanilla Discord:", err);
     require("../_app.asar");
 }
 JS

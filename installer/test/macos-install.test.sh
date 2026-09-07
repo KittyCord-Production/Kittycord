@@ -39,7 +39,7 @@ check "backup holds vanilla" "$(cat "$RES/_app.asar")" "VANILLA_ASAR_CONTENT"
 check "asar cached" "$(cat "$DATA/desktop.asar")" "KITTYCORD_BUILD"
 grepok "$RES/app/index.js" "require(\"$DATA/desktop.asar\")" "index requires cached asar"
 grepok "$RES/app/index.js" 'require("../_app.asar")' "index has vanilla fallback"
-grepok "$RES/app/package.json" '"main": "index.js"' "package.json main"
+check "package.json is the shared stub" "$(cat "$RES/app/package.json")" '{"name":"discord","main":"index.js","private":true}'
 
 echo "== repair is idempotent =="
 run install
@@ -76,17 +76,29 @@ check "backup follows the new discord" "$(cat "$RES/_app.asar")" "NEW_VANILLA_AS
 checknofile "$RES/app.asar"
 grepok "$RES/app/index.js" "require(\"$DATA/desktop.asar\")" "shim is back after a host update"
 
+echo "== a bad checksum leaves the working build alone =="
+SERVE="$ROOT/serve"
+mkdir -p "$SERVE"
+printf 'TAMPERED_BUILD' > "$SERVE/desktop.asar"
+printf '%s
+' "0000000000000000000000000000000000000000000000000000000000000000" > "$SERVE/desktop.asar.sha256"
+printf 'PREVIOUS_BUILD' > "$DATA/desktop.asar"
+out="$(KC_ACTION=install KC_RESOURCES_DIR="$RES" KC_ASAR_URL="file://$SERVE/desktop.asar" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= bash "$SCRIPT" 2>&1)" && rc=0 || rc=$?
+check "bad checksum exits 1" "$rc" "1"
+check "cached build survives a bad download" "$(cat "$DATA/desktop.asar")" "PREVIOUS_BUILD"
+checknofile "$DATA/desktop.asar.download"
+printf 'KITTYCORD_BUILD' > "$DATA/desktop.asar"
+
 echo "== discovery path under sh =="
 DISC="$ROOT/disc"
 mkdir -p "$DISC/apps/Discord.app/Contents/Resources" "$DISC/none"
 printf 'VANILLA_ASAR_CONTENT' > "$DISC/apps/Discord.app/Contents/Resources/app.asar"
-sed "s#\"/Applications\" \"\$HOME/Applications\"#\"$DISC/apps\" \"$DISC/none\"#" "$SCRIPT" > "$DISC/inst.sh"
-out="$(KC_ACTION=install KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$DISC/inst.sh" 2>&1)"
+out="$(KC_ACTION=install KC_APP_BASES="$DISC/apps:$DISC/none" KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$SCRIPT" 2>&1)"
 check "sh discovery install exits 0" "$?" "0"
 grepok "$DISC/apps/Discord.app/Contents/Resources/app/index.js" "require(\"$DATA/desktop.asar\")" "sh discovery patched the fixture"
 
 rm -rf "$DISC/apps"; mkdir -p "$DISC/apps"
-out="$(KC_ACTION=install KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$DISC/inst.sh" 2>&1)" && rc=0 || rc=$?
+out="$(KC_ACTION=install KC_APP_BASES="$DISC/apps:$DISC/none" KC_ASAR_SOURCE="$SRC" KC_DATA_DIR="$DATA" KC_SKIP_QUIT=1 KC_CREATOR_CODE= sh "$SCRIPT" 2>&1)" && rc=0 || rc=$?
 check "sh discovery no-Discord exits 1" "$rc" "1"
 case "$out" in *"No Discord installation"*) echo "PASS  no-Discord message shown"; pass=$((pass+1));; *) echo "FAIL  no-Discord message shown"; fail=$((fail+1));; esac
 

@@ -148,7 +148,8 @@ function S([double]$v) { return [int][Math]::Round($v * $script:ui) }
 # ----- config -----
 $Repo        = "KittyCord-Production/Kittycord"
 $AsarUrl     = "https://github.com/$Repo/releases/latest/download/desktop.asar"
-$InstallDir  = Join-Path $env:LOCALAPPDATA "Kittycord"
+$DiscordRoot = if ($env:KC_DISCORD_ROOT) { $env:KC_DISCORD_ROOT } else { $env:LOCALAPPDATA }
+$InstallDir  = if ($env:KC_INSTALL_DIR) { $env:KC_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "Kittycord" }
 $AsarPath    = Join-Path $InstallDir "desktop.asar"
 $AsarForward = ($AsarPath -replace '\\', '/')
 
@@ -255,6 +256,7 @@ $script:Strings = @{
         adminWarn        = "Tipp: Du musst dieses Programm nicht als Administrator ausführen. Empfohlen ist dein normaler Benutzer, da erhöhte Rechte die Dateiberechtigungen von Discord beeinflussen können."
         adminAsk         = "Trotzdem fortfahren?"
         toS              = "Client-Mods verstoßen gegen Discords Nutzungsbedingungen - Nutzung auf eigene Gefahr"
+        creatorCode      = "Creator-Code (optional) - hast du einen Empfehlungscode, gib ihn hier ein"
         stylePink        = "Stil: Pink"
         styleBlue        = "Stil: Blau"
     }
@@ -305,6 +307,7 @@ $script:Strings = @{
         adminWarn        = "Consejo: no necesitas ejecutar esto como administrador. Se recomienda usar tu usuario normal, ya que la elevación puede afectar a los permisos de archivos de Discord."
         adminAsk         = "¿Continuar de todos modos?"
         toS              = "los mods de cliente van contra los ToS de Discord - úsalo bajo tu propia responsabilidad"
+        creatorCode      = "Código de creador (opcional): si tienes un código de referido, escríbelo aquí"
         stylePink        = "Estilo: Rosa"
         styleBlue        = "Estilo: Azul"
     }
@@ -355,6 +358,7 @@ $script:Strings = @{
         adminWarn        = "Astuce : inutile de lancer ce programme en tant qu'administrateur. Utilisez votre compte normal, l'élévation peut affecter les permissions des fichiers de Discord."
         adminAsk         = "Continuer quand même ?"
         toS              = "les mods clients sont contraires aux CGU de Discord - à utiliser à vos risques"
+        creatorCode      = "Code créateur (facultatif) - si vous avez un code de parrainage, saisissez-le ici"
         stylePink        = "Style : Rose"
         styleBlue        = "Style : Bleu"
     }
@@ -405,6 +409,7 @@ $script:Strings = @{
         adminWarn        = "Совет: запускать от имени администратора не нужно. Рекомендуется обычный пользователь - повышение прав может повлиять на права файлов Discord."
         adminAsk         = "Всё равно продолжить?"
         toS              = "клиентские моды нарушают условия использования Discord - используйте на свой риск"
+        creatorCode      = "Код автора (необязательно) - если у вас есть реферальный код, введите его здесь"
         stylePink        = "Стиль: Розовый"
         styleBlue        = "Стиль: Синий"
     }
@@ -671,16 +676,18 @@ function Get-DiscordInstalls {
     )
     $found = @()
     foreach ($b in $branches) {
-        $base = Join-Path $env:LOCALAPPDATA $b.Dir
+        $base = Join-Path $DiscordRoot $b.Dir
         if (-not (Test-Path $base)) { continue }
-        $res = $null
-        $appDirs = Get-ChildItem -Path $base -Directory -Filter "app-*" -ErrorAction SilentlyContinue |
-            Sort-Object Name -Descending
+        $appDirs = @(Get-ChildItem -Path $base -Directory -Filter "app-*" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '^app-\d+(\.\d+){1,3}$' } |
+            Sort-Object { [version]$_.Name.Substring(4) } -Descending)
+        $all = @()
         foreach ($appDir in $appDirs) {
             $candidate = Join-Path $appDir.FullName "resources"
-            if (Test-Path $candidate) { $res = $candidate; break }
+            if (Test-Path $candidate) { $all += $candidate }
         }
-        if (-not $res) { continue }
+        if ($all.Count -eq 0) { continue }
+        $res = $all[0]
 
         $stateKey = "stNot"
         $indexJs = Join-Path $res "app\index.js"
@@ -689,7 +696,7 @@ function Get-DiscordInstalls {
             if ($content -match "Kittycord") { $stateKey = "stInstalled" }
             else { $stateKey = "stOther" }
         }
-        $found += [pscustomobject]@{ Name = $b.Name; Proc = $b.Proc; Resources = $res; StateKey = $stateKey }
+        $found += [pscustomobject]@{ Name = $b.Name; Proc = $b.Proc; Resources = $res; AllResources = $all; StateKey = $stateKey }
     }
     return $found
 }
@@ -1354,8 +1361,35 @@ $script:doneMsg = ""
 $workerBody = {
     function Log($m) { $q.Enqueue([string]$m) }
 
+    function Install-Shim([string]$res, [string]$idx) {
+        $appAsar = Join-Path $res "app.asar"
+        $backup = Join-Path $res "_app.asar"
+        $appDir = Join-Path $res "app"
+        if ((Test-Path $appAsar) -and -not (Test-Path $backup)) { Move-Item -Path $appAsar -Destination $backup -Force }
+        if (-not (Test-Path $backup)) { throw "no original app.asar/_app.asar found" }
+        if (Test-Path $appDir) { Remove-Item -Path $appDir -Recurse -Force }
+        New-Item -ItemType Directory -Path $appDir | Out-Null
+        $enc = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText((Join-Path $appDir "package.json"), '{"name":"discord","main":"index.js","private":true}', $enc)
+        [System.IO.File]::WriteAllText((Join-Path $appDir "index.js"), $idx, $enc)
+    }
+
+    function Remove-Shim([string]$res) {
+        $appAsar = Join-Path $res "app.asar"
+        $backup = Join-Path $res "_app.asar"
+        $appDir = Join-Path $res "app"
+        if (Test-Path $appDir) { Remove-Item -Path $appDir -Recurse -Force }
+        if ((Test-Path $backup) -and -not (Test-Path $appAsar)) { Move-Item -Path $backup -Destination $appAsar -Force }
+    }
+
+    function Stop-Client([string]$proc) {
+        Get-Process -Name $proc -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Milliseconds 1200
+    }
+
     # SHA-256 published next to the asar by CI. $null when a release predates the checksum files.
     function Get-ExpectedHash {
+        if ($env:KC_ASAR_SOURCE) { return $null }
         try {
             $r = Invoke-WebRequest -Uri ($AsarUrl + ".sha256") -UseBasicParsing -TimeoutSec 15
             $c = $r.Content
@@ -1366,20 +1400,19 @@ $workerBody = {
         return $null
     }
 
-    function Test-AsarFile([string]$expected) {
-        if (-not (Test-Path $AsarPath)) {
+    function Test-AsarFile([string]$path, [string]$expected) {
+        if (-not (Test-Path $path)) {
             $script:dlErr = $L.errNoFile
             return $false
         }
-        if ((Get-Item $AsarPath).Length -le 500000) {
+        if ((Get-Item $path).Length -le 500000) {
             $script:dlErr = $L.errTooSmall
             return $false
         }
         if ($expected) {
-            $actual = (Get-FileHash -Path $AsarPath -Algorithm SHA256).Hash.ToLower()
+            $actual = (Get-FileHash -Path $path -Algorithm SHA256).Hash.ToLower()
             if ($actual -ne $expected) {
                 $script:dlErr = $L.errChecksum
-                Remove-Item $AsarPath -Force -ErrorAction SilentlyContinue
                 return $false
             }
             Log $L.logChecksumOk
@@ -1395,13 +1428,18 @@ $workerBody = {
             try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
             New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
             $expected = Get-ExpectedHash
+            $tmpPath = "$AsarPath.download"
             $ok = $false
             $script:dlErr = "?"
 
-            # Streamed download so the progress bar shows real progress (never looks frozen on
-            # slow connections). Each attempt is verified before it counts as a success.
+            if ($env:KC_ASAR_SOURCE) {
+                Copy-Item -Path $env:KC_ASAR_SOURCE -Destination $tmpPath -Force
+                $ok = Test-AsarFile $tmpPath $expected
+                if (-not $ok) { Remove-Item $tmpPath -Force -ErrorAction SilentlyContinue }
+            }
+
             for ($t = 0; $t -lt 2 -and -not $ok; $t++) {
-                if (Test-Path $AsarPath) { Remove-Item $AsarPath -Force -ErrorAction SilentlyContinue }
+                if (Test-Path $tmpPath) { Remove-Item $tmpPath -Force -ErrorAction SilentlyContinue }
                 $inStream = $null; $outStream = $null; $resp = $null
                 try {
                     $req = [System.Net.HttpWebRequest]::Create($AsarUrl)
@@ -1411,7 +1449,7 @@ $workerBody = {
                     $resp = $req.GetResponse()
                     $total = $resp.ContentLength
                     $inStream = $resp.GetResponseStream()
-                    $outStream = [System.IO.File]::Create($AsarPath)
+                    $outStream = [System.IO.File]::Create($tmpPath)
                     $buffer = New-Object byte[] 81920
                     $sum = 0; $lastPct = -1; $lastMb = -1.0
                     while (($n = $inStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
@@ -1431,13 +1469,14 @@ $workerBody = {
                     }
                     $outStream.Close(); $inStream.Close(); $resp.Close()
                     Log ($L.logDownloaded -f ([Math]::Round($sum / 1MB, 1)))
-                    $ok = Test-AsarFile $expected
+                    $ok = Test-AsarFile $tmpPath $expected
+                    if (-not $ok -and (Test-Path $tmpPath)) { Remove-Item $tmpPath -Force -ErrorAction SilentlyContinue }
                 } catch {
                     $script:dlErr = $_.Exception.Message
                     try { if ($outStream) { $outStream.Close() } } catch { }
                     try { if ($inStream) { $inStream.Close() } } catch { }
                     try { if ($resp) { $resp.Close() } } catch { }
-                    if (Test-Path $AsarPath) { Remove-Item $AsarPath -Force -ErrorAction SilentlyContinue }
+                    if (Test-Path $tmpPath) { Remove-Item $tmpPath -Force -ErrorAction SilentlyContinue }
                     Start-Sleep -Seconds 2
                 }
             }
@@ -1448,8 +1487,9 @@ $workerBody = {
                     Log $L.logRetryCurl
                     $st.Pct = 0
                     $st.Note = $L.noteRetry
-                    & $curl -L --fail --silent --show-error -A Kittycord-Installer -o $AsarPath $AsarUrl 2>$null
-                    $ok = Test-AsarFile $expected
+                    & $curl -L --fail --silent --show-error -A Kittycord-Installer -o $tmpPath $AsarUrl 2>$null
+                    $ok = Test-AsarFile $tmpPath $expected
+                    if (-not $ok -and (Test-Path $tmpPath)) { Remove-Item $tmpPath -Force -ErrorAction SilentlyContinue }
                 }
             }
             if (-not $ok) {
@@ -1461,26 +1501,17 @@ $workerBody = {
             $st.Pct = 100
             $st.Note = $L.notePatching
             Log $L.logPatching
-            $idx = 'try {' + "`r`n" +
-                '    require("' + $AsarForward + '");' + "`r`n" +
-                '} catch (err) {' + "`r`n" +
-                '    console.error("[Kittycord] Failed to load, starting vanilla Discord:", err);' + "`r`n" +
-                '    require("../_app.asar");' + "`r`n" +
-                '}'
+            if (Test-Path $tmpPath) { Move-Item -Path $tmpPath -Destination $AsarPath -Force }
+            $idx = 'try {' + "`n" +
+                '    require("' + $AsarForward + '");' + "`n" +
+                '} catch (err) {' + "`n" +
+                '    console.error("[Kittycord] Failed to load patcher, starting vanilla Discord:", err);' + "`n" +
+                '    require("../_app.asar");' + "`n" +
+                '}' + "`n"
             foreach ($i in $sel) {
                 try {
-                    Get-Process -Name $i.Proc -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-                    Start-Sleep -Milliseconds 1200
-                    $res = $i.Resources
-                    $appAsar = Join-Path $res "app.asar"
-                    $backup = Join-Path $res "_app.asar"
-                    $appDir = Join-Path $res "app"
-                    if ((Test-Path $appAsar) -and -not (Test-Path $backup)) { Move-Item -Path $appAsar -Destination $backup -Force }
-                    if (-not (Test-Path $backup)) { throw "no original app.asar/_app.asar found" }
-                    if (Test-Path $appDir) { Remove-Item -Path $appDir -Recurse -Force }
-                    New-Item -ItemType Directory -Path $appDir | Out-Null
-                    Set-Content -Path (Join-Path $appDir "package.json") -Encoding utf8 -Value '{ "name": "discord", "main": "index.js", "private": true }'
-                    Set-Content -Path (Join-Path $appDir "index.js") -Encoding utf8 -Value $idx
+                    Stop-Client $i.Proc
+                    Install-Shim $i.Resources $idx
                     Log ($L.logPatched -f $i.Name)
                 } catch { Log ($L.logErrPatch -f $i.Name, $_.Exception.Message); $st.Ok = $false }
             }
@@ -1500,14 +1531,8 @@ $workerBody = {
             $st.Note = $L.noteRemoving
             foreach ($i in $sel) {
                 try {
-                    Get-Process -Name $i.Proc -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-                    Start-Sleep -Milliseconds 1200
-                    $res = $i.Resources
-                    $appAsar = Join-Path $res "app.asar"
-                    $backup = Join-Path $res "_app.asar"
-                    $appDir = Join-Path $res "app"
-                    if (Test-Path $appDir) { Remove-Item -Path $appDir -Recurse -Force }
-                    if ((Test-Path $backup) -and -not (Test-Path $appAsar)) { Move-Item -Path $backup -Destination $appAsar -Force }
+                    Stop-Client $i.Proc
+                    foreach ($res in @($i.AllResources)) { Remove-Shim $res }
                     Log ($L.logReverted -f $i.Name)
                 } catch { Log ($L.logErrRevert -f $i.Name, $_.Exception.Message); $st.Ok = $false }
             }
@@ -1587,10 +1612,7 @@ function Save-CreatorCode {
         if ($code -match '^[a-z0-9_-]{3,20}$') {
             $dir = Join-Path $env:APPDATA "Kittycord"
             if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-            $ts = [int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
-            $json = '{"code":"' + $code + '","ts":' + $ts + '}'
-            # Write BOM-less UTF-8: PowerShell 5.1's "Set-Content -Encoding UTF8" prepends a BOM, which
-            # makes the client's JSON.parse of referral.json fail, so the code would never be counted.
+            $json = '{"code":"' + $code + '"}'
             [System.IO.File]::WriteAllText((Join-Path $dir "referral.json"), $json, (New-Object System.Text.UTF8Encoding($false)))
         }
     } catch { }
@@ -1600,39 +1622,29 @@ function Save-StyleSeed {
     try {
         $dir = Join-Path $env:APPDATA "Kittycord"
         if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-        $ts = [int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
-        $json = '{"accent":"' + $script:StyleId + '","ts":' + $ts + '}'
+        $json = '{"accent":"' + $script:StyleId + '"}'
         [System.IO.File]::WriteAllText((Join-Path $dir "style.json"), $json, (New-Object System.Text.UTF8Encoding($false)))
     } catch { }
 }
 
-$btnInstall.Add_Click({
-    if (-not $btnInstall.Tag.On) { return }
+function Start-Action($btn, $mode) {
+    if (-not $btn.Tag.On) { return }
     $sel = Get-Selected
     if ($sel.Count -eq 0) { Write-Status (T "selectFirst"); return }
-    Save-CreatorCode
-    Save-StyleSeed
+    if ($mode -eq "install") {
+        Save-CreatorCode
+        Save-StyleSeed
+        $script:doneMsg = (T "msgDoneInstall")
+    } else {
+        $script:doneMsg = (T "msgDoneUninstall")
+    }
     Set-Busy $true
-    $script:doneMsg = (T "msgDoneInstall")
-    Start-Work "install" $sel
-})
-$btnRepair.Add_Click({
-    if (-not $btnRepair.Tag.On) { return }
-    $sel = Get-Selected
-    if ($sel.Count -eq 0) { Write-Status (T "selectFirst"); return }
-    Save-StyleSeed
-    Set-Busy $true
-    $script:doneMsg = (T "msgDoneInstall")
-    Start-Work "install" $sel
-})
-$btnUninstall.Add_Click({
-    if (-not $btnUninstall.Tag.On) { return }
-    $sel = Get-Selected
-    if ($sel.Count -eq 0) { Write-Status (T "selectFirst"); return }
-    Set-Busy $true
-    $script:doneMsg = (T "msgDoneUninstall")
-    Start-Work "uninstall" $sel
-})
+    Start-Work $mode $sel
+}
+
+$btnInstall.Add_Click({ Start-Action $btnInstall "install" })
+$btnRepair.Add_Click({ Start-Action $btnRepair "install" })
+$btnUninstall.Add_Click({ Start-Action $btnUninstall "uninstall" })
 
 $form.Add_Shown({
     Update-Language

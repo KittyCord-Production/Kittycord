@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 <#
-    Kittycord — Windows uninstaller
+    Kittycord - Windows uninstaller
 
     Reverts the Discord patch: removes the injected `app` folder and restores the
     original `app.asar` from the `_app.asar` backup.
@@ -49,7 +49,7 @@ foreach ($b in $Branches) {
 }
 
 if (-not $revertedAny) {
-    Write-Host "Nothing to uninstall — no patched Discord installation found." -ForegroundColor Yellow
+    Write-Host "Nothing to uninstall - no patched Discord installation found." -ForegroundColor Yellow
 } else {
     Write-Host ""
     Write-Host "Kittycord removed. Start Discord again for a clean client." -ForegroundColor Magenta

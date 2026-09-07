@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 <#
-    Kittycord — Windows installer
+    Kittycord - Windows installer
 
     Patches your local Discord desktop client to load Kittycord from this repo's
     `dist/desktop` build. Run `pnpm build` first so the build output exists.
@@ -35,7 +35,8 @@ $Branches = @(
 function Get-LatestResources([string]$baseDir) {
     if (-not (Test-Path $baseDir)) { return $null }
     $appDirs = Get-ChildItem -Path $baseDir -Directory -Filter "app-*" -ErrorAction SilentlyContinue |
-        Sort-Object Name -Descending
+        Where-Object { $_.Name -match '^app-\d+(\.\d+){1,3}$' } |
+        Sort-Object { [version]$_.Name.Substring(4) } -Descending
     foreach ($d in $appDirs) {
         $res = Join-Path $d.FullName "resources"
         if (Test-Path $res) { return $res }
@@ -74,25 +75,16 @@ foreach ($b in $Branches) {
     if (Test-Path $appDir) { Remove-Item -Path $appDir -Recurse -Force }
     New-Item -ItemType Directory -Path $appDir | Out-Null
 
-    @'
-{
-    "name": "discord",
-    "main": "index.js",
-    "private": true
-}
-'@ | Set-Content -Path (Join-Path $appDir "package.json") -Encoding utf8
+    $enc = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText((Join-Path $appDir "package.json"), '{"name":"discord","main":"index.js","private":true}', $enc)
 
-    # index.js loads the Kittycord patcher; the patcher itself loads the original Discord.
-    # Falls back to vanilla Discord if the patcher fails to load.
-    $indexJs = @"
-try {
-    require("$PatcherForward");
-} catch (err) {
-    console.error("[Kittycord] Failed to load patcher, starting vanilla Discord:", err);
-    require("../_app.asar");
-}
-"@
-    $indexJs | Set-Content -Path (Join-Path $appDir "index.js") -Encoding utf8
+    $indexJs = 'try {' + "`n" +
+        '    require("' + $PatcherForward + '");' + "`n" +
+        '} catch (err) {' + "`n" +
+        '    console.error("[Kittycord] Failed to load patcher, starting vanilla Discord:", err);' + "`n" +
+        '    require("../_app.asar");' + "`n" +
+        '}' + "`n"
+    [System.IO.File]::WriteAllText((Join-Path $appDir "index.js"), $indexJs, $enc)
 
     Write-Host "  Patched $($b.Name)." -ForegroundColor Green
     $patchedAny = $true

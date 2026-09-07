@@ -85,14 +85,34 @@ jobs:
                       Write-Host "::error::installer script must be saved as UTF-8 with BOM"
                       exit 1
                   }
-                  $tokens = $null
-                  $errors = $null
-                  [void][System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors)
-                  if ($errors -and $errors.Count -gt 0) {
-                      foreach ($e in $errors) { Write-Host "::error::line $($e.Extent.StartLineNumber): $($e.Message)" }
-                      exit 1
+                  $failed = $false
+                  foreach ($rel in @("installer/Kittycord-Installer-GUI.ps1", "installer/Kittycord-Install.ps1", "installer/Kittycord-Uninstall.ps1", "installer/test/windows-install.test.ps1")) {
+                      $p = (Resolve-Path $rel).Path
+                      $b = [System.IO.File]::ReadAllBytes($p)
+                      $hasBom = $b.Length -ge 3 -and $b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF
+                      if (-not $hasBom) {
+                          $offset = 0
+                          for ($i = 0; $i -lt $b.Length; $i++) { if ($b[$i] -gt 127) { $offset = $i; break } }
+                          if ($offset -gt 0) {
+                              Write-Host "::error::$rel has no BOM but contains a non-ASCII byte at offset $offset - Windows PowerShell would misread it"
+                              $failed = $true
+                          }
+                      }
+                      $tokens = $null
+                      $errors = $null
+                      [void][System.Management.Automation.Language.Parser]::ParseFile($p, [ref]$tokens, [ref]$errors)
+                      if ($errors -and $errors.Count -gt 0) {
+                          foreach ($e in $errors) { Write-Host "::error::$rel line $($e.Extent.StartLineNumber): $($e.Message)" }
+                          $failed = $true
+                      }
                   }
-                  Write-Host "Installer script OK"
+                  if ($failed) { exit 1 }
+                  Write-Host "Installer scripts OK"
+
+            - name: Run the installer against a Discord fixture
+              shell: powershell
+              run: |
+                  powershell -NoProfile -ExecutionPolicy Bypass -File installer/test/windows-install.test.ps1
 
             - name: Compile GUI installer with ps2exe
               shell: powershell
