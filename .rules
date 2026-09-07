@@ -52,7 +52,8 @@ Does NOT get merged:
    * SPDX-License-Identifier: GPL-3.0-or-later
    */
   ```
-  The header text stays exactly `Vencord, a Discord client mod` with author `Vendicated and contributors` on every new file. This is the GPL-3.0 copyright notice required by the license and enforced by the `simple-header/header` lint rule — it is NOT a brand label, so don't change it to "Kittycord".
+  The author stays `Vendicated and contributors` on every file. This is the GPL-3.0 copyright notice required by the license and enforced by the `simple-header/header` lint rule, not a brand label.
+  The first line depends on who owns the file: inherited files (`src/plugins/`, `src/equicordplugins/`, `src/api/`, `src/components/`, most of `src/main/`, `scripts/`) keep `Vencord, a Discord client mod` so they stay byte-identical to their source. Kittycord-owned files (`src/kittycordplugins/`, `src/moggcordplugins/`, `src/branding.ts`, `src/kittycordStartup.ts` and the Kittycord-only files in `src/main/`) use `Kittycord, a Discord client mod` (`scripts/header-kittycord.txt`), which the lint rule accepts as well.
   Older files carry the full GPL preamble. Leave existing headers alone, don't rewrite them.
 - Folder per plugin. New original plugins go in `src/kittycordplugins/<name>/index.tsx`. Other plugin folders exist: `src/plugins/`, `src/equicordplugins/`, `src/moggcordplugins/`. Single-file plugins still get a folder.
 - Folder suffixes the build filters on: `.desktop`, `.web`, `.dev`, `.discordDesktop`, `.vesktop`, `.equibop`.
