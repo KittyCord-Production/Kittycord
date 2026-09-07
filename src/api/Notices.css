@@ -11,7 +11,7 @@
     color: #f4e6ef !important;
 }
 
-[class*="notice"][class*="colorDefault"] [class*="button"]:not([class*="close"]):not([class*="dismiss"]) {
+[class*="notice"][class*="colorDefault"] [class*="button"]:not([class*="close"], [class*="dismiss"]) {
     background: #ff5fa6 !important;
     border-color: transparent !important;
     color: #fff !important;
@@ -19,6 +19,6 @@
     transition: background-color 0.15s ease;
 }
 
-[class*="notice"][class*="colorDefault"] [class*="button"]:not([class*="close"]):not([class*="dismiss"]):hover {
+[class*="notice"][class*="colorDefault"] [class*="button"]:not([class*="close"], [class*="dismiss"]):hover {
     background: #ff8ac4 !important;
 }

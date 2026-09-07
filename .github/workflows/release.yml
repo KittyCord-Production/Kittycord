@@ -17,8 +17,40 @@ env:
     FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+    check:
+        name: Type-check and lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Install pnpm
+              run: corepack enable
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Type check
+              run: pnpm testTsc
+
+            - name: Lint
+              run: pnpm lint
+
+            - name: Lint styles
+              run: pnpm lint-styles
+
+            - name: Lint intl keys
+              run: pnpm lint:intl
+
+            - name: Lint patches
+              run: pnpm lint:patches
+
     build:
         name: Build Kittycord
+        needs: check
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -72,6 +104,7 @@ jobs:
 
     installer:
         name: Build Windows installer (.exe)
+        needs: check
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v4
@@ -143,6 +176,7 @@ jobs:
 
     mac-installer-test:
         name: Test macOS installer
+        needs: check
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v4

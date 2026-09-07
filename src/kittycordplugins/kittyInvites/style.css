@@ -145,7 +145,11 @@
 .kc-inv-row.kc-inv-top1 .kc-inv-rank,
 .kc-inv-row.kc-inv-top2 .kc-inv-rank,
 .kc-inv-row.kc-inv-top3 .kc-inv-rank { color: #3a2230; }
-.kc-inv-row.kc-inv-top1 .kc-inv-rank { background: linear-gradient(135deg, #ffe28c, #f6b748); box-shadow: 0 2px 7px rgba(246, 183, 72, .45); }
+
+.kc-inv-row.kc-inv-top1 .kc-inv-rank {
+    background: linear-gradient(135deg, #ffe28c, #f6b748);
+    box-shadow: 0 2px 7px rgb(246 183 72 / 45%);
+}
 .kc-inv-row.kc-inv-top2 .kc-inv-rank { background: linear-gradient(135deg, #eef1f7, #c0c7d4); }
 .kc-inv-row.kc-inv-top3 .kc-inv-rank { background: linear-gradient(135deg, #f1b888, #d1824d); }
 
