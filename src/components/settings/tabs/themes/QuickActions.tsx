@@ -9,13 +9,12 @@ import { Settings } from "@api/Settings";
 import { FolderIcon, PaintbrushIcon, PencilIcon, PlusIcon, RestartIcon } from "@components/Icons";
 import { QuickAction, QuickActionCard } from "@components/settings";
 import { openPluginModal } from "@components/settings/tabs/plugins/PluginModal";
+import { openStudio } from "@kittycordplugins/kittycordStudio/StudioModal";
 import { findLazy } from "@webpack";
 import { React } from "@webpack/common";
 import type { ComponentType, Ref, SyntheticEvent } from "react";
 
 import Plugins from "~plugins";
-
-import { openStudio } from "../../../../kittycordplugins/kittycordStudio/StudioModal";
 
 type FileInputType = ComponentType<{
     ref: Ref<HTMLInputElement>;

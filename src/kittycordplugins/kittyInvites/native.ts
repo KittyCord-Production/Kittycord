@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { DATA_DIR } from "@main/utils/constants";
 import { app, IpcMainInvokeEvent } from "electron";
 import { readFileSync, unlinkSync } from "fs";
 import { join } from "path";
-
-import { BRAND_API } from "../../branding";
 
 const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;

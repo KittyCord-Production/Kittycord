@@ -7,12 +7,12 @@
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { isPluginEnabled, plugins } from "@api/PluginManager";
+import { BRAND_ICON } from "@branding";
 import { openPluginModal, openSettingsTabModal, PluginsTab, VencordTab } from "@components/settings";
 import SettingsPlugin from "@plugins/_core/settings";
 import definePlugin from "@utils/types";
 import { Menu, Popout, useRef, useState } from "@webpack/common";
 
-import { BRAND_ICON } from "../../branding";
 import { buildCustomPluginEntries, buildPluginMenuEntries, buildThemeMenu } from "./menu";
 
 interface Feature {

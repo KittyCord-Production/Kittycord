@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { BRAND_API } from "@branding";
 import { KittycordAccent } from "@shared/accentPresets";
 import { SettingsStore as SettingsStoreClass } from "@shared/SettingsStore";
 import { Logger } from "@utils/Logger";
@@ -24,8 +25,6 @@ import { DefinedSettings, OptionType, SettingsChecks, SettingsDefinition } from 
 import { React, useEffect } from "@webpack/common";
 
 import plugins from "~plugins";
-
-import { BRAND_API } from "../branding";
 
 const logger = new Logger("Settings");
 

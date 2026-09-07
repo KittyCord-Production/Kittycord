@@ -5,6 +5,7 @@
  */
 
 import { get, set } from "@api/DataStore";
+import { BRAND_WEBSITE } from "@branding";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { WebsiteIcon } from "@components/Icons";
@@ -15,7 +16,6 @@ import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, React, showToast, Text, Toasts } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { BRAND_WEBSITE } from "../../branding";
 import { openGallery } from "../kittycordStudio/GalleryModal";
 import { browseGallery, enableTheme, galleryAvailable, type GalleryTheme, likeGalleryTheme, saveTheme } from "../kittycordStudio/store";
 import { derivePalette, type StudioParams } from "../kittycordStudio/template";

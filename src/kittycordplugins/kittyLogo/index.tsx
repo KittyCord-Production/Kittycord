@@ -6,11 +6,11 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
+import { BRAND_ICON } from "@branding";
 import { classNameFactory } from "@utils/css";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, PluginNative } from "@utils/types";
 
-import { BRAND_ICON } from "../../branding";
 import style from "./style.css?managed";
 
 const cl = classNameFactory("vc-kittylogo-");

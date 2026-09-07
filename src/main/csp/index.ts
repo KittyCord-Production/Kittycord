@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { NativeSettings } from "@main/settings";
 import { session } from "electron";
-
-import { BRAND_API } from "../../branding";
 
 type PolicyMap = Record<string, string[]>;
 

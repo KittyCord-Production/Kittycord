@@ -30,26 +30,25 @@ export * as WebpackPatcher from "./webpack/patchWebpack";
 export { PlainSettings, Settings };
 
 import { coreStyleRootNode, initStyles } from "@api/Styles";
-import { ChangelogTab, openSettingsTabModal, UpdaterTab } from "@components/settings";
-import { markUpdateNoticeShown, shouldSurfaceUpdateNotice } from "@components/settings/tabs/changelog/changelogManager";
-import { ACCENT_PRESETS } from "@shared/accentPresets";
+import { openSettingsTabModal, UpdaterTab } from "@components/settings";
 import { debounce } from "@shared/debounce";
 import { IS_WINDOWS } from "@utils/constants";
 import { createAndAppendStyle } from "@utils/css";
 import { StartAt } from "@utils/types";
 import { SettingsRouter, showToast, Toasts } from "@webpack/common";
 
-import { get as dsGet, set as dsSet } from "./api/DataStore";
+import { get as dsGet } from "./api/DataStore";
 import { popNotice, showNotice } from "./api/Notices";
 import { NotificationData, showNotification } from "./api/Notifications";
-import { initPluginManager, isPluginEnabled, PMLogger, startAllPlugins } from "./api/PluginManager";
+import { initPluginManager, PMLogger, startAllPlugins } from "./api/PluginManager";
 import { PlainSettings, Settings, SettingsStore } from "./api/Settings";
 import { areLocalSettingsDirty, getCloudSettings, getCloudSyncDirection, markLocalSettingsDirty, putCloudSettings, shouldCloudSync } from "./api/SettingsSync/cloudSync";
 import { loadCustomPlugins } from "./customPlugins";
+import { initKittycordStyles, scheduleKittycordNotices } from "./kittycordStartup";
 import { relaunch } from "./utils/native";
 import { checkForUpdates, isOutdated as getIsOutdated, update, UpdateLogger } from "./utils/updater";
 import { onceReady } from "./webpack";
-import { patches, patchResilience } from "./webpack/patchWebpack";
+import { patches } from "./webpack/patchWebpack";
 
 if (IS_REPORTER) {
     require("./debug/runReporter");
@@ -219,54 +218,6 @@ function initTrayIpc() {
     VencordNative.tray.setUpdateState(getIsOutdated);
 }
 
-async function maybeSurfaceChangelog() {
-    try {
-        if (!await shouldSurfaceUpdateNotice()) return;
-        await markUpdateNoticeShown();
-        showNotice(
-            "You're on a new version of Kittycord!",
-            "What's New",
-            () => { if (ChangelogTab) openSettingsTabModal(ChangelogTab); }
-        );
-    } catch (err) {
-        UpdateLogger.error("Failed to surface changelog notice", err);
-    }
-}
-
-function maybeWarnPatchFailures() {
-    const { erroredPatches, noEffectPatches } = patchResilience;
-    if (erroredPatches < 3 && noEffectPatches < 8) return;
-
-    showNotice(
-        "Some Kittycord features couldn't load, likely because Discord updated. The basics still work, and a Kittycord update usually fixes it.",
-        "OK",
-        popNotice
-    );
-}
-
-const PERFORMANCE_SUGGESTION_KEY = "Kittycord_PerformanceSuggested";
-
-async function maybeSuggestPerformanceMode() {
-    try {
-        if (isPluginEnabled("PerformanceMode")) return;
-
-        const cores = navigator.hardwareConcurrency || 8;
-        const memory = (navigator as { deviceMemory?: number; }).deviceMemory ?? 8;
-        if (cores > 4 && memory > 4) return;
-
-        if (await dsGet(PERFORMANCE_SUGGESTION_KEY)) return;
-        await dsSet(PERFORMANCE_SUGGESTION_KEY, true);
-
-        showNotice(
-            "This device looks low on power. Turn on PerformanceMode in Kittycord settings for a lighter, smoother Discord.",
-            "OK",
-            popNotice
-        );
-    } catch (err) {
-        UpdateLogger.error("Failed to run performance auto-detect", err);
-    }
-}
-
 async function init() {
     await onceReady;
     startAllPlugins(StartAt.WebpackReady);
@@ -282,11 +233,7 @@ async function init() {
         setInterval(runUpdateCheck, 1000 * 60 * 30); // 30 minutes
     }
 
-    if (!IS_DEV) setTimeout(maybeSurfaceChangelog, 6000);
-
-    if (!IS_DEV && !IS_REPORTER) setTimeout(maybeWarnPatchFailures, 10_000);
-
-    if (!IS_DEV) setTimeout(maybeSuggestPerformanceMode, 14_000);
+    scheduleKittycordNotices();
 
     if (IS_DEV) {
         const pendingPatches = patches.filter(p => !p.all && p.predicate?.() !== false);
@@ -306,13 +253,7 @@ loadCustomPlugins();
 initPluginManager();
 initStyles();
 
-const accentStyleNode = createAndAppendStyle("vencord-kittycord-accent", coreStyleRootNode);
-function applyAccent() {
-    const preset = ACCENT_PRESETS[Settings.kittycordAccent] ?? ACCENT_PRESETS.pink;
-    accentStyleNode.textContent = `:root{--kc-accent:${preset.accent};--kc-accent-soft:${preset.soft};--kc-accent-glow:${preset.glow};--kc-logo-filter:${preset.logoFilter}}`;
-}
-applyAccent();
-SettingsStore.addChangeListener("kittycordAccent", applyAccent);
+initKittycordStyles();
 
 startAllPlugins(StartAt.Init);
 init();

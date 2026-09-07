@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BRAND_API } from "../../branding";
+import { BRAND_API } from "@branding";
 
 export const DEKO_CDN = `${BRAND_API}/deko/assets`;
 export const KITTY_DEKO_SKU = "107107100101107111";

@@ -18,10 +18,7 @@
 
 import { Button } from "@components/Button";
 import { Heart } from "@components/Heart";
-import { OpenExternalIcon } from "@components/Icons";
-import { openInviteModal } from "@utils/discord";
 import { ButtonProps } from "@vencord/discord-types";
-import { showToast } from "@webpack/common";
 
 export function DonateButton({
     equicord = false,
@@ -40,30 +37,6 @@ export function DonateButton({
         >
             <Heart />
             Donate
-        </Button>
-    );
-}
-
-export function InviteButton({
-    className,
-    ...props
-}: Partial<ButtonProps>) {
-    return (
-        <Button
-            {...props}
-            variant="none"
-            size="medium"
-            type="button"
-            onClick={async e => {
-                e.preventDefault();
-                openInviteModal("wKgT9j2xfN").catch(() =>
-                    showToast("Invalid or expired invite"),
-                );
-            }}
-            className={className || "vc-donate-button"}
-        >
-            Invite
-            <OpenExternalIcon className="vc-invite-link" />
         </Button>
     );
 }

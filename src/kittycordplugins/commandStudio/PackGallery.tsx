@@ -5,6 +5,7 @@
  */
 
 import { get, set } from "@api/DataStore";
+import { packShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
 import { Logger } from "@utils/Logger";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
@@ -12,7 +13,6 @@ import type { PluginNative } from "@utils/types";
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { packShareUrl } from "../../branding";
 import type { GalleryPack } from "./native";
 import { addCommand, CustomCommand, getCommand, sanitizeCommands, settings } from "./settings";
 

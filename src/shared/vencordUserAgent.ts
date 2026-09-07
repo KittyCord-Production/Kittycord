@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_USER_AGENT_NAME } from "@branding";
+
 import gitHash from "~git-hash";
 import gitRemote from "~git-remote";
-
-import { BRAND_USER_AGENT_NAME } from "../branding";
 
 export { gitHash, gitRemote };
 

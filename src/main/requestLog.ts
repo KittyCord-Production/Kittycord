@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { AsyncLocalStorage } from "async_hooks";
 import { app, ipcMain, session } from "electron";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 const LOG_FILE = join(DATA_DIR, "requestLog.json");

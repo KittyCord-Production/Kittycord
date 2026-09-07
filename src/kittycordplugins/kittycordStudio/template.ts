@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BRAND_API } from "../../branding";
+import { BRAND_API } from "@branding";
 
 export interface StudioColors {
     bg: string;

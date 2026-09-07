@@ -540,7 +540,7 @@ export default definePlugin({
             <Card variant="warning" className={Margins.top8} defaultPadding>
                 Please do not private message Kittycord plugin developers for support!
                 <br />
-                Instead, use the support channel: {Parser.parse("https://discord.com/channels/1173279886065029291/1297590739911573585")}
+                Instead, use the support channel: {Parser.parse(`https://discord.com/channels/${GUILD_ID}/${SUPPORT_CHANNEL_ID}`)}
                 {!ChannelStore.getChannel(SUPPORT_CHANNEL_ID) && " (Click the link to join)"}
             </Card>
         );

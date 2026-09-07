@@ -5,9 +5,8 @@
  */
 
 import { getUserSettingLazy } from "@api/UserSettings";
+import { AvatarDecorationData, CustomStatus, DisplayNameStyles, Nameplate, ProfileEffect, ProfilePreset } from "@vencord/discord-types";
 import { FluxDispatcher, GuildMemberStore, IconUtils, UserProfileSettingsStore, UserProfileStore, UserStore } from "@webpack/common";
-
-import { AvatarDecorationData, CustomStatus, DisplayNameStyles, Nameplate, ProfileEffect, ProfilePreset } from "./types";
 
 const CustomStatusSettings = getUserSettingLazy("status", "customStatus")!;
 

@@ -9,6 +9,7 @@
 // most once a day, and ONLY when the user has explicitly consented. Stores nothing about the user,
 // no account, no messages. Fully inert while ENDPOINT is empty (no prompt, no network).
 
+import { BRAND_API } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { randomUUID } from "crypto";
 import { ipcMain } from "electron";
@@ -17,7 +18,6 @@ import { join } from "path";
 
 import gitHash from "~git-hash";
 
-import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 // Set this to the deployed Cloudflare Worker URL (no trailing slash) to activate stats.

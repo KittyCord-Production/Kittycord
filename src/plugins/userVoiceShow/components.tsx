@@ -118,7 +118,6 @@ export type VoiceChannelIndicatorProps = {
     userId: string;
     isMessageIndicator?: boolean;
     isProfile?: boolean;
-    isMessage?: boolean;
     isActionButton?: boolean;
     shouldHighlight?: boolean;
 };

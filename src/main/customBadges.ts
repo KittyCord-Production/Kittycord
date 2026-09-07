@@ -8,10 +8,9 @@
 // an explicit user action; the badge list is a public cosmetic, so no consent gate. Validation and
 // the Discord-impersonation blocklist are enforced server-side too.
 
+import { BRAND_API } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
-
-import { BRAND_API } from "../branding";
 
 const ENDPOINT: string = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;

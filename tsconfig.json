@@ -64,6 +64,15 @@
             ],
             "@equicordplugins/*": [
                 "./src/equicordplugins/*"
+            ],
+            "@kittycordplugins/*": [
+                "./src/kittycordplugins/*"
+            ],
+            "@moggcordplugins/*": [
+                "./src/moggcordplugins/*"
+            ],
+            "@branding": [
+                "./src/branding"
             ]
         },
         "plugins": [

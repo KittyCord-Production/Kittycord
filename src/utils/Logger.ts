@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { BRAND_NAME } from "../branding";
+import { BRAND_NAME } from "@branding";
 
 export class Logger {
     /**

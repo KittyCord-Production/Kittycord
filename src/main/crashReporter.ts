@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
@@ -11,7 +12,6 @@ import { join } from "path";
 
 import gitHash from "~git-hash";
 
-import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 const ENDPOINT: string = BRAND_API;

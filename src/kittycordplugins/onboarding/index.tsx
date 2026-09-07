@@ -8,6 +8,7 @@ import { get, set } from "@api/DataStore";
 import { showNotification } from "@api/Notifications";
 import { isPluginEnabled, pluginRequiresRestart, plugins, startPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
+import { BRAND_WEBSITE } from "@branding";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { parseUrl } from "@utils/misc";
@@ -17,7 +18,6 @@ import definePlugin, { type PluginNative } from "@utils/types";
 import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { BRAND_WEBSITE } from "../../branding";
 import { type FriendAction, friendConsumed, markFriendConsumed, ONBOARDING_SEEN_KEY as SEEN_KEY, subscribeFriendAction, takeFriendAction } from "../_shared/friendLink";
 import { applyGalleryThemeById } from "../kittycordStudio/store";
 import { SourceList, useDetectedSources } from "../setupImport";

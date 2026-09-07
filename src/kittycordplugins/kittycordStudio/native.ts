@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { THEMES_DIR } from "@main/utils/constants";
 import { ensureSafePath } from "@main/utils/ensureSafePath";
 import { IpcMainInvokeEvent } from "electron";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-
-import { BRAND_API } from "../../branding";
 
 const FILE_NAME_RE = /^Kittycord Studio - [\w\-'!&. ]{1,40}\.theme\.css$/;
 const MAX_CSS_BYTES = 200_000;

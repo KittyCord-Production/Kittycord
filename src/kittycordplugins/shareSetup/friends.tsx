@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_ICON } from "@branding";
 import { ErrorBoundary } from "@components/index";
 import { openPrivateChannel, openUserProfile } from "@utils/discord";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
@@ -11,7 +12,6 @@ import type { User } from "@vencord/discord-types";
 import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, Toasts, UserStore, useStateFromStores } from "@webpack/common";
 import type { ComponentType, ReactNode } from "react";
 
-import { BRAND_ICON } from "../../branding";
 import { sendFileToUser } from "../_shared/dm";
 import { openInvite } from "../_shared/inviteModal";
 import { buildModeFile } from "../modes/share";

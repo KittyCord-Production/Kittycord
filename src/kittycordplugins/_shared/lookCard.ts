@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_ICON } from "@branding";
 import { IconUtils, UserStore } from "@webpack/common";
 
-import { BRAND_ICON } from "../../branding";
 import { assetUrl, byId } from "../kittyDeko/catalog";
 import { canvasToBlob, COL, drawCardBackground, drawFooterPill, FONT, loadImage, loadImageCors, roundRectPath, truncate } from "./canvasKit";
 

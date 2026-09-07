@@ -5,11 +5,10 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { BRAND_ICON } from "@branding";
 import { BaseText } from "@components/BaseText";
 import { OptionType } from "@utils/types";
 import { useEffect, UserStore, useState } from "@webpack/common";
-
-import { BRAND_ICON } from "../../branding";
 
 const settings = definePluginSettings({
     showEquicordDonor: {

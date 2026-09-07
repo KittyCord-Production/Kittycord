@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_WEBSITE } from "@branding";
 import { ErrorBoundary } from "@components/index";
 import { escapeRegExp } from "@utils/text";
 import type { Message } from "@vencord/discord-types";
 import { Button, Text, UserStore } from "@webpack/common";
 
-import { BRAND_WEBSITE } from "../../branding";
 import { openCommandsImport, openPackImport } from "./PackGallery";
 import { importCommands, settings } from "./settings";
 

@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BRAND_ICON } from "../../branding";
+import { BRAND_ICON } from "@branding";
+
 import { canvasToBlob, COL, drawDiamond, drawGlow, drawSparkle, FONT, loadImage, roundRectPath, truncate, wrapText } from "../_shared/canvasKit";
 import type { WrappedSnapshot } from "./storage";
 

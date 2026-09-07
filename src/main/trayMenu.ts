@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_NAME } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { gitHashShort } from "@shared/vencordUserAgent";
 import { BrowserWindow, ipcMain, Menu, MenuItemConstructorOptions, shell } from "electron";
 import aboutHtml from "file://about.html?minify";
 
-import { BRAND_NAME } from "../branding";
 import { KITTY_ICON_DATA_URL } from "./iconData";
 import { SETTINGS_DIR, THEMES_DIR } from "./utils/constants";
 

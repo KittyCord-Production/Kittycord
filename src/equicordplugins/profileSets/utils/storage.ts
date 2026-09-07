@@ -6,9 +6,8 @@
 
 import { DataStore } from "@api/index";
 import { Logger } from "@utils/Logger";
+import { ProfilePreset } from "@vencord/discord-types";
 import { UserStore } from "@webpack/common";
-
-import { ProfilePreset } from "./types";
 
 const logger = new Logger("ProfilePresets");
 const LEGACY_PRESETS_KEY = "ProfileDataset";

@@ -7,6 +7,7 @@
 import { showNotice } from "@api/Notices";
 import { hasAnyVisibleSettings, isPluginEnabled, pluginRequiresRestart, startDependenciesRecursive, startPlugin, stopPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
+import { BRAND_ICON } from "@branding";
 import { CogWheel, InfoIcon } from "@components/Icons";
 import { AddonCard } from "@components/settings/AddonCard";
 import { classNameFactory } from "@utils/css";
@@ -16,7 +17,6 @@ import { React, showToast, Toasts } from "@webpack/common";
 
 import { PluginMeta } from "~plugins";
 
-import { BRAND_ICON } from "../../../../branding";
 import { openPluginModal } from "./PluginModal";
 
 const logger = new Logger("PluginCard");
@@ -33,10 +33,7 @@ interface PluginCardProps extends React.HTMLProps<HTMLDivElement> {
 export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, onMouseLeave, isNew }: PluginCardProps) {
     const settings = Settings.plugins[plugin.name];
     const pluginMeta = PluginMeta[plugin.name];
-    const isKittycordPlugin = pluginMeta.folderName.startsWith("src/kittycordplugins/") ?? false;
-    const isMoggcordPlugin = pluginMeta.folderName.startsWith("src/moggcordplugins/") ?? false;
-    const isEquicordPlugin = pluginMeta.folderName.startsWith("src/equicordplugins/") ?? false;
-    const isVencordPlugin = pluginMeta.folderName.startsWith("src/plugins/") ?? false;
+    const isOwnPlugin = pluginMeta.folderName.startsWith("src/kittycordplugins/") || pluginMeta.folderName.startsWith("src/moggcordplugins/");
     const isUserPlugin = pluginMeta?.userPlugin ?? false;
     const isModifiedPlugin = plugin.isModified ?? false;
 
@@ -100,34 +97,22 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
             title: "Modified plugin"
         },
         {
-            condition: isKittycordPlugin,
+            condition: isOwnPlugin,
             src: BRAND_ICON,
             alt: "Kittycord",
             title: "Kittycord Plugin"
-        },
-        {
-            condition: isMoggcordPlugin,
-            src: BRAND_ICON,
-            alt: "Kittycord",
-            title: "Kittycord Plugin"
-        },
-        {
-            condition: isEquicordPlugin,
-            src: BRAND_ICON,
-            alt: "Built-in",
-            title: "Built-in plugin"
-        },
-        {
-            condition: isVencordPlugin,
-            src: BRAND_ICON,
-            alt: "Built-in",
-            title: "Built-in plugin"
         },
         {
             condition: isUserPlugin,
             src: BRAND_ICON,
             alt: "User",
             title: "User plugin"
+        },
+        {
+            condition: true,
+            src: BRAND_ICON,
+            alt: "Built-in",
+            title: "Built-in plugin"
         }
     ];
 

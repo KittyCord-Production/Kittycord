@@ -6,9 +6,9 @@
 
 import { get, set } from "@api/DataStore";
 import { definePluginSettings } from "@api/Settings";
+import { BRAND_API } from "@branding";
 import { OptionType } from "@utils/types";
 
-import { BRAND_API } from "../../branding";
 import { RuleList } from "./RuleList";
 
 const SOUND_CDN = `${BRAND_API}/sounds`;

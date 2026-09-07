@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "@branding";
 import { IpcMainInvokeEvent } from "electron";
 
-import { BRAND_API } from "../../branding";
 import { CATALOG, PRICED_IDS } from "./catalog";
 
 const ENDPOINT = BRAND_API;

@@ -5,9 +5,9 @@
  */
 
 import { plugins } from "@api/PluginManager";
+import { BRAND_WEBSITE } from "@branding";
 import { escapeRegExp } from "@utils/text";
 
-import { BRAND_WEBSITE } from "../../branding";
 import { CustomCommand, sanitizeCommands } from "../commandStudio/settings";
 import { sanitizeParams, StudioParams } from "../kittycordStudio/template";
 

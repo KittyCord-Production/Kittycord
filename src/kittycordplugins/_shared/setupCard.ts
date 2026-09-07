@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BRAND_ICON } from "../../branding";
+import { BRAND_ICON } from "@branding";
+
 import { canvasToBlob, COL, drawCardBackground, drawFooterPill, FONT, loadImage, loadImageCors, roundRectPath, truncate, wrapText } from "./canvasKit";
 
 const WIDTH = 1200;

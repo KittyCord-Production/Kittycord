@@ -5,11 +5,10 @@
  */
 
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
+import { BRAND_BADGE_ICON } from "@branding";
 import { Logger } from "@utils/Logger";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { UserStore } from "@webpack/common";
-
-import { BRAND_BADGE_ICON } from "../../branding";
 
 const Native = VencordNative?.pluginHelpers?.UsesKittycord as PluginNative<typeof import("./native")> | undefined;
 const logger = new Logger("UsesKittycord");

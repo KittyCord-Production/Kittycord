@@ -5,9 +5,8 @@
  */
 
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
+import { BRAND_WEBSITE } from "@branding";
 import definePlugin, { type PluginNative } from "@utils/types";
-
-import { BRAND_WEBSITE } from "../../branding";
 
 const svgIcon = (svg: string) => "data:image/svg+xml," + encodeURIComponent(svg);
 

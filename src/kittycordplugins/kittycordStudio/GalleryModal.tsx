@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { themeShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
 import { Logger } from "@utils/Logger";
 import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 import type { ComponentType } from "react";
 
-import { themeShareUrl } from "../../branding";
 import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
 import { derivePalette, NAME_RE, type StudioParams } from "./template";
 

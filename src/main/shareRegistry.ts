@@ -7,12 +7,12 @@
 // "Which friends use Kittycord?" registry. Main process (CSP-free, local opt-out file). On by
 // default; sends only the user's own id (register) or friend ids (lookup) unless the user opts out.
 
+import { BRAND_API } from "@branding";
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 const ENDPOINT: string = BRAND_API;
