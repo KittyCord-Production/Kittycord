@@ -80,7 +80,6 @@ export function clearAudioCache() {
     audioCache.clear();
 }
 
-export const getAudio = (fileId: string) => audioCache.get(fileId);
 export const listAudio = () => [...audioCache.entries()].map(([fileId, entry]) => ({ fileId, ...entry }));
 
 async function persistAudio() {

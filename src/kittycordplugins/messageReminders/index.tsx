@@ -8,16 +8,12 @@ import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
 import { showNotification } from "@api/Notifications";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Message } from "@vencord/discord-types";
+import { Message, RenderModalProps } from "@vencord/discord-types";
 import { Button, ChannelStore, Menu, MessageActions, React, showToast, Text, Toasts } from "@webpack/common";
-import type { ComponentType } from "react";
 
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const KEY = "Kittycord_Reminders";
 
@@ -85,7 +81,7 @@ async function checkDue() {
     due.forEach(fire);
 }
 
-function RemindersModal({ rootProps }: { rootProps: any; }) {
+function RemindersModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [list, setList] = React.useState<Reminder[]>([...reminders].sort((a, b) => a.remindAt - b.remindAt));
 
     function cancel(id: string) {

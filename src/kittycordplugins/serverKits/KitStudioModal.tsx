@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { get, set } from "@api/DataStore";
 import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
@@ -17,7 +18,7 @@ import { Modal, openModal, showToast, TextInput, Toasts, useMemo, UserStore,useS
 import { settings as commandSettings } from "../commandStudio/settings";
 import { getThemes, loadThemes } from "../kittycordStudio/store";
 import { settings as soundSettings } from "../soundStudio/store";
-import { importablePlugin, kitLink, ServerKit } from "./kit";
+import { importablePlugin, KIT_TOKENS_KEY, kitLink, ServerKit } from "./kit";
 import { Native } from "./native-bridge";
 
 function candidatePlugins() {
@@ -34,6 +35,7 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
     const [includeSounds, setIncludeSounds] = useState(true);
     const [chosenPlugins, setChosenPlugins] = useState<string[]>([]);
     const [link, setLink] = useState<string | null>(null);
+    const [kitId, setKitId] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
 
     const themes = useMemo(() => Object.entries(getThemes()), []);
@@ -56,7 +58,8 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
                 .map(r => ({
                     scope: r.scope === "friend" ? "user" as const : r.scope as "channel" | "guild",
                     targetId: r.targetId,
-                    sound: r.sound.kind === "curated" ? r.sound.id : ""
+                    sound: r.sound.kind === "curated" ? r.sound.id : "",
+                    volume: r.volume
                 }));
         if (chosenPlugins.length) kit.plugins = chosenPlugins;
 
@@ -74,7 +77,32 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
         setBusy(false);
 
         if (!result.ok) return showToast(result.error, Toasts.Type.FAILURE);
+
+        const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
+        tokens[result.id] = result.ownerToken;
+        await set(KIT_TOKENS_KEY, tokens);
+
+        setKitId(result.id);
         setLink(kitLink(result.id));
+    }
+
+    async function unpublish() {
+        if (!Native || !kitId) return;
+
+        const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
+        const token = tokens[kitId];
+        if (!token) return showToast("This kit was published from another device, so it can only be taken down there.", Toasts.Type.FAILURE);
+
+        setBusy(true);
+        const removed = await Native.deleteKit(kitId, token);
+        setBusy(false);
+
+        if (!removed) return showToast("Could not take that kit down. Try again in a moment.", Toasts.Type.FAILURE);
+
+        delete tokens[kitId];
+        await set(KIT_TOKENS_KEY, tokens);
+        showToast("Kit taken down. The link no longer works.", Toasts.Type.SUCCESS);
+        modalProps.onClose();
     }
 
     return (
@@ -89,6 +117,7 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
                     variant: "primary",
                     onClick: () => copyWithToast(link, "Link copied. Paste it into your server description.")
                 },
+                { text: busy ? "Taking down…" : "Take it down", variant: "critical-secondary", disabled: busy, onClick: unpublish },
                 { text: "Done", variant: "secondary", onClick: modalProps.onClose }
             ] : [
                 { text: "Cancel", variant: "secondary", onClick: modalProps.onClose },

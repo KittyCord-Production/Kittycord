@@ -7,18 +7,13 @@
 import { themeShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
 import { derivePalette, NAME_RE, type StudioParams } from "./template";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("KittycordStudio");
 
@@ -105,7 +100,7 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
     );
 }
 
-function GalleryModal({ rootProps }: { rootProps: any; }) {
+function GalleryModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [sort, setSort] = React.useState<GallerySort>("top");
     const [themes, setThemes] = React.useState<GalleryTheme[] | null>(null);
 
@@ -150,7 +145,7 @@ function GalleryModal({ rootProps }: { rootProps: any; }) {
     );
 }
 
-function PublishModal({ rootProps, params }: { rootProps: any; params: StudioParams; }) {
+function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; params: StudioParams; }) {
     const me = UserStore.getCurrentUser();
     const [authorName, setAuthorName] = React.useState((me?.globalName as string) || me?.username || "Someone");
     const [busy, setBusy] = React.useState(false);

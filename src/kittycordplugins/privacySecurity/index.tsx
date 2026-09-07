@@ -42,7 +42,7 @@ function ConsentToggle({ bridge, title, description }: { bridge: ConsentBridge; 
 function PrivacyTab() {
     return (
         <ErrorBoundary noop>
-            <div className="kc-priv">
+            <div>
                 <Text variant="heading-lg/semibold">Is Kittycord safe? 🐱</Text>
                 <Text variant="text-md/normal" style={{ marginTop: 6 }}>
                     Yes — and you don't have to take our word for it. Kittycord is fully open source. It <b>never reads your Discord login token</b>, <b>never logs your keystrokes</b> and <b>never collects your messages</b>. Every line is public, so anyone can check.

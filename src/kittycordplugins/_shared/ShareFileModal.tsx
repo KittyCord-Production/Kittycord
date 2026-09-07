@@ -6,21 +6,16 @@
 
 import { Flex } from "@components/Flex";
 import { getCurrentChannel } from "@utils/discord";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize } from "@utils/modal";
-import type { User } from "@vencord/discord-types";
-import { Button, DraftType, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UploadHandler, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
+import { ModalSize } from "@utils/modal";
+import type { RenderModalProps, User } from "@vencord/discord-types";
+import { Button, DraftType, React, showToast, Text, TextInput, Toasts, UploadHandler } from "@webpack/common";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { FriendPicker } from "./FriendPicker";
 
 export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote }: {
-    rootProps: any;
+    rootProps: RenderModalProps;
     title: string;
     blurb: string;
     buildFile(): File;
@@ -29,13 +24,6 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
     const [target, setTarget] = React.useState<User | null>(null);
     const [note, setNote] = React.useState(defaultNote);
     const [busy, setBusy] = React.useState(false);
-
-    const friendOptions = React.useMemo(() =>
-        RelationshipStore.getFriendIDs()
-            .map(id => UserStore.getUser(id))
-            .filter((u): u is User => Boolean(u))
-            .map(u => ({ label: u.globalName || u.username, value: u.id }))
-            .sort((a, b) => a.label.localeCompare(b.label)), []);
 
     async function sendDm() {
         if (!target) return;
@@ -68,13 +56,7 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
                 <Text variant="text-sm/normal" style={{ margin: "12px 0", opacity: 0.8 }}>{blurb}</Text>
 
                 <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
-                <SearchableSelect
-                    options={friendOptions}
-                    value={target?.id}
-                    placeholder="Pick a friend…"
-                    onChange={(v: string) => setTarget(UserStore.getUser(v) ?? null)}
-                    closeOnSelect
-                />
+                <FriendPicker value={target} onChange={setTarget} />
 
                 <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />

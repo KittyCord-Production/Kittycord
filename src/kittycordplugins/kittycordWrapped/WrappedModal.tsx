@@ -8,20 +8,15 @@ import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { getCurrentChannel, insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { renderCard, renderShareCard, SKINS, type WrappedVariant } from "./card";
 import { settings } from "./settings";
 import { buildSnapshot, resetData } from "./storage";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("KittycordWrapped");
 
@@ -39,7 +34,7 @@ const TITLES: Record<WrappedVariant, string> = {
     summer: "Kittycord Summer ☀️"
 };
 
-function WrappedModal({ rootProps, variant }: { rootProps: any; variant: WrappedVariant; }) {
+function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; variant: WrappedVariant; }) {
     const skin = SKINS[variant];
     const [showNames, setShowNames] = React.useState(settings.store.showServerNames);
     const [landscape, setLandscape] = React.useState(false);

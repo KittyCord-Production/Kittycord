@@ -6,7 +6,7 @@
 
 import { del, get, set } from "@api/DataStore";
 import { Settings } from "@api/Settings";
-import { ChannelStore, GuildMemberCountStore, GuildStore, RelationshipStore, SnowflakeUtils, UserStore } from "@webpack/common";
+import { ChannelStore, GuildStore, RelationshipStore, SnowflakeUtils, UserStore } from "@webpack/common";
 
 export const KEY = "KittycordWrapped";
 
@@ -24,10 +24,8 @@ export interface WrappedData {
 }
 
 export interface LiveStats {
-    accountCreated: number;
     accountYear: number;
     guildCount: number;
-    largestGuild: { name: string; count: number; } | null;
     friendCount: number;
     pluginCount: number;
     themeCount: number;
@@ -59,7 +57,6 @@ export interface WrappedSnapshot {
     peakDay: number | null;
     pluginCount: number;
     themeCount: number;
-    largestGuild: { name: string; count: number; } | null;
     showServerNames: boolean;
 }
 
@@ -173,20 +170,12 @@ export function readLive(): LiveStats {
     const created = user ? SnowflakeUtils.extractTimestamp(user.id) : Date.now();
     const guilds = Object.values(GuildStore.getGuilds());
 
-    let largest: { name: string; count: number; } | null = null;
-    for (const g of guilds) {
-        const count = GuildMemberCountStore.getMemberCount(g.id) ?? (g as any).memberCount ?? 0;
-        if (!largest || count > largest.count) largest = { name: g.name, count };
-    }
-
     const pluginCount = Object.values(Settings.plugins).filter(p => p?.enabled).length;
     const themeCount = Settings.enabledThemes?.length ?? 0;
 
     return {
-        accountCreated: created,
         accountYear: new Date(created).getFullYear(),
         guildCount: guilds.length,
-        largestGuild: largest,
         friendCount: RelationshipStore.getFriendCount?.() ?? RelationshipStore.getFriendIDs().length,
         pluginCount,
         themeCount
@@ -248,7 +237,6 @@ export function buildSnapshot(showServerNames: boolean): WrappedSnapshot {
         peakDay: d.messages ? argmax(d.byDay) : null,
         pluginCount: live.pluginCount,
         themeCount: live.themeCount,
-        largestGuild: live.largestGuild,
         showServerNames
     };
 }

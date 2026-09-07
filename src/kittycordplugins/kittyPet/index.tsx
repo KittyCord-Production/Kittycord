@@ -7,10 +7,12 @@
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, React, SelectedChannelStore, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { animalArt } from "./animalArt";
 import { startCursorTracking, stopCursorTracking } from "./cursor";
 import { GhostController } from "./ghost";
@@ -22,12 +24,6 @@ import { ACCESSORIES, ACCESSORY_URIS } from "./sprites";
 import { addXp, DAILY_MSG_XP_CAP, DAILY_PET_XP, getSave, grantPlayXp, levelFor, loadSave, MAX_LEVEL, nextLevelXp, PET_PROFILES, PetProfile, updateSave } from "./state";
 import style from "./style.css?managed";
 import { buildTeddyUri } from "./teddyArt";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as React.ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as React.ComponentType<any>;
-const ModalContent = ModalContentRaw as React.ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as React.ComponentType<any>;
 
 const CAT_ACCESSORY_LEVELS: Record<string, number> = { bow: 2, scarf: 3, hat: 4, crown: 5, flower: 6, glasses: 7, bell: 8, wizardHat: 9, star: 10, bowtie: 3, topHat: 5, headphones: 7 };
 
@@ -358,7 +354,7 @@ function PetPanel() {
     );
 }
 
-function PetModal({ rootProps }: { rootProps: any; }) {
+function PetModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const copy = PET_COPY[currentProfile()];
 
     return (

@@ -7,19 +7,14 @@
 import { Flex } from "@components/Flex";
 import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
-import type { User } from "@vencord/discord-types";
-import { Button, IconUtils, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps, User } from "@vencord/discord-types";
+import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
+import { FriendPicker } from "./FriendPicker";
 import { INVITE_FILENAME, renderInviteCard } from "./inviteCard";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("InviteFriend");
 
@@ -29,7 +24,7 @@ function withCodeMessage(code: string) {
     return `${DEFAULT_MESSAGE}\n(optional: my creator code "${code}" — pop it into the installer when you set it up, it just credits me 💖)`;
 }
 
-function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }) {
+function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: User | null; }) {
     const [target, setTarget] = React.useState<User | null>(user);
     const [note, setNote] = React.useState(DEFAULT_MESSAGE);
     const [myCode, setMyCode] = React.useState<string | null>(null);
@@ -38,15 +33,6 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [blob, setBlob] = React.useState<Blob | null>(null);
     const [busy, setBusy] = React.useState(false);
-
-    const friendOptions = React.useMemo(() => {
-        if (user) return [];
-        return RelationshipStore.getFriendIDs()
-            .map(id => UserStore.getUser(id))
-            .filter((u): u is User => Boolean(u))
-            .map(u => ({ label: u.globalName || u.username, value: u.id }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-    }, [user]);
 
     React.useEffect(() => {
         let cancelled = false;
@@ -132,13 +118,7 @@ function InviteModal({ rootProps, user }: { rootProps: any; user: User | null; }
                 {!user && (
                     <>
                         <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to</Text>
-                        <SearchableSelect
-                            options={friendOptions}
-                            value={target?.id}
-                            placeholder="Pick a friend…"
-                            onChange={(v: string) => setTarget(UserStore.getUser(v) ?? null)}
-                            closeOnSelect
-                        />
+                        <FriendPicker value={target} onChange={setTarget} />
                     </>
                 )}
                 {user && (

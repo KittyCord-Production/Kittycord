@@ -47,10 +47,6 @@ export function getFile(id: string) {
     return files[id];
 }
 
-export function listFiles() {
-    return Object.values(files);
-}
-
 export async function addFile(file: File): Promise<StoredFile | { error: string; }> {
     if (file.size > MAX_FILE_BYTES) return { error: "That file is larger than 8 MB." };
     if (Object.keys(files).length >= MAX_FILES) return { error: `You can keep at most ${MAX_FILES} files.` };

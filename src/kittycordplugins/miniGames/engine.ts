@@ -40,7 +40,6 @@ export interface TttState {
     nextPlayer: string | null;
     winner: string | null;
     draw: boolean;
-    latestId: string;
     moveCount: number;
 }
 
@@ -60,7 +59,6 @@ export function deriveTtt(msgs: GameMessage[]): TttState | null {
         nextPlayer: vs,
         winner: null,
         draw: false,
-        latestId: msgs[msgs.length - 1].id,
         moveCount: 0
     };
 
@@ -104,7 +102,6 @@ export interface RpsState {
     counterMove?: number;
     revealMove?: number;
     nonce?: string;
-    latestId: string;
 }
 
 export function deriveRps(msgs: GameMessage[]): RpsState | null {
@@ -121,7 +118,6 @@ export function deriveRps(msgs: GameMessage[]): RpsState | null {
         vs,
         commit: start.c,
         phase: "waitCounter",
-        latestId: msgs[msgs.length - 1].id
     };
 
     for (const msg of msgs.filter(m => m.payload.t === "rps" && m.payload.n > 0)) {

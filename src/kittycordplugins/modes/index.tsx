@@ -9,13 +9,13 @@ import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { ErrorBoundary } from "@components/index";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
-import type { Message } from "@vencord/discord-types";
+import type { Message, RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, GuildStore, React, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { ShareFileModal } from "../_shared/ShareFileModal";
 import { buildModeFile, fetchMode, findModeAttachment } from "./share";
 import { applyMode, type AutoTrigger, captureInto, currentThemes, deleteMode, getActiveId, getModes, getTogglablePlugins, loadModes, type Mode, newMode, notifyManualActivation, runningGameNames, saveMode, startAuto, type StatusValue, stopAuto } from "./utils";
@@ -36,12 +36,6 @@ const AUTO_OPTIONS = [
     { label: "When a server is open", value: "guild" }
 ];
 
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
-
 const STATUS_OPTIONS = [
     { label: "Don't change", value: "" },
     { label: "Online", value: "online" },
@@ -54,7 +48,7 @@ function Label({ children }: { children: string; }) {
     return <Text variant="text-sm/semibold" style={{ marginBottom: 4, marginTop: 12 }}>{children}</Text>;
 }
 
-function ModeEditor({ rootProps, initial, onSaved }: { rootProps: any; initial: Mode; onSaved(): void; }) {
+function ModeEditor({ rootProps, initial, onSaved }: { rootProps: RenderModalProps; initial: Mode; onSaved(): void; }) {
     const [name, setName] = React.useState(initial.name);
     const [emoji, setEmoji] = React.useState(initial.emoji ?? "");
     const [status, setStatus] = React.useState<string>(initial.status ?? "");
@@ -301,7 +295,7 @@ function triggerLabel(mode: Mode): string | null {
     return `🏠 ${a.guildIds.map(id => GuildStore.getGuild(id)?.name ?? "server").join(", ")}`;
 }
 
-function ModesModal({ rootProps }: { rootProps: any; }) {
+function ModesModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const modes = getModes();
     const activeId = getActiveId();

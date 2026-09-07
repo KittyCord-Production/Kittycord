@@ -127,7 +127,11 @@ export default {
     },
 
     kittycordDeepLinks: {
-        onLink: (cb: (action: { kind: string; value: string; }) => void) => { ipcRenderer.on(IpcEvents.DEEP_LINK, (_, action) => cb(action)); },
+        onLink: (cb: (action: { kind: string; value: string; }) => void) => {
+            const listener = (_: unknown, action: { kind: string; value: string; }) => cb(action);
+            ipcRenderer.on(IpcEvents.DEEP_LINK, listener);
+            return () => { ipcRenderer.off(IpcEvents.DEEP_LINK, listener); };
+        },
         poll: () => invoke<{ kind: string; value: string; } | null>(IpcEvents.DEEP_LINK_POLL),
     },
 

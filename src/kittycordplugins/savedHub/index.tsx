@@ -6,15 +6,12 @@
 
 import { get, set } from "@api/DataStore";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
-import type { ComponentType } from "react";
 
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const COLLECTIONS_KEY = "Kittycord_Collections";
 const BOOKMARKS_KEY = "Kittycord_Bookmarks";
@@ -102,7 +99,7 @@ function Chip({ children, color = "var(--brand-500)" }: { children: any; color?:
     return <span style={{ background: color, color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11, marginLeft: 4 }}>{children}</span>;
 }
 
-function SavedModal({ rootProps, index }: { rootProps: any; index: UnifiedItem[]; }) {
+function SavedModal({ rootProps, index }: { rootProps: RenderModalProps; index: UnifiedItem[]; }) {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const [query, setQuery] = React.useState("");
     const [source, setSource] = React.useState("all");

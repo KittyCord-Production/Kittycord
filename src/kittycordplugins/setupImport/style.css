@@ -25,26 +25,3 @@
 .kc-import-file {
     margin-top: 10px;
 }
-
-.kc-import-content {
-    padding-bottom: 8px;
-}
-
-.kc-import-skipped {
-    margin-top: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: var(--background-secondary);
-    color: var(--text-muted);
-}
-
-.kc-import-skipped summary {
-    cursor: pointer;
-    color: var(--text-normal);
-}
-
-.kc-import-skipped > div {
-    margin-top: 6px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-}

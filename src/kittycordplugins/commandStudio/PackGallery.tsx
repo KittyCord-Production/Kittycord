@@ -8,18 +8,14 @@ import { get, set } from "@api/DataStore";
 import { packShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import type { PluginNative } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import type { GalleryPack } from "./native";
 import { addCommand, CustomCommand, getCommand, sanitizeCommands, settings } from "./settings";
-
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const Native = VencordNative?.pluginHelpers?.CommandStudio as PluginNative<typeof import("./native")> | undefined;
 
@@ -130,7 +126,7 @@ async function copyShareLink(id: string) {
     }
 }
 
-function ImportDialog({ rootProps, pack, commands }: { rootProps: any; pack: GalleryPack; commands: CustomCommand[]; }) {
+function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalProps; pack: GalleryPack; commands: CustomCommand[]; }) {
     const prefix = settings.store.prefix.trim() || ".";
     const clashes = commands.filter(c => getCommand(c.trigger));
 
@@ -272,7 +268,7 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
     );
 }
 
-function PackGalleryModal({ rootProps }: { rootProps: any; }) {
+function PackGalleryModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [sort, setSort] = React.useState<PackSort>("top");
     const [packs, setPacks] = React.useState<GalleryPack[] | null>(null);
 
@@ -317,7 +313,7 @@ function PackGalleryModal({ rootProps }: { rootProps: any; }) {
     );
 }
 
-function PublishDialog({ rootProps, commands }: { rootProps: any; commands: CustomCommand[]; }) {
+function PublishDialog({ rootProps, commands }: { rootProps: RenderModalProps; commands: CustomCommand[]; }) {
     const me = UserStore.getCurrentUser();
     const [name, setName] = React.useState("");
     const [authorName, setAuthorName] = React.useState((me?.globalName as string) || me?.username || "Someone");

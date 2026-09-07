@@ -7,19 +7,15 @@
 import { Flex } from "@components/Flex";
 import { sendMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
-import type { User } from "@vencord/discord-types";
-import { Button, React, RelationshipStore, SearchableSelect, showToast, Text, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps, User } from "@vencord/discord-types";
+import { Button, React, showToast, Text, Toasts } from "@webpack/common";
 
 import { ensureDmChannel } from "../_shared/dm";
+import { FriendPicker } from "../_shared/FriendPicker";
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { packsAvailable, quickShare } from "./PackGallery";
 import { CustomCommand, exportCommands } from "./settings";
-
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("CommandStudio");
 const NAME_RE = /^[\w\-'!&. ]{1,40}$/;
@@ -29,17 +25,10 @@ function packName(commands: CustomCommand[]): string {
     return "Shared commands";
 }
 
-function ShareDialog({ rootProps, commands, label }: { rootProps: any; commands: CustomCommand[]; label: string; }) {
+function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalProps; commands: CustomCommand[]; label: string; }) {
     const [payload, setPayload] = React.useState<string | null>(packsAvailable() ? null : exportCommands(commands));
     const [target, setTarget] = React.useState<User | null>(null);
     const [busy, setBusy] = React.useState(false);
-
-    const friendOptions = React.useMemo(() =>
-        RelationshipStore.getFriendIDs()
-            .map(id => UserStore.getUser(id))
-            .filter((u): u is User => Boolean(u))
-            .map(u => ({ label: u.globalName || u.username, value: u.id }))
-            .sort((a, b) => a.label.localeCompare(b.label)), []);
 
     React.useEffect(() => {
         if (!packsAvailable()) return;
@@ -84,13 +73,7 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: any; commands:
                 </Text>
 
                 <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
-                <SearchableSelect
-                    options={friendOptions}
-                    value={target?.id}
-                    placeholder="Pick a friend…"
-                    onChange={(v: string) => setTarget(UserStore.getUser(v) ?? null)}
-                    closeOnSelect
-                />
+                <FriendPicker value={target} onChange={setTarget} />
 
                 <Text
                     variant="text-sm/normal"

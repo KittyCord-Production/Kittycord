@@ -7,23 +7,18 @@
 import { BRAND_ICON } from "@branding";
 import { ErrorBoundary } from "@components/index";
 import { openPrivateChannel, openUserProfile } from "@utils/discord";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
-import type { User } from "@vencord/discord-types";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps, User } from "@vencord/discord-types";
 import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, Toasts, UserStore, useStateFromStores } from "@webpack/common";
-import type { ComponentType, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { sendFileToUser } from "../_shared/dm";
 import { openInvite } from "../_shared/inviteModal";
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { buildModeFile } from "../modes/share";
 import { getModes, loadModes, type Mode } from "../modes/utils";
 import { getKittycordFriendIds, getShareConsent, registerSelf, setShareConsent } from "./registry";
 import { sendShare } from "./utils";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const DEFAULT_NOTE = "Here's my Kittycord setup — open it in Kittycord to import.";
 
@@ -195,7 +190,7 @@ export function InviteMoreSection({ excludeIds }: { excludeIds: Set<string>; }) 
     );
 }
 
-function SendModeModal({ rootProps, user }: { rootProps: any; user: User; }) {
+function SendModeModal({ rootProps, user }: { rootProps: RenderModalProps; user: User; }) {
     const [modes, setModes] = React.useState<Mode[]>(getModes());
     const [busy, setBusy] = React.useState(false);
 
@@ -283,7 +278,7 @@ function FriendsListBody() {
     );
 }
 
-export function FriendsListModal({ rootProps }: { rootProps: any; }) {
+export function FriendsListModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>

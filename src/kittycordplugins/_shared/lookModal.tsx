@@ -7,19 +7,15 @@
 import { Flex } from "@components/Flex";
 import { getCurrentChannel, insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
-import type { User } from "@vencord/discord-types";
-import { Button, DraftType, React, RelationshipStore, SearchableSelect, showToast, Text, Toasts, UploadHandler, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
+import type { RenderModalProps, User } from "@vencord/discord-types";
+import { Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
+import { FriendPicker } from "./FriendPicker";
 import { collectLook, LOOK_FILENAME, type LookData, renderLookCard } from "./lookCard";
-
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("ShowOff");
 
@@ -29,19 +25,12 @@ function fileFromBlob(blob: Blob) {
     return new File([blob], LOOK_FILENAME, { type: "image/png" });
 }
 
-function LookModal({ rootProps }: { rootProps: any; }) {
+function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [data, setData] = React.useState<LookData | null | undefined>(undefined);
     const [blob, setBlob] = React.useState<Blob | null>(null);
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [target, setTarget] = React.useState<User | null>(null);
     const [busy, setBusy] = React.useState(false);
-
-    const friendOptions = React.useMemo(() =>
-        RelationshipStore.getFriendIDs()
-            .map(id => UserStore.getUser(id))
-            .filter((u): u is User => Boolean(u))
-            .map(u => ({ label: u.globalName || u.username, value: u.id }))
-            .sort((a, b) => a.label.localeCompare(b.label)), []);
 
     React.useEffect(() => {
         let cancelled = false;
@@ -131,13 +120,7 @@ function LookModal({ rootProps }: { rootProps: any; }) {
                         </div>
 
                         <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
-                        <SearchableSelect
-                            options={friendOptions}
-                            value={target?.id}
-                            placeholder="Pick a friend…"
-                            onChange={(v: string) => setTarget(UserStore.getUser(v) ?? null)}
-                            closeOnSelect
-                        />
+                        <FriendPicker value={target} onChange={setTarget} />
 
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0", flexWrap: "wrap" }}>
                             <Button color={Button.Colors.PRIMARY} disabled={!blob || busy} onClick={copy}>Copy</Button>

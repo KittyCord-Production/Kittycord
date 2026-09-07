@@ -9,16 +9,12 @@ import { get, set } from "@api/DataStore";
 import { showNotification } from "@api/Notifications";
 import { Flex } from "@components/Flex";
 import { getCurrentChannel, sendMessage } from "@utils/discord";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Channel } from "@vencord/discord-types";
+import { Channel, RenderModalProps } from "@vencord/discord-types";
 import { Button, React, SearchableSelect, Text, TextInput } from "@webpack/common";
-import type { ComponentType } from "react";
 
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const KEY = "Kittycord_Scheduled";
 const PINK = "#ff5fa6";
@@ -38,7 +34,6 @@ interface Scheduled {
     content: string;
     fireAt: number;
     repeat: Repeat;
-    createdAt: number;
 }
 
 let items: Scheduled[] = [];
@@ -135,7 +130,7 @@ function unitMs(unit: string) {
     return unit === "minutes" ? 60_000 : unit === "hours" ? 3_600_000 : DAY;
 }
 
-function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: any; channelId: string; channelLabel: string; }) {
+function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: RenderModalProps; channelId: string; channelLabel: string; }) {
     const [kind, setKind] = React.useState<Kind>("message");
     const [content, setContent] = React.useState("");
     const [amount, setAmount] = React.useState("30");
@@ -155,8 +150,7 @@ function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: any;
             channelLabel,
             content: content.trim(),
             fireAt: Date.now() + n * unitMs(unit),
-            repeat,
-            createdAt: Date.now()
+            repeat
         };
         items = [...items, item];
         save();
@@ -209,7 +203,7 @@ function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: any;
     );
 }
 
-function ManagerModal({ rootProps }: { rootProps: any; }) {
+function ManagerModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [list, setList] = React.useState<Scheduled[]>([...items]);
 
     function cancel(id: string) {

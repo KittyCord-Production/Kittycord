@@ -6,16 +6,13 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType, type PluginNative } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType, CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 interface Cosmetic {
     color1: string;
@@ -174,7 +171,7 @@ function NameStyleEditor() {
     );
 }
 
-function NameStyleModal({ rootProps }: { rootProps: any; }) {
+function NameStyleModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>

@@ -68,8 +68,6 @@ export const bgAssetUrl = (id: string) => `${ASSET_ENDPOINT}/bg/assets/${id}`;
 export const patternAssetUrl = (id: string) => `${ASSET_ENDPOINT}/pattern/assets/${id}`;
 export const fontAssetUrl = (id: string) => `${ASSET_ENDPOINT}/fonts/${id}.woff2`;
 
-const MARKER_RE = /\/\* kc-studio:([A-Za-z0-9+/=]+) \*\//;
-
 export function defaultParams(): StudioParams {
     return {
         v: 1,
@@ -350,16 +348,6 @@ html.kc-idle-noblur [class*="guilds_"] { backdrop-filter: none; }`;
 
 export function encodeMarker(params: StudioParams): string {
     return `/* kc-studio:${btoa(encodeURIComponent(JSON.stringify(params)))} */`;
-}
-
-export function decodeMarker(css: string): StudioParams | null {
-    const match = css.match(MARKER_RE);
-    if (!match) return null;
-    try {
-        return sanitizeParams(JSON.parse(decodeURIComponent(atob(match[1]))));
-    } catch {
-        return null;
-    }
 }
 
 export function themeFileName(params: StudioParams): string {

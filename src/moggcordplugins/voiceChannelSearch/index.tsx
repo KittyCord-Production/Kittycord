@@ -10,16 +10,12 @@
 import "./styles.css";
 
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, openModal } from "@utils/modal";
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "@kittycordplugins/_shared/modal";
+import { openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { findByPropsLazy, findStoreLazy } from "@webpack";
 import { Forms, React, useEffect, useRef, UserStore,useState } from "@webpack/common";
-import { ComponentType } from "react";
-
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const GuildStore = findStoreLazy("GuildStore");
 const GuildChannelStore = findStoreLazy("GuildChannelStore");
@@ -137,7 +133,7 @@ function SpinnerIcon() {
     );
 }
 
-function VoiceSearchModal({ rootProps, channels }: { rootProps: any; channels: VoiceChannel[] | null; }) {
+function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps; channels: VoiceChannel[] | null; }) {
     const [query, setQuery] = useState("");
     const [filtered, setFiltered] = useState<VoiceChannel[] | null>(null);
     const [joiningId, setJoiningId] = useState<string | null>(null);
@@ -284,7 +280,7 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: any; channels: V
     );
 }
 
-function VoiceSearchModalWrapper({ rootProps }: { rootProps: any; }) {
+function VoiceSearchModalWrapper({ rootProps }: { rootProps: RenderModalProps; }) {
     const [channels, setChannels] = useState<VoiceChannel[] | null>(
         // If cache is fresh, display immediately without spinner
         scanCache && Date.now() - scanCacheAt < SCAN_TTL ? scanCache : null

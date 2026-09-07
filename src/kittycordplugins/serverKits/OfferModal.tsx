@@ -68,7 +68,7 @@ function OfferDialog({ modalProps, kit, onDecided }: {
                         scope: rule.scope === "user" ? "friend" : rule.scope,
                         targetId: rule.targetId,
                         sound: { kind: "curated", id: rule.sound },
-                        volume: 1
+                        volume: rule.volume ?? 100
                     });
 
             if (kit.plugins && picks.plugins) restartNeeded = applyPlugins(kit.plugins);

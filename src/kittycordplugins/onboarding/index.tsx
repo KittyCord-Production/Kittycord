@@ -12,22 +12,17 @@ import { BRAND_WEBSITE } from "@branding";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { parseUrl } from "@utils/misc";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { type PluginNative } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, ONBOARDING_SEEN_KEY as SEEN_KEY, subscribeFriendAction, takeFriendAction } from "../_shared/friendLink";
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { applyGalleryThemeById } from "../kittycordStudio/store";
 import { SourceList, useDetectedSources } from "../setupImport";
 import { applyShare, parseEnvelope, type ShareEnvelope } from "../shareSetup/utils";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const CODE_RE = /^[a-z0-9_-]{3,20}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -102,7 +97,7 @@ function shareSummary(env: ShareEnvelope): string {
     return `${n} plugins & their settings`;
 }
 
-function OnboardingModal({ rootProps }: { rootProps: any; }) {
+function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [chosen, setChosen] = React.useState<Record<string, boolean>>(
         Object.fromEntries(PACKS.map(p => [p.id, p.default] as [string, boolean]))
     );

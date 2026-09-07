@@ -12,19 +12,16 @@ import { ShieldIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
 import { gitHashShort } from "@shared/vencordUserAgent";
 import { removeFromArray } from "@utils/misc";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin from "@utils/types";
 import { checkForUpdates, update } from "@utils/updater";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, React, showToast, Text, Toasts } from "@webpack/common";
 import { getBuildNumber, patchResilience } from "@webpack/patcher";
-import type { ComponentType, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const IS_WINDOWS_CLIENT = typeof navigator !== "undefined" && /win/i.test(navigator.platform || navigator.userAgent || "");
 const canRepairHost = IS_DISCORD_DESKTOP && !IS_VESKTOP && !IS_EQUIBOP && IS_WINDOWS_CLIENT;
@@ -235,7 +232,7 @@ function DoctorPanel() {
     );
 }
 
-function DoctorModal({ rootProps }: { rootProps: any; }) {
+function DoctorModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>

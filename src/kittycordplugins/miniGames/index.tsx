@@ -7,23 +7,17 @@
 import { updateMessage } from "@api/MessageUpdater";
 import { ErrorBoundary } from "@components/index";
 import { sendMessage } from "@utils/discord";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import type { Message, User } from "@vencord/discord-types";
+import type { Message, RenderModalProps, User } from "@vencord/discord-types";
 import { Button, ChannelStore, Menu, MessageStore, React, SelectedChannelStore, showToast, Text, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
 import { ensureDmChannel } from "../_shared/dm";
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { GameCard, RpsBoard, TttBoard } from "./boards";
 import { collectGame, deriveGame, GameMessage, RPS_CHOICES } from "./engine";
 import { decodeGameMessage, encodeGameMessage, GAME_LABELS, GamePayload, MOVE_FALLBACK, newGameId, randomNonce, sha256Hex, startFallback } from "./protocol";
 import { getPending, removePending, storePending } from "./store";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 async function sendGameMessage(userId: string, payload: GamePayload, fallback: string): Promise<boolean> {
     const channelId = await ensureDmChannel(userId);
@@ -55,7 +49,7 @@ async function startRps(user: User, choice: number) {
     }
 }
 
-function GamePickerModal({ rootProps, user }: { rootProps: any; user: User; }) {
+function GamePickerModal({ rootProps, user }: { rootProps: RenderModalProps; user: User; }) {
     const [picking, setPicking] = React.useState(false);
 
     return (

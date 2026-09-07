@@ -18,7 +18,7 @@ import { GuildStore, Modal, openModal, Select, showToast, TextArea, TextInput, T
 
 import { expand, PLACEHOLDERS, splitSteps } from "./placeholders";
 import { addCommand, categories, CommandScope, CustomCommand, getCommand, importCommands, MAX_ALIASES, MAX_CATEGORY, MAX_DESCRIPTION, removeCommand, settings, SLASH_NAME_RE, takenNames } from "./settings";
-import { addFile, getFile, MAX_FILE_BYTES, removeFile, StoredFile } from "./store";
+import { addFile, getFile, MAX_FILE_BYTES, removeFile } from "./store";
 
 const EXAMPLE_RESPONSE = "Hallo {1|zusammen}, wann hättest du Zeit? Vorschlag: {args}";
 const EMPTY: CustomCommand = { trigger: "", message: "", mode: "send" };
@@ -352,5 +352,3 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
         </Modal>
     );
 }
-
-export type { StoredFile };

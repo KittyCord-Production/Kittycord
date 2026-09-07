@@ -12,6 +12,7 @@ import { CustomCommand, sanitizeCommands } from "../commandStudio/settings";
 import { sanitizeParams, StudioParams } from "../kittycordStudio/template";
 
 export const KIT_LINK_RE = new RegExp(`${escapeRegExp(BRAND_WEBSITE)}/k/\\?id=([0-9a-f-]{36})`, "i");
+export const KIT_TOKENS_KEY = "Kittycord_KitTokens";
 export const MAX_SOUNDS = 20;
 export const MAX_PLUGINS = 40;
 
@@ -19,6 +20,7 @@ export interface KitSound {
     scope: "user" | "channel" | "guild";
     targetId: string;
     sound: string;
+    volume?: number;
 }
 
 export interface ServerKit {
@@ -77,11 +79,12 @@ export function sanitizeKit(raw: unknown): ServerKit | null {
         const sounds: KitSound[] = [];
         for (const entry of data.sounds.slice(0, MAX_SOUNDS)) {
             if (!entry || typeof entry !== "object") continue;
-            const { scope, targetId, sound } = entry as Record<string, unknown>;
+            const { scope, targetId, sound, volume } = entry as Record<string, unknown>;
             if (scope !== "user" && scope !== "channel" && scope !== "guild") continue;
             if (typeof targetId !== "string" || !SNOWFLAKE_RE.test(targetId)) continue;
             if (typeof sound !== "string" || !SOUND_RE.test(sound)) continue;
-            sounds.push({ scope, targetId, sound });
+            const level = typeof volume === "number" && Number.isFinite(volume) ? Math.min(100, Math.max(0, Math.round(volume))) : undefined;
+            sounds.push({ scope, targetId, sound, volume: level });
         }
         if (sounds.length) kit.sounds = sounds;
     }
@@ -97,15 +100,4 @@ export function sanitizeKit(raw: unknown): ServerKit | null {
     if (!kit.theme && !kit.commands && !kit.sounds && !kit.plugins) return null;
 
     return kit;
-}
-
-export function kitSummary(kit: ServerKit): string {
-    const parts: string[] = [];
-    if (kit.theme) parts.push("a theme");
-    if (kit.commands?.length) parts.push(`${kit.commands.length} command${kit.commands.length === 1 ? "" : "s"}`);
-    if (kit.sounds?.length) parts.push(`${kit.sounds.length} sound rule${kit.sounds.length === 1 ? "" : "s"}`);
-    if (kit.plugins?.length) parts.push(`${kit.plugins.length} plugin${kit.plugins.length === 1 ? "" : "s"}`);
-
-    if (parts.length <= 1) return parts[0] ?? "nothing";
-    return `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
 }

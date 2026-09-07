@@ -160,7 +160,7 @@ window.VencordNative = {
     },
 
     kittycordDeepLinks: {
-        onLink: NOOP,
+        onLink: () => NOOP,
         poll: async () => null,
     },
 

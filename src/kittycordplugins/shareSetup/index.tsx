@@ -15,23 +15,17 @@ import SettingsPlugin from "@plugins/_core/settings";
 import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { removeFromArray } from "@utils/misc";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
-import type { Message, MessageAttachment, User } from "@vencord/discord-types";
+import type { Message, MessageAttachment, RenderModalProps, User } from "@vencord/discord-types";
 import { Alerts, Button, Forms, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { FriendsListModal, KittycordFriendsRoster, KittycordFriendsTab, useKittycordFriends } from "./friends";
 import { getShareConsent, registerSelf, setShareConsent, unregisterSelf } from "./registry";
 import style from "./style.css?managed";
 import { applyShare, buildSetupPreview, fetchShare, findShareAttachment, sendShare, type ShareEnvelope, type ShareScope } from "./utils";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const SCOPE_OPTIONS: { label: string; value: ShareScope; }[] = [
     { label: "Plugins & their settings", value: "plugins" },
@@ -99,7 +93,7 @@ function restartPrompt() {
     });
 }
 
-function SendModal({ rootProps, user }: { rootProps: any; user: User; }) {
+function SendModal({ rootProps, user }: { rootProps: RenderModalProps; user: User; }) {
     const [scope, setScope] = React.useState<ShareScope>("plugins");
     const [note, setNote] = React.useState(DEFAULT_NOTE);
     const [busy, setBusy] = React.useState(false);
@@ -213,7 +207,7 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
 
 const ImportCard = ErrorBoundary.wrap(ImportCardInner, { noop: true });
 
-function FriendsModal({ rootProps }: { rootProps: any; }) {
+function FriendsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const { phase, friends, reload, setPhase, setFriends } = useKittycordFriends();
     const [scope, setScope] = React.useState<ShareScope>("plugins");
     const [note, setNote] = React.useState(DEFAULT_NOTE);

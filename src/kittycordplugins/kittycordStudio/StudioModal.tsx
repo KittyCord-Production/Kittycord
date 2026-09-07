@@ -8,21 +8,16 @@ import { get, set } from "@api/DataStore";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { Logger } from "@utils/Logger";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, Button, React, showToast, Slider, Text, TextInput, Toasts } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { ShareFileModal } from "../_shared/ShareFileModal";
 import { openGallery, openPublish } from "./GalleryModal";
 import { buildThemeFile } from "./share";
 import { enableTheme, galleryAvailable, getThemes, isThemeEnabled, loadThemes, removeTheme, saveTheme } from "./store";
 import { ASSET_ENDPOINT, BG_IDS, BG_URL_RE, bgAssetUrl, defaultParams, derivePalette, FONT_IDS, FONTS, HEX_RE, MAX_BG_URL_LEN, MAX_BLUR, MAX_ROUNDNESS, NAME_RE, PATTERN_IDS, sanitizeParams, type StudioBg, type StudioParams } from "./template";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const logger = new Logger("KittycordStudio");
 
@@ -142,7 +137,7 @@ export function PreviewPane({ params }: { params: StudioParams; }) {
     );
 }
 
-function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootProps: any; initial: StudioParams; initialFileName?: string; onSaved(): void; }) {
+function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootProps: RenderModalProps; initial: StudioParams; initialFileName?: string; onSaved(): void; }) {
     const [params, setParams] = React.useState<StudioParams>(() => {
         try { return sanitizeParams(initial); } catch { return defaultParams(); }
     });
@@ -315,7 +310,7 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
     );
 }
 
-function StudioListModal({ rootProps }: { rootProps: any; }) {
+function StudioListModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const [ready, setReady] = React.useState(false);
 

@@ -37,8 +37,6 @@ export async function loadWellbeing(): Promise<void> {
     data = { days: trim(stored?.days ?? []) };
 }
 
-export const getData = () => data;
-
 export function recentDays(n: number): DayStat[] {
     const out: DayStat[] = [];
     const now = new Date();

@@ -8,17 +8,12 @@ import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
 import { updateMessage } from "@api/MessageUpdater";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Message } from "@vencord/discord-types";
+import { Message, RenderModalProps } from "@vencord/discord-types";
 import { Button, Menu, MessageActions, React, Text, TextInput } from "@webpack/common";
-import type { ComponentType } from "react";
 
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const KEY = "Kittycord_MessageTags";
 const PRESET_TAGS = ["TODO", "Important", "Question", "Funny"];
@@ -62,7 +57,7 @@ async function toggleTag(msg: Message, tag: string) {
     updateMessage(msg.channel_id, msg.id);
 }
 
-function TagsModal({ rootProps }: { rootProps: any; }) {
+function TagsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     const [query, setQuery] = React.useState("");
     const [active, setActive] = React.useState<string[]>([]);

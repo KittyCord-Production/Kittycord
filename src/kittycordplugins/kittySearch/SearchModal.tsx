@@ -11,15 +11,16 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { BackupAndRestoreTab, ChangelogTab, CloudTab, openPluginModal, openSettingsTabModal, PluginsTab, ThemesTab, UpdaterTab, VencordTab } from "@components/settings";
 import SettingsPlugin from "@plugins/_core/settings";
 import { classNameFactory } from "@utils/css";
-import { closeModal, ModalContent as ModalContentRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { closeModal, ModalSize, openModal } from "@utils/modal";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
 import { OptionType } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { React, ScrollerThin, Text, TextInput, useEffect, useMemo, useState } from "@webpack/common";
 import type { ComponentType, KeyboardEvent } from "react";
 
+import { ModalContent, ModalRoot } from "../_shared/modal";
+
 const cl = classNameFactory("vc-kittysearch-");
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
 
 interface Entry {
     label: string;
@@ -93,7 +94,7 @@ function fuzzyScore(query: string, text: string): number {
 
 const MAX_RESULTS = 40;
 
-function SearchModal({ rootProps }: { rootProps: any; }) {
+function SearchModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [query, setQuery] = useState("");
     const [sel, setSel] = useState(0);
     const index = useMemo(buildIndex, []);

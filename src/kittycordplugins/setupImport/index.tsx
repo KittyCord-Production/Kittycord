@@ -19,8 +19,6 @@ import { Text, useEffect, useState } from "@webpack/common";
 import { Native, openImportModal } from "./ImportModal";
 import type { DetectedSource } from "./native";
 
-export const importAvailable = () => Boolean(Native);
-
 export function useDetectedSources() {
     const [sources, setSources] = useState<DetectedSource[] | null>(null);
 

@@ -5,17 +5,13 @@
  */
 
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, moment, React, Text, UserStore } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { clearHistory, getHistory, HistoryEntry } from "./history";
 import { bucketColor, bucketLabel } from "./presence";
-
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 function Row({ entry }: { entry: HistoryEntry; }) {
     const user = UserStore.getUser(entry.userId);
@@ -37,7 +33,7 @@ function Row({ entry }: { entry: HistoryEntry; }) {
     );
 }
 
-function HistoryModal({ rootProps }: { rootProps: any; }) {
+function HistoryModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [list, setList] = React.useState<HistoryEntry[]>(getHistory());
 
     return (

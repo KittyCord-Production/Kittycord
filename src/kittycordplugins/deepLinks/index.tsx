@@ -17,7 +17,7 @@ const Invites = VencordNative?.pluginHelpers?.KittyInvites as PluginNative<typeo
 const CODE_RE = /^[a-z0-9_-]{3,20}$/;
 
 let pendingCode: string | null = null;
-let wired = false;
+let unsubscribe: (() => void) | null = null;
 
 async function claim(code: string) {
     if (friendConsumed({ kind: "claim", value: code })) return;
@@ -103,10 +103,13 @@ export default definePlugin({
     },
 
     start() {
-        if (!wired) {
-            VencordNative.kittycordDeepLinks.onLink(handle);
-            wired = true;
-        }
+        unsubscribe = VencordNative.kittycordDeepLinks.onLink(handle);
         VencordNative.kittycordDeepLinks.poll().then(handle);
+    },
+
+    stop() {
+        unsubscribe?.();
+        unsubscribe = null;
+        pendingCode = null;
     }
 });

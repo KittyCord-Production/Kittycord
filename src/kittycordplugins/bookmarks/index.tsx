@@ -7,17 +7,12 @@
 import { get, set } from "@api/DataStore";
 import { updateMessage } from "@api/MessageUpdater";
 import { Flex } from "@components/Flex";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Message } from "@vencord/discord-types";
+import { Message, RenderModalProps } from "@vencord/discord-types";
 import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
-import type { ComponentType } from "react";
 
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
 const KEY = "Kittycord_Bookmarks";
 
@@ -68,7 +63,7 @@ function BookmarkIcon(props: any) {
     );
 }
 
-function BookmarksModal({ rootProps }: { rootProps: any; }) {
+function BookmarksModal({ rootProps }: { rootProps: RenderModalProps; }) {
     const [list, setList] = React.useState<Bookmark[]>(bookmarks);
     const [query, setQuery] = React.useState("");
     const [guild, setGuild] = React.useState("");

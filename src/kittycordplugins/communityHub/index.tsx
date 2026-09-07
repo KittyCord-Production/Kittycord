@@ -11,21 +11,16 @@ import { Flex } from "@components/Flex";
 import { WebsiteIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
-import { ModalCloseButton as ModalCloseButtonRaw, ModalContent as ModalContentRaw, ModalHeader as ModalHeaderRaw, ModalRoot as ModalRootRaw, ModalSize, openModal } from "@utils/modal";
+import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
+import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, React, showToast, Text, Toasts } from "@webpack/common";
-import type { ComponentType } from "react";
 
+import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { openGallery } from "../kittycordStudio/GalleryModal";
 import { browseGallery, enableTheme, galleryAvailable, type GalleryTheme, likeGalleryTheme, saveTheme } from "../kittycordStudio/store";
 import { derivePalette, type StudioParams } from "../kittycordStudio/template";
 import type { NewsItem } from "./native";
-
-// The @utils/modal components are intentionally typed `never` (deprecated). Cast them so we can use them as JSX.
-const ModalRoot = ModalRootRaw as ComponentType<any>;
-const ModalHeader = ModalHeaderRaw as ComponentType<any>;
-const ModalContent = ModalContentRaw as ComponentType<any>;
-const ModalCloseButton = ModalCloseButtonRaw as ComponentType<any>;
 
 const Native = VencordNative?.pluginHelpers?.CommunityHub as PluginNative<typeof import("./native")> | undefined;
 
@@ -171,7 +166,7 @@ function CommunityPanel() {
     );
 }
 
-function CommunityModal({ rootProps }: { rootProps: any; }) {
+function CommunityModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
