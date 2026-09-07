@@ -7,6 +7,7 @@
 import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
 import { updateMessage } from "@api/MessageUpdater";
+import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
@@ -129,6 +130,21 @@ function TagsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     );
 }
 
+function TagChipsInner({ message }: { message: Message; }) {
+    const tags = getTags(message.id);
+    if (!tags.length) return null;
+
+    return (
+        <Flex style={{ gap: 4, alignItems: "center" }}>
+            {tags.map(t => (
+                <span key={t} style={{ background: "var(--brand-500)", color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11 }}>{t}</span>
+            ))}
+        </Flex>
+    );
+}
+
+const TagChips = ErrorBoundary.wrap(TagChipsInner, { noop: true });
+
 export default definePlugin({
     name: "MessageTags",
     description: "Tag messages with private local labels (TODO, Important, ...), see them as chips, and browse/jump to them from the Kittycord menu in the header.",
@@ -158,15 +174,7 @@ export default definePlugin({
     },
 
     renderMessageAccessory({ message }) {
-        const tags = getTags(message.id);
-        if (!tags.length) return null;
-        return (
-            <Flex style={{ gap: 4, alignItems: "center" }}>
-                {tags.map(t => (
-                    <span key={t} style={{ background: "var(--brand-500)", color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11 }}>{t}</span>
-                ))}
-            </Flex>
-        );
+        return <TagChips message={message} />;
     },
 
     toolboxActions: {

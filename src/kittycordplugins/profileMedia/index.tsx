@@ -8,6 +8,7 @@ import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { CloudDownloadIcon, ImageIcon } from "@components/Icons";
 import { openImageModal } from "@utils/discord";
 import definePlugin from "@utils/types";
+import { saveFile } from "@utils/web";
 import { User } from "@vencord/discord-types";
 import { IconUtils, Menu, showToast, Toasts, UserProfileStore } from "@webpack/common";
 
@@ -35,14 +36,7 @@ async function downloadImage(url: string, filename: string) {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        const objectUrl = URL.createObjectURL(await res.blob());
-        const a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(objectUrl);
+        saveFile(new File([await res.blob()], filename));
     } catch {
         showToast("Failed to download image", Toasts.Type.FAILURE);
     }

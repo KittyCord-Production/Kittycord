@@ -52,7 +52,7 @@ async function openInviteStatsShare() {
     }
     try {
         const mine = await Native.getMe(me.id);
-        const name = (me as any).globalName || me.username;
+        const name = me.globalName || me.username;
         const avatar = IconUtils.getUserAvatarURL(me, false, 128);
         const blob = await renderInviteStatsCard(name, avatar, mine.invites, mine.rank);
         const file = new File([blob], INVITE_STATS_FILENAME, { type: "image/png" });
@@ -90,7 +90,7 @@ function InvitesTab() {
 
     const userName = (id: string) => {
         const u = UserStore.getUser(id);
-        return (u as any)?.globalName || u?.username || id;
+        return u?.globalName || u?.username || id;
     };
 
     function ensureUser(id: string) {

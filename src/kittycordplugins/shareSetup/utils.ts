@@ -90,19 +90,20 @@ export function findShareAttachment(attachments: MessageAttachment[] | undefined
 export function parseEnvelope(text: string): ShareEnvelope {
     if (text.length > MAX_SHARE_BYTES) throw new Error("That setup file is too large.");
 
-    let obj: any;
+    let parsed: unknown;
     try {
-        obj = JSON.parse(text);
+        parsed = JSON.parse(text);
     } catch {
         throw new Error("That setup file could not be read.");
     }
 
+    const obj = parsed as Record<string, unknown>;
     if (!obj || obj.kind !== "kittycord-share" || typeof obj.v !== "number" || typeof obj.body !== "string")
         throw new Error("That file is not a Kittycord setup.");
     if (obj.scope !== "plugins" && obj.scope !== "css" && obj.scope !== "all")
         throw new Error("That setup uses an unknown scope.");
 
-    return obj as ShareEnvelope;
+    return obj as unknown as ShareEnvelope;
 }
 
 export async function fetchShare(attachment: MessageAttachment): Promise<ShareEnvelope> {

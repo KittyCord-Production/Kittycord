@@ -117,7 +117,7 @@ export function buildPluginMenuEntries(includeEmpty = false) {
                                                 ref={ref}
                                                 {...props}
                                                 minValue={option.markers[0]}
-                                                maxValue={option.markers.at(-1)!}
+                                                maxValue={option.markers[option.markers.length - 1]}
                                                 value={s[key]}
                                                 onChange={v => s[key] = v}
                                             />

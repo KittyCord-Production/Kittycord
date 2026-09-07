@@ -174,9 +174,11 @@ function triggerMatches(t: AutoTrigger): boolean {
 }
 
 function bestMatch(): Mode | null {
-    const matches = modes.filter(m => m.auto && triggerMatches(m.auto));
+    const matches = modes
+        .map(m => (m.auto && triggerMatches(m.auto) ? { mode: m, auto: m.auto } : null))
+        .filter((m): m is { mode: Mode; auto: AutoTrigger; } => m !== null);
     if (!matches.length) return null;
-    return [...matches].sort((a, b) => PRIORITY[a.auto!.kind] - PRIORITY[b.auto!.kind])[0];
+    return [...matches].sort((a, b) => PRIORITY[a.auto.kind] - PRIORITY[b.auto.kind])[0].mode;
 }
 
 export async function evaluateAuto() {

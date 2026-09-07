@@ -142,11 +142,11 @@ function GameAccessoryInner({ message }: { message: Message; }) {
         setTimeout(() => { sendingRef.current = false; }, 1500);
     }
 
-    function rematch() {
-        const opponentId = state!.starter === me.id ? state!.vs : state!.starter;
+    const rematch = () => {
+        const opponentId = state.starter === me.id ? state.vs : state.starter;
         const opponent = UserStore.getUser(opponentId);
         if (opponent) openGamePicker(opponent);
-    }
+    };
 
     if (state.kind === "ttt") {
         return (

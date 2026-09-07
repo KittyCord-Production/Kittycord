@@ -90,7 +90,7 @@ function CommunityPanel() {
     }
 
     const visibleNews = (news ?? []).filter(n => !dismissed.includes(n.id));
-    const hasThemes = !!themes?.length;
+    const [topTheme, ...moreThemes] = themes ?? [];
 
     return (
         <ErrorBoundary noop>
@@ -120,29 +120,29 @@ function CommunityPanel() {
                 </>
             )}
 
-            {hasThemes && (
+            {topTheme && (
                 <>
                     <Flex style={{ alignItems: "center", marginTop: 6, marginBottom: 6 }}>
                         <Text variant="text-sm/semibold" style={{ flexGrow: 1 }}>{anyFeatured ? "Theme of the week" : "Popular theme"}</Text>
                         <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={openGallery}>Browse all</Button>
                     </Flex>
                     <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 14, marginBottom: 8 }}>
-                        <Swatches params={themes![0].params} width="100%" height={44} />
+                        <Swatches params={topTheme.params} width="100%" height={44} />
                         <Flex style={{ alignItems: "center", gap: 10, marginTop: 12 }}>
                             <div style={{ flexGrow: 1, minWidth: 0 }}>
                                 <Flex style={{ alignItems: "center", gap: 6 }}>
-                                    {themes![0].featured && <span style={{ fontSize: 12 }}>⭐</span>}
-                                    <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{themes![0].name}</Text>
+                                    {topTheme.featured && <span style={{ fontSize: 12 }}>⭐</span>}
+                                    <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topTheme.name}</Text>
                                 </Flex>
-                                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {themes![0].authorName}</Text>
+                                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {topTheme.authorName}</Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => like(themes![0])}>
-                                ♥ {likes[themes![0].id] ?? themes![0].likes}
+                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => like(topTheme)}>
+                                ♥ {likes[topTheme.id] ?? topTheme.likes}
                             </Button>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={() => applyTheme(themes![0])}>Apply</Button>
+                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={() => applyTheme(topTheme)}>Apply</Button>
                         </Flex>
                     </div>
-                    {themes!.slice(1).map(t => (
+                    {moreThemes.map(t => (
                         <div key={t.id} style={{ background: "var(--background-secondary)", borderRadius: 10, padding: 10, marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
                             <Swatches params={t.params} />
                             <div style={{ flexGrow: 1, minWidth: 0 }}>

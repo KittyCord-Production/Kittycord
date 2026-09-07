@@ -11,6 +11,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message, RenderModalProps } from "@vencord/discord-types";
 import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import type { SVGProps } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -55,7 +56,7 @@ async function toggle(msg: Message) {
     updateMessage(msg.channel_id, msg.id);
 }
 
-function BookmarkIcon(props: any) {
+function BookmarkIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg viewBox="0 0 24 24" width={24} height={24} fill="currentColor" {...props}>
             <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />

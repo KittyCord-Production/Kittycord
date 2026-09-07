@@ -11,6 +11,7 @@ import { Flex } from "@components/Flex";
 import { ShieldIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
 import { gitHashShort } from "@shared/vencordUserAgent";
+import { IS_WINDOWS } from "@utils/constants";
 import { removeFromArray } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
@@ -23,8 +24,7 @@ import type { ReactNode } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
-const IS_WINDOWS_CLIENT = typeof navigator !== "undefined" && /win/i.test(navigator.platform || navigator.userAgent || "");
-const canRepairHost = IS_DISCORD_DESKTOP && !IS_VESKTOP && !IS_EQUIBOP && IS_WINDOWS_CLIENT;
+const canRepairHost = IS_DISCORD_DESKTOP && !IS_VESKTOP && !IS_EQUIBOP && IS_WINDOWS;
 const canUpdate = !IS_WEB && !IS_UPDATER_DISABLED;
 
 const WARN_COLOR = "#f0b232";
@@ -67,7 +67,7 @@ function scan(): Scan {
         enabledCount,
         failed,
         discordBuild,
-        transparencyOn: IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && Settings.transparent === true,
+        transparencyOn: IS_DISCORD_DESKTOP && IS_WINDOWS && Settings.transparent === true,
         perfOn: isPluginEnabled("PerformanceMode"),
         heavyTheme: heavyThemeFile?.replace(/\.theme\.css$/, "") ?? (isPluginEnabled("HelloKittyTheme") ? "HelloKittyTheme" : null),
         weakDevice: (navigator.hardwareConcurrency || 8) <= 4 || ((navigator as { deviceMemory?: number; }).deviceMemory ?? 8) <= 4
@@ -198,7 +198,7 @@ function DoctorPanel() {
                 {updateState === "error" && " Couldn't check for updates."}
             </StatusCard>
 
-            {IS_DISCORD_DESKTOP && IS_WINDOWS_CLIENT && (
+            {IS_DISCORD_DESKTOP && IS_WINDOWS && (
                 <StatusCard title="Window behavior" ok={!data.transparencyOn}>
                     {data.transparencyOn
                         ? "Window Transparency is on, so Windows can't snap this window — dragging it to the top or pressing Win+Arrow won't maximize it. Turn off \"Enable Window Transparency\" in Kittycord settings to get snapping back. Tip: Background Material gives a glass look without this limitation."

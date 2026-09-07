@@ -51,13 +51,14 @@ export async function fetchTheme(attachment: MessageAttachment): Promise<Fetched
     const text = await downloadAttachmentText(attachment, Native);
     if (text.length > MAX_THEME_BYTES) throw new Error("That theme file is too large.");
 
-    let obj: any;
+    let parsed: unknown;
     try {
-        obj = JSON.parse(text);
+        parsed = JSON.parse(text);
     } catch {
         throw new Error("That theme file could not be read.");
     }
 
+    const obj = parsed as { kind?: unknown; v?: unknown; params?: unknown; sender?: { username?: unknown; }; };
     if (!obj || obj.kind !== "kittycord-theme" || typeof obj.v !== "number")
         throw new Error("That file is not a Kittycord theme.");
 

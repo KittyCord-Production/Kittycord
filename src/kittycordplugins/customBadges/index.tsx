@@ -26,7 +26,9 @@ export async function refreshBadges() {
     customBadges.clear();
     for (const b of list) {
         if (!customBadges.has(b.id)) customBadges.set(b.id, []);
-        customBadges.get(b.id)![b.slot] = { emoji: b.emoji, label: b.label };
+        const slots = customBadges.get(b.id) ?? [];
+        slots[b.slot] = { emoji: b.emoji, label: b.label };
+        customBadges.set(b.id, slots);
     }
 }
 

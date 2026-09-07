@@ -13,6 +13,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Channel, RenderModalProps } from "@vencord/discord-types";
 import { Button, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import type { SVGProps } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -243,7 +244,7 @@ function ManagerModal({ rootProps }: { rootProps: RenderModalProps; }) {
     );
 }
 
-function ClockIcon(props: any) {
+function ClockIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg viewBox="0 0 24 24" width={24} height={24} fill="currentColor" {...props}>
             <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm1-13h-2v6l5 3 1-1.7-4-2.3V7Z" />

@@ -60,11 +60,11 @@ export function RequestLog() {
     const hosts = [...new Set(entries?.map(e => e.host) ?? [])];
     const recent = [...(entries ?? [])].reverse();
 
-    async function exportLog() {
-        const log = await bridge!.getRequestLog();
+    const exportLog = async () => {
+        const log = await bridge.getRequestLog();
         const name = `kittycord-requests-${new Date().toISOString().slice(0, 10)}.json`;
         saveFile(new File([JSON.stringify(log, null, 2)], name, { type: "application/json" }));
-    }
+    };
 
     return (
         <>

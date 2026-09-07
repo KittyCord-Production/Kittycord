@@ -6,6 +6,7 @@
 
 import { themeShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
+import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
@@ -53,13 +54,8 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
         if (result !== null) setLikes(result);
     }
 
-    async function copyLink() {
-        try {
-            await navigator.clipboard.writeText(themeShareUrl(theme.id));
-            showToast("Share link copied — anyone can preview this theme.", Toasts.Type.SUCCESS);
-        } catch {
-            showToast("Could not copy the link.", Toasts.Type.FAILURE);
-        }
+    function copyLink() {
+        copyWithToast(themeShareUrl(theme.id), "Share link copied — anyone can preview this theme.");
     }
 
     function remove() {

@@ -11,7 +11,7 @@ import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import { isOverlayWindow } from "@utils/overlay";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Alerts, Button, React, showToast, Text, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, IconUtils, React, showToast,Text, Toasts, UserStore } from "@webpack/common";
 
 import { assetUrl, byId, CATALOG, Deko, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
@@ -48,8 +48,8 @@ function useKittyDekoDecoration(user?: { id?: string; }) {
 }
 
 function avatarUrl(): string {
-    const me = UserStore.getCurrentUser() as any;
-    return me?.getAvatarURL?.(undefined, 128) ?? "";
+    const me = UserStore.getCurrentUser();
+    return me ? IconUtils.getUserAvatarURL(me, false, 128) : "";
 }
 
 function DekoShop() {
@@ -105,7 +105,8 @@ function DekoShop() {
     async function equip(id: string | null) {
         if (!Native || !me) return;
         if (id) {
-            const d = byId.get(id)!;
+            const d = byId.get(id);
+            if (!d) return;
             if (d.supporterOnly && !supporter) {
                 showToast("This frame is for Kittycord supporters.", Toasts.Type.FAILURE);
                 return;

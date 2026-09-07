@@ -91,8 +91,8 @@ function SafetyTab() {
     }
 
     const done = CHECKLIST.filter(c => checks[c.id]).length;
-    const telemetry = (VencordNative as any)?.kittycordTelemetry as ConsentBridge | undefined;
-    const share = (VencordNative as any)?.kittycordShare as ConsentBridge | undefined;
+    const telemetry = VencordNative.kittycordTelemetry;
+    const share = VencordNative.kittycordShare;
 
     return (
         <ErrorBoundary noop>

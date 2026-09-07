@@ -10,6 +10,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
 import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import type { PropsWithChildren } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -95,7 +96,7 @@ const SOURCE_OPTIONS = [
     { label: "Tagged", value: "tag" }
 ];
 
-function Chip({ children, color = "var(--brand-500)" }: { children: any; color?: string; }) {
+function Chip({ children, color = "var(--brand-500)" }: PropsWithChildren<{ color?: string; }>) {
     return <span style={{ background: color, color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11, marginLeft: 4 }}>{children}</span>;
 }
 

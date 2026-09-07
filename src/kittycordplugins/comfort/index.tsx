@@ -18,7 +18,7 @@ import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
 import { Select, Text, TextInput } from "@webpack/common";
 
-const WATCHED = ["plugins.*"] as const;
+const WATCHED = ["plugins.*"] satisfies Parameters<typeof useSettings>[0];
 
 interface Preset {
     id: string;
@@ -186,7 +186,7 @@ function BreaksRow() {
 }
 
 function ComfortTab() {
-    useSettings(WATCHED as unknown as Parameters<typeof useSettings>[0]);
+    useSettings(WATCHED);
 
     return (
         <ErrorBoundary noop>

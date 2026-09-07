@@ -53,7 +53,8 @@ function ImportDialog({ modalProps, source }: { modalProps: RenderModalProps; so
             .catch(() => setFailed(true));
     }, [source.key]);
 
-    const canPlugins = Boolean(plan?.matched.length);
+    const matchedCount = plan?.matched.length ?? 0;
+    const canPlugins = matchedCount > 0;
     const canThemes = Boolean(data?.themes.length);
     const canQuickCss = Boolean(data?.quickCss?.trim());
 
@@ -127,7 +128,7 @@ function ImportDialog({ modalProps, source }: { modalProps: RenderModalProps; so
                         value={choices.plugins && canPlugins}
                         disabled={!canPlugins}
                         onChange={v => setChoices(c => ({ ...c, plugins: v }))}
-                        title={canPlugins ? `${plan!.matched.length} plugins and their settings` : "No plugins to bring over"}
+                        title={canPlugins ? `${matchedCount} plugins and their settings` : "No plugins to bring over"}
                         description={plan?.skipped.length
                             ? `${plan.skipped.length} more do not exist in Kittycord and stay behind.`
                             : "Every plugin that also exists here keeps the settings you gave it."}

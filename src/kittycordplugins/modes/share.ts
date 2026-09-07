@@ -93,13 +93,14 @@ export async function fetchMode(attachment: MessageAttachment): Promise<FetchedM
     const text = await downloadAttachmentText(attachment, Native);
     if (text.length > MAX_MODE_BYTES) throw new Error("That mode file is too large.");
 
-    let obj: any;
+    let parsed: unknown;
     try {
-        obj = JSON.parse(text);
+        parsed = JSON.parse(text);
     } catch {
         throw new Error("That mode file could not be read.");
     }
 
+    const obj = parsed as { kind?: unknown; v?: unknown; mode?: unknown; sender?: { username?: unknown; }; };
     if (!obj || obj.kind !== "kittycord-mode" || typeof obj.v !== "number")
         throw new Error("That file is not a Kittycord mode.");
 

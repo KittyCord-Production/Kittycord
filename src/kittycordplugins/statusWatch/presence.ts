@@ -9,23 +9,25 @@ import { PresenceStore } from "@webpack/common";
 
 export type StatusBucket = "online" | "idle" | "dnd" | "offline";
 
-export const BUCKETS: { key: StatusBucket; label: string; color: string; body: string; }[] = [
-    { key: "online", label: "Online", color: "var(--text-status-online)", body: "is now online" },
-    { key: "idle", label: "Idle", color: "var(--text-status-idle)", body: "went idle" },
-    { key: "dnd", label: "Do Not Disturb", color: "var(--text-status-dnd)", body: "is on Do Not Disturb" },
-    { key: "offline", label: "Offline", color: "var(--text-status-offline)", body: "went offline" }
-];
+const BUCKET_INFO: Record<StatusBucket, { label: string; color: string; body: string; }> = {
+    online: { label: "Online", color: "var(--text-status-online)", body: "is now online" },
+    idle: { label: "Idle", color: "var(--text-status-idle)", body: "went idle" },
+    dnd: { label: "Do Not Disturb", color: "var(--text-status-dnd)", body: "is on Do Not Disturb" },
+    offline: { label: "Offline", color: "var(--text-status-offline)", body: "went offline" }
+};
+
+export const BUCKETS = (Object.keys(BUCKET_INFO) as StatusBucket[]).map(key => ({ key, ...BUCKET_INFO[key] }));
 
 export function bucketLabel(bucket: StatusBucket): string {
-    return BUCKETS.find(b => b.key === bucket)!.label;
+    return BUCKET_INFO[bucket].label;
 }
 
 export function bucketColor(bucket: StatusBucket): string {
-    return BUCKETS.find(b => b.key === bucket)!.color;
+    return BUCKET_INFO[bucket].color;
 }
 
 export function bucketBody(bucket: StatusBucket): string {
-    return BUCKETS.find(b => b.key === bucket)!.body;
+    return BUCKET_INFO[bucket].body;
 }
 
 export function bucketOf(status: OnlineStatus | undefined): StatusBucket | null {

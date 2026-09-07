@@ -7,6 +7,7 @@
 import { get, set } from "@api/DataStore";
 import { packShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
+import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { PluginNative } from "@utils/types";
@@ -117,13 +118,8 @@ export async function quickShare(name: string, commands: CustomCommand[]): Promi
     return packShareUrl(result.id);
 }
 
-async function copyShareLink(id: string) {
-    try {
-        await navigator.clipboard.writeText(packShareUrl(id));
-        showToast("Share link copied — anyone can preview this pack.", Toasts.Type.SUCCESS);
-    } catch {
-        showToast("Could not copy the link.", Toasts.Type.FAILURE);
-    }
+function copyShareLink(id: string) {
+    copyWithToast(packShareUrl(id), "Share link copied — anyone can preview this pack.");
 }
 
 function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalProps; pack: GalleryPack; commands: CustomCommand[]; }) {

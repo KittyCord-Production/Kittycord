@@ -41,10 +41,10 @@ function ImportCardInner({ message }: { message: Message; }) {
         ? commands.map(c => `${prefix}${c.trigger}`).join(" ")
         : "a command";
 
-    function add() {
-        if (share!.kind === "link") openPackImport(share!.value);
-        else openCommandsImport(commands!, what, own ? "you" : sender);
-    }
+    const add = () => {
+        if (share.kind === "link") openPackImport(share.value);
+        else if (commands) openCommandsImport(commands, what, own ? "you" : sender);
+    };
 
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>

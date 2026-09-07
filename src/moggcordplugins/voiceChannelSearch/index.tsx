@@ -39,6 +39,7 @@ interface VoiceChannel {
 let scanCache: VoiceChannel[] | null = null;
 let scanCacheAt = 0;
 const SCAN_TTL = 10000; // 10s cache
+const MAX_ROWS = 150;
 
 async function scan(): Promise<VoiceChannel[]> {
     // Returns cache if fresh
@@ -180,7 +181,8 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
     }
 
     const displayList = filtered ?? channels;
-    const count = displayList?.length ?? 0;
+    const rows = displayList ?? [];
+    const count = rows.length;
 
     return (
         <ModalRoot {...rootProps} size="medium">
@@ -218,10 +220,10 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
                             )}
                         </div>
                         <div className="vcs-channel-list">
-                            {displayList!.length === 0 && (
+                            {rows.length === 0 && (
                                 <div className="vcs-empty">{query ? "No channel found" : "No voice channels"}</div>
                             )}
-                            {displayList!.slice(0, 150).map(ch => (
+                            {rows.slice(0, MAX_ROWS).map(ch => (
                                 <div key={ch.channelId}
                                     className={`vcs-row${ch.canAccess ? "" : " vcs-row--locked"}`}
                                     onClick={() => ch.canAccess && join(ch)}
@@ -267,9 +269,9 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
                                     }
                                 </div>
                             ))}
-                            {displayList!.length > 80 && !query && (
+                            {rows.length > MAX_ROWS && !query && (
                                 <div className="vcs-empty" style={{ fontSize: 11, opacity: 0.5 }}>
-                                    {displayList!.length - 80} more channels — use search
+                                    {rows.length - MAX_ROWS} more channels — use search
                                 </div>
                             )}
                         </div>
