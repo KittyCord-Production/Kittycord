@@ -44,6 +44,22 @@ The fork is designed to minimise conflicts:
 - **Internal `Vencord*` identifiers are left untouched** (IPC channels, `VencordNative`,
   `VencordStyles`, IndexedDB `VencordData`/`VencordStore`, `Vencord_*` localStorage keys). Do not
   rename these — it breaks plugin compatibility and guarantees painful merges.
+- **Kittycord code lives in Kittycord files.** `src/main/kittycord.ts` and `src/kittycordStartup.ts`
+  hold the startup work, so `src/main/patcher.ts` and `src/Vencord.ts` only carry a one-line call
+  each. Add new startup steps there, not in the inherited entry points.
+- **Import through the aliases** — `@branding`, `@kittycordplugins/*`, `@moggcordplugins/*`. A
+  relative path from an inherited file breaks whenever upstream moves that file.
+
+### Files deliberately removed
+
+These exist upstream and are intentionally gone here. A merge that touches them produces a
+delete/modify conflict; resolve it with `git rm`, do not restore them.
+
+| Path | Why it is gone |
+|---|---|
+| `misc/install.sh` | Installs a different client mod; Kittycord ships its own installers. |
+| `scripts/generateReport.ts` | Its only consumer was a workflow this repo does not have. |
+| `src/equicordplugins/scheduledMessages/`, `src/equicordplugins/signature/`, `src/equicordplugins/pendingFriendRequest/` handling | Kittycord ships its own plugin of the same name, so only one was ever reachable. |
 
 ## Plugin folder layout
 
@@ -64,4 +80,22 @@ pnpm install
 pnpm build        # desktop (patcher/renderer/preload)
 pnpm buildWeb     # browser extension + userscript
 pnpm inject       # patch local Discord for testing
+pnpm uninject     # revert it
 ```
+
+Before pushing, run what CI runs:
+
+```bash
+pnpm testTsc && pnpm lint && pnpm lint-styles && pnpm lint:intl && pnpm lint:patches
+```
+
+The installers have their own tests, which CI runs on every release build:
+
+```bash
+powershell -NoProfile -ExecutionPolicy Bypass -File installer/test/windows-install.test.ps1
+bash installer/test/macos-install.test.sh
+```
+
+Both patch a throwaway Discord fixture and never touch a real install. If you change how any
+installer writes the shim into Discord, the Windows test compares the bytes against
+`src/main/applyHostPatch.ts` and will fail if the three writers drift apart.

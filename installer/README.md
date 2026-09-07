@@ -83,7 +83,7 @@ patched). It is produced automatically by [.github/workflows/release.yml](../.gi
    ```
 2. Run the installer (do **not** use an Administrator terminal):
    ```powershell
-   powershell -ExecutionPolicy Bypass -File .\installer\Kittycord-Install.ps1
+   pnpm inject
    ```
 3. Start Discord again. You should see the Kittycord settings section.
 
@@ -94,10 +94,11 @@ fallback to vanilla Discord if the patcher ever fails to load).
 ## Uninstall
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\installer\Kittycord-Uninstall.ps1
+pnpm uninject
 ```
 
-This removes the injected `app/` folder and restores the original `app.asar`.
+This removes the injected `app/` folder and restores the original `app.asar` in every Discord
+version folder it finds.
 
 ## Notes
 
@@ -106,3 +107,20 @@ This removes the injected `app/` folder and restores the original `app.asar`.
 - Discord host updates create a new `app-<version>` folder; re-run the installer after a Discord
   update if Kittycord stops loading (a host-update hook handles most cases automatically).
 - A standalone custom client and a Linux installer are on the roadmap.
+
+## Tests
+
+Both end-user installers are covered by tests that run against a throwaway Discord fixture, never
+a real install. CI runs them on every release build.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File installer/test/windows-install.test.ps1
+```
+
+```sh
+bash installer/test/macos-install.test.sh
+```
+
+The Windows test pulls the patch logic straight out of `Kittycord-Installer-GUI.ps1`, so it can
+never drift from the script CI compiles, and it compares the injected files byte for byte against
+what `src/main/applyHostPatch.ts` writes.

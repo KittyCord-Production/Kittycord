@@ -183,12 +183,12 @@ pnpm build
 Inject your local build into the Discord desktop client (Windows):
 
 ```shell
-powershell -ExecutionPolicy Bypass -File .\installer\Kittycord-Install.ps1
+pnpm inject
 ```
 
 Start Discord again and the Kittycord settings section appears. Re-run the script after
 `pnpm build` whenever you want your latest changes in the client; revert everything with
-`installer\Kittycord-Uninstall.ps1`.
+`pnpm uninject`.
 
 ### Web extension / userscript
 
