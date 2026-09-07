@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export const DEKO_CDN = "https://kittycord-analytics.hell-bullet-hb.workers.dev/deko/assets";
+import { BRAND_API } from "../../branding";
+
+export const DEKO_CDN = `${BRAND_API}/deko/assets`;
 export const KITTY_DEKO_SKU = "107107100101107111";
 
 export interface Deko {

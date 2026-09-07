@@ -25,6 +25,8 @@ import { React, useEffect } from "@webpack/common";
 
 import plugins from "~plugins";
 
+import { BRAND_API } from "../branding";
+
 const logger = new Logger("Settings");
 
 export type ThemeActivationMode = "always" | "light" | "dark";
@@ -109,7 +111,7 @@ export interface Settings {
     ignoreResetWarning: boolean;
 }
 
-export const DEFAULT_CLOUD_URL = "https://kittycord-analytics.hell-bullet-hb.workers.dev/";
+export const DEFAULT_CLOUD_URL = `${BRAND_API}/`;
 
 const DefaultSettings: Settings = {
     autoUpdate: true,
@@ -164,7 +166,9 @@ const DefaultSettings: Settings = {
 const settings = !IS_REPORTER ? VencordNative.settings.get() : {} as Settings;
 mergeDefaults(settings, DefaultSettings);
 
-if (settings.cloud && !settings.cloud.authenticated && settings.cloud.url !== DEFAULT_CLOUD_URL) {
+const INHERITED_CLOUD_URLS = ["https://cloud.equicord.org/", "https://api.vencord.dev/"];
+
+if (settings.cloud && !settings.cloud.authenticated && INHERITED_CLOUD_URLS.includes(settings.cloud.url)) {
     settings.cloud.url = DEFAULT_CLOUD_URL;
 }
 

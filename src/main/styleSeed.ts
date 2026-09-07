@@ -26,7 +26,7 @@ try {
             continue;
         }
         try {
-            const accent = JSON.parse((raw.charCodeAt(0) === 0xFEFF ? raw.slice(1) : raw).trim())?.accent;
+            const accent = JSON.parse(raw.trim())?.accent;
             if (typeof accent === "string" && Object.prototype.hasOwnProperty.call(ACCENT_PRESETS, accent)) {
                 RendererSettings.store.kittycordAccent = accent as KittycordAccent;
             }

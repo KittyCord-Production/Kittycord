@@ -20,6 +20,7 @@ import { onceDefined } from "@shared/onceDefined";
 import electron, { app, BrowserWindowConstructorOptions, Menu } from "electron";
 import { dirname, join } from "path";
 
+import { installKittycord } from "./kittycord";
 import { RendererSettings } from "./settings";
 import { patchTrayMenu } from "./trayMenu";
 import { IS_VANILLA } from "./utils/constants";
@@ -44,86 +45,7 @@ if (!IS_VANILLA) {
 
     patchTrayMenu();
 
-    try {
-        require("./requestLog").installRequestLog();
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up the request log", err);
-    }
-
-    try {
-        require("./styleSeed");
-    } catch (err) {
-        console.error("[Kittycord] Failed to apply style seed", err);
-    }
-
-    // Rebrand Discord's startup splash window to Kittycord (best-effort, never throws).
-    try {
-        require("./kittycordSplash");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up splash branding", err);
-    }
-
-    // Install Kittycord's bundled themes into the user's themes folder (shows up under Settings > Themes).
-    try {
-        require("./bundledThemes");
-    } catch (err) {
-        console.error("[Kittycord] Failed to install bundled themes", err);
-    }
-
-    // Optional anonymous usage stats (opt-in; fully inert until an endpoint is configured + the user agrees).
-    try {
-        require("./telemetry");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up telemetry", err);
-    }
-
-    try {
-        require("./crashReporter");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up crash reporting", err);
-    }
-
-    try {
-        require("./deepLinks");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up deep links", err);
-    }
-
-    // Optional opt-in "which friends use Kittycord?" registry (inert until configured + the user agrees).
-    try {
-        require("./shareRegistry");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up share registry", err);
-    }
-
-    // Custom profile badges (emoji + label).
-    try {
-        require("./customBadges");
-    } catch (err) {
-        console.error("[Kittycord] Failed to set up custom badges", err);
-    }
-
-    /*
-     * re-apply the patch when discord ships a new host version. skipped
-     * on vesktop and equibop because they manage their own updates.
-     */
-    if (!IS_VESKTOP && !IS_EQUIBOP) {
-        try {
-            require("./hostUpdateHook").installHostUpdateHook();
-        } catch (err) {
-            console.error("[Kittycord] Failed to install host update hook", err);
-        }
-    }
-
-    if (process.platform === "win32" && !IS_VESKTOP && !IS_EQUIBOP) {
-        /* before-quit fallback for the rare case the hook above never sees discord_desktop_core get required */
-        require("./persistAfterDiscordUpdates");
-        try {
-            require("./retainPatch").installRetainPatch();
-        } catch (err) {
-            console.error("[Kittycord] Failed to install retain patch", err);
-        }
-    }
+    installKittycord();
 
     if (process.platform === "win32" && settings.winCtrlQ) {
         const originalBuild = Menu.buildFromTemplate;
@@ -238,7 +160,7 @@ if (!IS_VANILLA) {
     app.commandLine.appendSwitch("disable-background-timer-throttling");
     app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 } else {
-    console.log("[Kittycord] Running in vanilla mode. Not loading Equicord");
+    console.log("[Kittycord] Running in vanilla mode. Not loading Kittycord");
 }
 
 console.log("[Kittycord] Loading original Discord app.asar");

@@ -12,9 +12,10 @@ import { ipcMain } from "electron";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
+import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
-const ENDPOINT: string = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+const ENDPOINT: string = BRAND_API;
 
 const FILE = join(DATA_DIR, "shareRegistry.json");
 const DAY = 24 * 60 * 60 * 1000;

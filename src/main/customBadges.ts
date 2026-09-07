@@ -11,7 +11,9 @@
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 
-const ENDPOINT: string = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+import { BRAND_API } from "../branding";
+
+const ENDPOINT: string = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const MAX_ICON_LEN = 512;
 const MAX_LABEL_LEN = 24;

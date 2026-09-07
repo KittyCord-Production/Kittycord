@@ -6,7 +6,9 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+import { BRAND_API } from "../../branding";
+
+const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const ROLE_IDS = new Set(["kittycord-developer", "kittycord-staff", "kittycord-helper", "kittycord-donor", "kittycord-contributor", "kittycord-bughunter"]);
 

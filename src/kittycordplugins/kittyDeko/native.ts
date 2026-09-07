@@ -6,9 +6,10 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
+import { BRAND_API } from "../../branding";
 import { CATALOG, PRICED_IDS } from "./catalog";
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const DEKO_IDS = new Set(CATALOG.map(d => d.id));
 

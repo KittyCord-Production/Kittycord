@@ -8,9 +8,10 @@ import { get, set } from "@api/DataStore";
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
 
+import { BRAND_API } from "../../branding";
 import { RuleList } from "./RuleList";
 
-const SOUND_CDN = "https://kittycord-analytics.hell-bullet-hb.workers.dev/sounds";
+const SOUND_CDN = `${BRAND_API}/sounds`;
 const AUDIO_KEY = "SoundStudio_Audio";
 const SHARE_PREFIX = "KSND1:";
 

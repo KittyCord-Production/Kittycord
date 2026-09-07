@@ -9,7 +9,9 @@ import { app, IpcMainInvokeEvent } from "electron";
 import { readFileSync, unlinkSync } from "fs";
 import { join } from "path";
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+import { BRAND_API } from "../../branding";
+
+const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const CODE_RE = /^[a-z0-9_-]{3,20}$/;
 
@@ -54,7 +56,7 @@ export async function readReferralCode(_: IpcMainInvokeEvent): Promise<string | 
     for (const path of referralPaths()) {
         try {
             const raw = readFileSync(path, "utf-8");
-            const code = JSON.parse((raw.charCodeAt(0) === 0xFEFF ? raw.slice(1) : raw).trim())?.code;
+            const code = JSON.parse(raw.trim())?.code;
             if (typeof code === "string" && CODE_RE.test(code.toLowerCase())) return code.toLowerCase();
         } catch { /* not present here */ }
     }

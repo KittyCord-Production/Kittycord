@@ -6,7 +6,9 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+import { BRAND_API } from "../../branding";
+
+const ENDPOINT = BRAND_API;
 
 export interface NewsItem {
     id: string;

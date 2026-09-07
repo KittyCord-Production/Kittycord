@@ -6,7 +6,9 @@
 
 import { IpcMainInvokeEvent } from "electron";
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+import { BRAND_API } from "../../branding";
+
+const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_PAYLOAD_BYTES = 60_000;

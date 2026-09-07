@@ -9,12 +9,14 @@ import { ensureSafePath } from "@main/utils/ensureSafePath";
 import { IpcMainInvokeEvent } from "electron";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 
+import { BRAND_API } from "../../branding";
+
 const FILE_NAME_RE = /^Kittycord Studio - [\w\-'!&. ]{1,40}\.theme\.css$/;
 const MAX_CSS_BYTES = 200_000;
 const MAX_DOWNLOAD_BYTES = 2_000_000;
 const ALLOWED_HOST = /^(cdn|media)\.discordapp\.(com|net)$/;
 
-const ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 
 export async function writeTheme(_: IpcMainInvokeEvent, fileName: unknown, css: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {

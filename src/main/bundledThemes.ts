@@ -19,6 +19,7 @@ import sakura from "file://themes/sakura.theme.css";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
+import { stripBOM } from "./themes";
 import { THEMES_DIR } from "./utils/constants";
 
 const BUNDLED_THEMES: Record<string, string> = {
@@ -68,7 +69,7 @@ const SHIPPED_HASHES: Record<string, string[]> = {
 const MANIFEST_PATH = join(THEMES_DIR, ".kittycord-bundled.json");
 
 const hashCss = (css: string) => createHash("sha256")
-    .update((css.charCodeAt(0) === 0xFEFF ? css.slice(1) : css).replace(/\r\n/g, "\n").trimEnd(), "utf-8")
+    .update(stripBOM(css).replace(/\r\n/g, "\n").trimEnd(), "utf-8")
     .digest("hex");
 
 try {

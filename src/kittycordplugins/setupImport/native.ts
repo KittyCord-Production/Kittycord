@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { stripBOM } from "@main/themes";
 import { DATA_DIR, THEMES_DIR } from "@main/utils/constants";
 import { ensureSafePath } from "@main/utils/ensureSafePath";
 import { createHash } from "crypto";
@@ -58,10 +59,6 @@ function sourceDir(def: SourceDef) {
 
 function isOwnDir(dir: string) {
     return normalize(dir) === normalize(DATA_DIR);
-}
-
-function stripBOM(text: string) {
-    return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
 }
 
 function readCapped(path: string, maxBytes: number): string | null {

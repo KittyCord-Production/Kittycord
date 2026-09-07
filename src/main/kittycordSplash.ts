@@ -12,19 +12,9 @@
 
 import { ACCENT_PRESETS, AccentPreset } from "@shared/accentPresets";
 import { app } from "electron";
-import { readFileSync } from "fs";
-import { join } from "path";
 
 import { KITTY_ICON_DATA_URL } from "./iconData";
 import { RendererSettings } from "./settings";
-
-const releaseChannel = (() => {
-    try {
-        return JSON.parse(readFileSync(join(process.resourcesPath, "build_info.json"), "utf8")).releaseChannel as string;
-    } catch {
-        return "stable";
-    }
-})();
 
 // The Kittycord logo as an <img> filling its rounded container (the real app icon as a data URL).
 const KITTY_IMG = '<img src="' + KITTY_ICON_DATA_URL + '" alt="Kittycord" style="width:100%;height:100%;display:block">';
@@ -177,7 +167,7 @@ const REMOVE_OVERLAY_JS = `
     } catch (e) {}
 })();`;
 
-if (releaseChannel === "stable") app.on("browser-window-created", (_, win) => {
+app.on("browser-window-created", (_, win) => {
     try {
         if (win.webContents.isOffscreen()) return;
         win.on("always-on-top-changed", (_e, isAlwaysOnTop) => {
@@ -187,7 +177,8 @@ if (releaseChannel === "stable") app.on("browser-window-created", (_, win) => {
             try {
                 const url = win.webContents.getURL() || "";
                 if (/overlay/i.test(url) || win.isAlwaysOnTop()) return;
-                const preset = ACCENT_PRESETS[RendererSettings.store.kittycordAccent!] ?? ACCENT_PRESETS.pink;
+                const accent = RendererSettings.store.kittycordAccent;
+                const preset = (accent && ACCENT_PRESETS[accent]) || ACCENT_PRESETS.pink;
                 if (/splash/i.test(url)) {
                     win.webContents.executeJavaScript(buildSplashJs(preset)).catch(() => { });
                 } else if (/discord\.com/i.test(url) && !/popout/i.test(url)) {

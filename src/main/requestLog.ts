@@ -10,6 +10,7 @@ import { app, ipcMain, session } from "electron";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
+import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 const LOG_FILE = join(DATA_DIR, "requestLog.json");
@@ -99,7 +100,7 @@ function bodySize(init?: RequestInit) {
 }
 
 const ASSET_URLS = [
-    "https://kittycord-analytics.hell-bullet-hb.workers.dev/*",
+    `${BRAND_API}/*`,
     "https://i.scdn.co/*"
 ];
 

@@ -11,9 +11,10 @@ import { join } from "path";
 
 import gitHash from "~git-hash";
 
+import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
-const ENDPOINT: string = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+const ENDPOINT: string = BRAND_API;
 
 const FILE = join(DATA_DIR, "crash.json");
 const MAX_MSG = 500;

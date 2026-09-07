@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BRAND_API } from "../../branding";
+
 export interface StudioColors {
     bg: string;
     accent: string;
@@ -42,7 +44,7 @@ export const MAX_BLUR = 24;
 export const MAX_BG_URL_LEN = 300;
 export const BG_URL_RE = /^https:\/\/[^\s"'<>]+$/i;
 
-export const ASSET_ENDPOINT = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+export const ASSET_ENDPOINT = BRAND_API;
 
 export const BG_IDS: readonly string[] = ["petals", "aurora", "grid", "stars", "nebula", "dawn"];
 export const PATTERN_IDS: readonly string[] = ["dots", "diagonal", "hearts", "paws", "lattice"];

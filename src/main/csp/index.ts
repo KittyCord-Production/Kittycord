@@ -7,6 +7,8 @@
 import { NativeSettings } from "@main/settings";
 import { session } from "electron";
 
+import { BRAND_API } from "../../branding";
+
 type PolicyMap = Record<string, string[]>;
 
 export const ConnectSrc = ["connect-src"];
@@ -74,7 +76,7 @@ export const CspPolicies: PolicyMap = {
     "*.tenor.com": ImageAndMediaSrc,
     "*.tenor.co": ImageAndMediaSrc,
 
-    "kittycord-analytics.hell-bullet-hb.workers.dev": ImageAndMediaSrc,
+    [new URL(BRAND_API).host]: ImageAndMediaSrc,
     "i.scdn.co": ImageSrc,
 };
 

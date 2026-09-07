@@ -17,12 +17,13 @@ import { join } from "path";
 
 import gitHash from "~git-hash";
 
+import { BRAND_API } from "../branding";
 import { DATA_DIR } from "./utils/constants";
 
 // Set this to the deployed Cloudflare Worker URL (no trailing slash) to activate stats.
 // When empty, telemetry does NOTHING: no consent prompt, no network request.
 // Typed as string so the "is it configured?" checks below stay valid.
-const ENDPOINT: string = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
+const ENDPOINT: string = BRAND_API;
 
 const FILE = join(DATA_DIR, "telemetry.json");
 const DAY = 24 * 60 * 60 * 1000;
