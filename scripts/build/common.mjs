@@ -153,6 +153,7 @@ export const globPlugins = kind => ({
             let metaCode = "\n";
             let excludedCode = "\n";
             let i = 0;
+            const seenNames = new Map();
             for (const dir of pluginDirs) {
                 const userPlugin = dir === "userplugins";
 
@@ -185,6 +186,13 @@ export const globPlugins = kind => ({
                     }
 
                     const folderName = `src/${dir}/${fileName}`;
+
+                    const name = await resolvePluginName(fullDir, file).catch(() => null);
+                    if (name) {
+                        const previous = seenNames.get(name);
+                        if (previous) throw new Error(`Duplicate plugin name ${JSON.stringify(name)}: ${previous} and ${folderName}`);
+                        seenNames.set(name, folderName);
+                    }
 
                     const mod = `p${i}`;
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
