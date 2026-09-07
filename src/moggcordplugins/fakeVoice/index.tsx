@@ -4,19 +4,33 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord and audited (clean: local voice-state patch only, no network/token/eval).
-// Original author kept as inline credit.
-
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
+import { definePluginSettings } from "@api/Settings";
 import { UserAreaButton, UserAreaRenderProps } from "@api/UserArea";
-import definePlugin from "@utils/types";
+import ErrorBoundary from "@components/ErrorBoundary";
+import definePlugin, { OptionType } from "@utils/types";
 import { findByProps } from "@webpack";
 import { ContextMenuApi, Menu, React } from "@webpack/common";
 
+const settings = definePluginSettings({
+    fakeMute: {
+        type: OptionType.BOOLEAN,
+        description: "Appear muted to everyone else.",
+        default: true
+    },
+    fakeDeafen: {
+        type: OptionType.BOOLEAN,
+        description: "Appear deafened to everyone else.",
+        default: true
+    },
+    fakeVideo: {
+        type: OptionType.BOOLEAN,
+        description: "Appear to have your camera on.",
+        default: false
+    }
+});
+
 let isGhostActive = false;
-let configFakeMute = true;
-let configFakeDeafen = true;
-let configFakeVideo = false;
 
 const getVoiceChannelId = (): string | undefined => findByProps("getVoiceChannelId")?.getVoiceChannelId?.();
 
@@ -49,11 +63,11 @@ function GhostContextMenu() {
                 <Menu.MenuCheckboxItem
                     id="opt-both"
                     label="Fake Mute & Deafen"
-                    checked={configFakeMute && configFakeDeafen}
+                    checked={settings.store.fakeMute && settings.store.fakeDeafen}
                     action={() => {
-                        const nextState = !(configFakeMute && configFakeDeafen);
-                        configFakeMute = nextState;
-                        configFakeDeafen = nextState;
+                        const nextState = !(settings.store.fakeMute && settings.store.fakeDeafen);
+                        settings.store.fakeMute = nextState;
+                        settings.store.fakeDeafen = nextState;
                         forceUpdate();
                     }}
                 />
@@ -61,18 +75,18 @@ function GhostContextMenu() {
                 <Menu.MenuCheckboxItem
                     id="opt-mute"
                     label="Fake Mute"
-                    checked={configFakeMute}
+                    checked={settings.store.fakeMute}
                     action={() => {
-                        configFakeMute = !configFakeMute;
+                        settings.store.fakeMute = !settings.store.fakeMute;
                         forceUpdate();
                     }}
                 />
                 <Menu.MenuCheckboxItem
                     id="opt-deafen"
                     label="Fake Deafen"
-                    checked={configFakeDeafen}
+                    checked={settings.store.fakeDeafen}
                     action={() => {
-                        configFakeDeafen = !configFakeDeafen;
+                        settings.store.fakeDeafen = !settings.store.fakeDeafen;
                         forceUpdate();
                     }}
                 />
@@ -81,9 +95,9 @@ function GhostContextMenu() {
                 <Menu.MenuCheckboxItem
                     id="opt-video"
                     label="Fake Camera"
-                    checked={configFakeVideo}
+                    checked={settings.store.fakeVideo}
                     action={() => {
-                        configFakeVideo = !configFakeVideo;
+                        settings.store.fakeVideo = !settings.store.fakeVideo;
                         syncState();
                         forceUpdate();
                     }}
@@ -93,7 +107,7 @@ function GhostContextMenu() {
     );
 }
 
-function FakeDeafenUserButton({ iconForeground, hideTooltips, nameplate }: UserAreaRenderProps) {
+function FakeDeafenUserButtonInner({ iconForeground, hideTooltips, nameplate }: UserAreaRenderProps) {
     const [, forceUpdate] = React.useReducer((x: number) => x + 1, 0);
     return (
         <UserAreaButton
@@ -113,35 +127,40 @@ function FakeDeafenUserButton({ iconForeground, hideTooltips, nameplate }: UserA
     );
 }
 
+const FakeDeafenUserButton = ErrorBoundary.wrap(FakeDeafenUserButtonInner, { noop: true });
+
 export default definePlugin({
     name: "FakeVoice",
     description: "Appear muted, deafened or with your camera on to others while you stay in control. Right-click the user-area button for options, or use /fakemute, /fakedeafen and /fakecamera.",
     authors: [{ name: "Kittycord", id: 0n }, { name: "mushzi", id: 449282863582412850n }],
     dependencies: ["CommandsAPI", "UserAreaAPI"],
+    settings,
 
     patches: [
         {
             find: "}voiceStateUpdate(",
             replacement: {
                 match: /self_mute:([^,]+),self_deaf:([^,]+),self_video:([^,]+)/,
-                replace: "self_mute:$self.toggle($1,'mute'),self_deaf:$self.toggle($2,'deaf'),self_video:$self.toggle($3,'video')"
+                replace: "self_mute:$self.toggleMute($1),self_deaf:$self.toggleDeaf($2),self_video:$self.toggleVideo($3)"
             }
         }
     ],
 
-    toggle(val: any, what: string) {
-        if (!isGhostActive) return val;
-        switch (what) {
-            case "mute": return configFakeMute ? true : val;
-            case "deaf": return configFakeDeafen ? true : val;
-            case "video": return configFakeVideo ? true : val;
-            default: return val;
-        }
+    toggleMute(value: boolean) {
+        return isGhostActive && settings.store.fakeMute ? true : value;
+    },
+
+    toggleDeaf(value: boolean) {
+        return isGhostActive && settings.store.fakeDeafen ? true : value;
+    },
+
+    toggleVideo(value: boolean) {
+        return isGhostActive && settings.store.fakeVideo ? true : value;
     },
 
     userAreaButton: {
         icon: FakeDeafenIcon,
-        render: FakeDeafenUserButton
+        render: props => <FakeDeafenUserButton {...props} />
     },
 
     commands: [
@@ -150,8 +169,8 @@ export default definePlugin({
             name: "fakemute",
             description: "Toggle Fake Mute",
             execute: async (_, ctx) => {
-                configFakeMute = !configFakeMute;
-                isGhostActive = configFakeMute;
+                settings.store.fakeMute = !settings.store.fakeMute;
+                isGhostActive = settings.store.fakeMute;
                 syncState();
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Mute** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },
@@ -161,8 +180,8 @@ export default definePlugin({
             name: "fakedeafen",
             description: "Toggle Fake Deafen",
             execute: async (_, ctx) => {
-                configFakeDeafen = !configFakeDeafen;
-                isGhostActive = configFakeDeafen;
+                settings.store.fakeDeafen = !settings.store.fakeDeafen;
+                isGhostActive = settings.store.fakeDeafen;
                 syncState();
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },
@@ -172,9 +191,9 @@ export default definePlugin({
             name: "fakedeafen_mute",
             description: "Toggle Fake Deafen & Mute at the same time",
             execute: async (_, ctx) => {
-                const next = !(configFakeMute && configFakeDeafen);
-                configFakeMute = next;
-                configFakeDeafen = next;
+                const next = !(settings.store.fakeMute && settings.store.fakeDeafen);
+                settings.store.fakeMute = next;
+                settings.store.fakeDeafen = next;
                 isGhostActive = next;
                 syncState();
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen & Mute** are ${isGhostActive ? "enabled" : "disabled"}.` });
@@ -185,8 +204,8 @@ export default definePlugin({
             name: "fakecamera",
             description: "Toggle Fake Camera (appear camera-on to everyone)",
             execute: async (_, ctx) => {
-                configFakeVideo = !configFakeVideo;
-                isGhostActive = configFakeVideo;
+                settings.store.fakeVideo = !settings.store.fakeVideo;
+                isGhostActive = settings.store.fakeVideo;
                 syncState();
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Camera** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },

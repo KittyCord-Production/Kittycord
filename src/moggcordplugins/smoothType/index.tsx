@@ -8,9 +8,6 @@ import { definePluginSettings } from "@api/Settings";
 import definePlugin, { OptionType } from "@utils/types";
 import { Forms } from "@webpack/common";
 
-// Ported to Kittycord from moggcord. Original authors kept as inline credits
-// (they are not in Kittycord's shared Devs list).
-
 const STYLE_ID = "vc-smoothtype";
 
 const settings = definePluginSettings({

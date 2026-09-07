@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord from moggcord and adapted: retargeted to the Kittycord
-// settings heading, made opt-in (no longer a forced/required plugin).
-
 import definePlugin from "@utils/types";
 
 // Discord renders the "Kittycord Settings" heading from a plain string, so we
@@ -74,7 +71,7 @@ export default definePlugin({
     name: "SettingsGlint",
     enabledByDefault: false,
     description: "Animates the 'Kittycord Settings' heading with a black-and-white left-to-right glint.",
-    authors: [{ name: "Moggcord", id: 0n }],
+    authors: [{ name: "Kittycord", id: 0n }],
 
     start() {
         if (typeof window === "undefined") return;

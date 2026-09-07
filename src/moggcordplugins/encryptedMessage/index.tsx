@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord and audited (clean: purely local string encryption/decryption,
-// no network/token/eval; only the clipboard is used to copy decrypted text on request).
-
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { addContextMenuPatch, removeContextMenuPatch } from "@api/ContextMenu";
+import ErrorBoundary from "@components/ErrorBoundary";
 import definePlugin from "@utils/types";
 import type { Message } from "@vencord/discord-types";
 import { ContextMenuApi, Menu, Parser, React, Toasts, useEffect, useState } from "@webpack/common";
@@ -180,7 +178,7 @@ function TechniqueMenu() {
     );
 }
 
-const EncryptButton: ChatBarButtonFactory = ({ type }) => {
+const EncryptButtonInner: ChatBarButtonFactory = ({ type }) => {
     const [enabled, setEnabled] = React.useState(encryptionEnabled);
 
     if (!["normal", "sidebar"].some(n => type.analyticsName === n)) return null;
@@ -213,7 +211,7 @@ const EncryptButton: ChatBarButtonFactory = ({ type }) => {
 /* ── Inline decryption accessory (like translate) ── */
 const DecryptionSetters = new Map<string, (v: string | undefined) => void>();
 
-function DecryptionAccessory({ message }: { message: Message; }) {
+function DecryptionAccessoryInner({ message }: { message: Message; }) {
     const [decrypted, setDecrypted] = useState<string>();
 
     useEffect(() => {
@@ -290,15 +288,18 @@ const messageContextPatch = (children: any, { message }: { message: any; }) => {
     }
 };
 
+const EncryptButton = ErrorBoundary.wrap(EncryptButtonInner, { noop: true });
+const DecryptionAccessory = ErrorBoundary.wrap(DecryptionAccessoryInner, { noop: true });
+
 export default definePlugin({
     name: "EncryptedMessage",
-    description: "Encrypts your messages with 400 unique techniques (0–399). Only those who know the key can decrypt.",
-    authors: [{ name: "Kittycord", id: 0n }, { name: "Moggcord", id: 0n }],
+    description: "Scrambles your messages so they only read as text for people running Kittycord. Anyone without it sees gibberish, so treat this as obfuscation, not privacy.",
+    authors: [{ name: "Kittycord", id: 0n }],
     dependencies: ["ChatInputButtonAPI", "MessageEventsAPI", "MessageAccessoriesAPI"],
 
     chatBarButton: {
         icon: () => <LockIcon enabled={encryptionEnabled} />,
-        render: EncryptButton,
+        render: props => <EncryptButton {...props} />,
     },
 
     renderMessageAccessory({ message }: { message?: Message; }) {

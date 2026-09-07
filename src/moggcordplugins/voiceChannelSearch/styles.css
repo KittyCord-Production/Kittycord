@@ -199,24 +199,6 @@
     opacity: .75;
 }
 
-.vcs-row--locked {
-    opacity: 0.45;
-    cursor: default;
-    pointer-events: none;
-}
-
-.vcs-locked-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    opacity: 0.8;
-    padding: 3px 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 4px;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
 .vcs-joining-label {
     font-size: 12px;
     font-weight: 600;
@@ -245,42 +227,4 @@
 
 .vcs-join-btn:hover {
     opacity: .85;
-}
-
-/* ── Discord sidebar: channel visual effects ───────────────────────────── */
-
-/* Remove lock icons on channels without access */
-[class*="locked"] [class*="lockIcon"],
-[class*="locked"] [class*="lock-"],
-[class*="locked"] svg[class*="lock"],
-[class*="channelLocked"],
-[class*="iconLocked"] {
-    display: none !important;
-}
-
-/* Remove reduced opacity on locked channels */
-[class*="wrapper"][class*="locked"],
-[class*="container"][class*="locked"],
-[class*="channel"][class*="locked"] {
-    opacity: 1 !important;
-}
-
-/* Locked channel name = same color as normal ones */
-[class*="locked"] [class*="name"],
-[class*="locked"] [class*="channelName"] {
-    opacity: 1 !important;
-}
-
-/* Reveal native Discord buttons on hover for ALL channels */
-li[class*="channel"]:hover [class*="children"],
-li[class*="channel"]:hover [class*="iconContainer"],
-li[class*="channel"]:hover [class*="buttons"] {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-li[class*="channel"]:hover [class*="actionIcon"] {
-    color: var(--interactive-normal) !important;
-    opacity: 1 !important;
 }

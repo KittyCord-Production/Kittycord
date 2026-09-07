@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord and audited (clean: local DOM/CSS only, no network/token/eval).
-// Original author kept as inline credit.
-
 import "./styles.css";
 
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";

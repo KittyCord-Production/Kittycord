@@ -4,12 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord and audited (clean: reads Discord stores + joins voice channels locally,
-// only cdn.discordapp.com icons/avatars are loaded for display; no network/token/eval).
-
 import "./styles.css";
 
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
+import ErrorBoundary from "@components/ErrorBoundary";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "@kittycordplugins/_shared/modal";
 import { openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
@@ -30,7 +28,6 @@ interface VoiceChannel {
     guildName: string;
     guildIcon: string | null;
     memberCount: number;
-    canAccess: boolean; // false = channel visible but no permission to join
     // Pre-built unique search index: "channel name · server name"
     searchIndex: string;
 }
@@ -94,7 +91,6 @@ async function scan(): Promise<VoiceChannel[]> {
                             guildName: gName,
                             guildIcon: gIcon,
                             memberCount: memberCount[ch.id] ?? 0,
-                            canAccess: true,
                             searchIndex: `${cName.toLowerCase()} ${gName.toLowerCase()}`,
                         });
                     }
@@ -224,16 +220,9 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
                                 <div className="vcs-empty">{query ? "No channel found" : "No voice channels"}</div>
                             )}
                             {rows.slice(0, MAX_ROWS).map(ch => (
-                                <div key={ch.channelId}
-                                    className={`vcs-row${ch.canAccess ? "" : " vcs-row--locked"}`}
-                                    onClick={() => ch.canAccess && join(ch)}
-                                    title={ch.canAccess ? undefined : "No permission to join this channel"}
-                                >
+                                <div key={ch.channelId} className="vcs-row" onClick={() => join(ch)}>
                                     <span className="vcs-icon">
-                                        {ch.canAccess
-                                            ? (ch.channelType === 13 ? <StageIcon /> : <VoiceIcon />)
-                                            : <span style={{ opacity: 0.5, fontSize: 13 }}>🔒</span>
-                                        }
+                                        {ch.channelType === 13 ? <StageIcon /> : <VoiceIcon />}
                                     </span>
                                     <div className="vcs-info">
                                         <span className="vcs-name">{ch.channelName}</span>
@@ -263,9 +252,7 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
                                     </div>
                                     {joiningId === ch.channelId
                                         ? <span className="vcs-joining-label">Joining...</span>
-                                        : ch.canAccess
-                                            ? <button className="vcs-join-btn" onClick={e => { e.stopPropagation(); join(ch); }}>Join</button>
-                                            : <span className="vcs-locked-label">Private</span>
+                                        : <button className="vcs-join-btn" onClick={e => { e.stopPropagation(); join(ch); }}>Join</button>
                                     }
                                 </div>
                             ))}
@@ -296,7 +283,7 @@ function VoiceSearchModalWrapper({ rootProps }: { rootProps: RenderModalProps; }
     return <VoiceSearchModal rootProps={rootProps} channels={channels} />;
 }
 
-function VCSHeaderButton() {
+function VCSHeaderButtonInner() {
     return (
         <HeaderBarButton
             icon={SearchIcon}
@@ -306,10 +293,12 @@ function VCSHeaderButton() {
     );
 }
 
+const VCSHeaderButton = ErrorBoundary.wrap(VCSHeaderButtonInner, { noop: true });
+
 export default definePlugin({
     name: "VoiceChannelSearch",
     description: "Search and join any voice channel across all your servers.",
-    authors: [{ name: "Kittycord", id: 0n }, { name: "Moggcord", id: 0n }],
+    authors: [{ name: "Kittycord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
 
     start() {

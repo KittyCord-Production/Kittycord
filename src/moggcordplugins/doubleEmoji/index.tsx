@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-// Ported to Kittycord and audited (clean: local DOM-only event handling, no network/token/eval).
-// Original author kept as inline credit.
-
 import definePlugin from "@utils/types";
 
 let clickListener: (e: MouseEvent) => void;
@@ -14,7 +11,7 @@ let clickListener: (e: MouseEvent) => void;
 export default definePlugin({
     name: "DoubleEmoji",
     description: "Keeps the emoji picker open on click and highlights selected emojis with a blue border.",
-    authors: [{ name: "Kittycord", id: 0n }, { name: "Moggcord", id: 0n }],
+    authors: [{ name: "Kittycord", id: 0n }],
 
     start() {
         clickListener = (e: MouseEvent) => {
