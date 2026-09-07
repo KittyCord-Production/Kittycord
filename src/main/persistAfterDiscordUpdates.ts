@@ -10,15 +10,32 @@
  */
 
 import { app } from "electron";
+import EventEmitter from "events";
 import { dirname } from "path";
 
 import { findStaleSibling, getPatcherJsPath, patchResourcesDir } from "./applyHostPatch";
 
-app.on("before-quit", () => {
+function patchLatest() {
+    if (process.env.DISABLE_UPDATER_AUTO_PATCHING) return;
+
     try {
         const stale = findStaleSibling(dirname(process.execPath));
         if (stale) patchResourcesDir(stale, getPatcherJsPath());
     } catch (err) {
         console.error("[Kittycord] Failed to repatch latest host update", err);
     }
-});
+}
+
+if (process.platform === "win32" || process.platform === "linux") {
+    EventEmitter.prototype.emit = new Proxy(EventEmitter.prototype.emit, {
+        apply(target, thisArg, argArray) {
+            if (argArray[0] === "host-updated") {
+                patchLatest();
+            }
+
+            return Reflect.apply(target, thisArg, argArray);
+        },
+    });
+
+    app.on("before-quit", patchLatest);
+}
