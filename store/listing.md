@@ -53,7 +53,7 @@ Chrome Web Store limit is 132 characters. This one is 117.
 
 ## Privacy policy URL
 
-`https://kittycord.dev/privacy`
+`https://kittycord.dev/en/privacy/`
 
 Use this URL in both dashboards. It must stay in step with `PRIVACY_POLICY.md` in the repository.
 
