@@ -94,10 +94,13 @@ SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) pnpm buildStandalone
 sha256sum dist/desktop.asar
 ```
 
-The printed hash must equal the published `desktop.asar.sha256`. Use the same Node major version the
-release workflow uses (see `.github/workflows/release.yml`); a different Node or pnpm version can
-change the output. The Windows and macOS installers are not reproducible in this way — verify those
-with their checksums.
+The printed hash must equal the published `desktop.asar.sha256`. This has been checked across
+operating systems and Node versions: a Windows build on Node 24 and the Linux CI build on Node 22
+produced the same file down to the byte. If your hash differs, something in your checkout differs —
+start with `git status` and `pnpm install --frozen-lockfile`.
+
+The Windows and macOS installers are not reproducible this way, because the tool that wraps the
+installer script into an .exe is not deterministic. Verify those with their checksums instead.
 
 ## Why your antivirus might warn
 
