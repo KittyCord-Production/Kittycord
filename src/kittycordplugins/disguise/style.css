@@ -1,0 +1,32 @@
+.vc-disguise-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.vc-disguise-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--background-secondary);
+}
+
+.vc-disguise-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 10px 12px;
+}
+
+.vc-disguise-row-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin-right: auto;
+    overflow-wrap: anywhere;
+}
