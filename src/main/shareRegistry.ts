@@ -48,7 +48,7 @@ async function register(id: string) {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return;
 
     const state = read();
-    if (state.consent === false) return;
+    if (state.consent !== true) return;
     if (Date.now() - state.lastRegister < DAY) return;
 
     try {
@@ -80,7 +80,7 @@ async function unregister(id: string) {
 
 async function friendsCheck(ids: unknown): Promise<string[]> {
     if (!ENDPOINT) return [];
-    if (read().consent === false) return [];
+    if (read().consent !== true) return [];
     if (!Array.isArray(ids)) return [];
 
     const clean = ids.filter((x): x is string => typeof x === "string" && SNOWFLAKE_RE.test(x)).slice(0, MAX_FRIENDS);

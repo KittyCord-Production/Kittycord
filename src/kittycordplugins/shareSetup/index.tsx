@@ -64,7 +64,7 @@ function FriendDiscoveryToggle() {
             <FormSwitch
                 title="Find which friends use Kittycord"
                 description="Checks your friend list against the Kittycord server to show which friends also use it, and lets them find you. The server only ever keeps a salted hash of each id — never your friend list, your token or any messages. Turning this off deletes your entry from the server."
-                value={consent !== false}
+                value={consent === true}
                 onChange={onChange}
                 hideBorder
             />
@@ -303,7 +303,7 @@ export default definePlugin({
         });
         try {
             const { consent } = await getShareConsent();
-            if (consent !== false) await enableFriendDiscovery();
+            if (consent === true) await enableFriendDiscovery();
         } catch (e) {
             logger.error("friend discovery init failed", e);
         }

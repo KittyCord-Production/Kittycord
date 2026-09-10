@@ -51,7 +51,7 @@ export function useKittycordFriends() {
         (async () => {
             const { consent, endpointConfigured } = await getShareConsent();
             if (!endpointConfigured) return setPhase("disabled");
-            if (consent !== false) return reload();
+            if (consent === true) return reload();
             setPhase("needConsent");
         })();
     }, [reload]);

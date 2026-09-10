@@ -44,7 +44,8 @@ export default definePlugin({
             const me = UserStore.getCurrentUser();
             if (me && Native) {
                 kittycordUsers.add(me.id);
-                await Native.announce(me.id);
+                const { consent } = await VencordNative.kittycordShare.getConsent();
+                if (consent === true) await Native.announce(me.id);
             }
             await refresh();
             refreshTimer = setInterval(refresh, 10 * 60 * 1000);
