@@ -80,6 +80,8 @@ export interface NativeSettings {
         };
     };
     customCspRules: Record<string, string[]>;
+    lastUpdateVerified?: boolean;
+    lastHostRepairAt?: number;
 }
 
 const DefaultNativeSettings: NativeSettings = {

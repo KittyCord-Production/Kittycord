@@ -101,3 +101,15 @@
     font-family: var(--font-code, monospace);
     overflow-wrap: anywhere;
 }
+
+.kc-priv-build {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--background-secondary);
+}
+
+.kc-priv-build code {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}

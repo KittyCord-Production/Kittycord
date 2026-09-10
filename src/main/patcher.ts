@@ -23,7 +23,7 @@ import { dirname, join } from "path";
 import { installKittycord } from "./kittycord";
 import { RendererSettings } from "./settings";
 import { patchTrayMenu } from "./trayMenu";
-import { IS_VANILLA } from "./utils/constants";
+import { DATA_DIR, IS_VANILLA } from "./utils/constants";
 
 console.log("[Kittycord] Starting up...");
 
@@ -137,7 +137,7 @@ if (!IS_VANILLA) {
         s.set("DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING", true);
     });
 
-    process.env.DATA_DIR = join(app.getPath("userData"), "..", "Equicord");
+    process.env.DATA_DIR = DATA_DIR;
 
     // Monkey patch commandLine to:
     // - disable UseEcoQoSForBackgroundProcess: Work around Discord unloading when in background

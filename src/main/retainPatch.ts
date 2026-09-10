@@ -8,6 +8,7 @@ import { watch } from "original-fs";
 import { dirname } from "path";
 
 import { findStaleSibling, getPatcherJsPath, isAlreadyPatched, patchResourcesDir } from "./applyHostPatch";
+import { recordHostRepair } from "./buildInfo";
 
 const DEBOUNCE_MS = 1_500;
 const RETRY_INTERVAL_MS = 1_500;
@@ -30,7 +31,10 @@ const attempt = (): boolean => {
     try {
         const stale = findStaleSibling(dirname(process.execPath));
         if (!stale || isAlreadyPatched(stale)) return true;
-        return patchResourcesDir(stale, getPatcherJsPath());
+
+        const patched = patchResourcesDir(stale, getPatcherJsPath());
+        if (patched) recordHostRepair();
+        return patched;
     } catch (err) {
         console.error("[Kittycord] retain-patch attempt failed", err);
         return true;
@@ -59,7 +63,10 @@ export const repatchNow = (): boolean => {
         if (process.platform !== "win32") return false;
         const stale = findStaleSibling(dirname(process.execPath));
         if (!stale) return false;
-        return patchResourcesDir(stale, getPatcherJsPath());
+
+        const patched = patchResourcesDir(stale, getPatcherJsPath());
+        if (patched) recordHostRepair();
+        return patched;
     } catch (err) {
         console.error("[Kittycord] manual repatch failed", err);
         return false;

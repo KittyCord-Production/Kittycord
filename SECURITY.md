@@ -79,6 +79,26 @@ Compare the printed hash with the contents of the matching `.sha256` file from t
 (hashes are case-insensitive). If they don't, **do not run the file** — re-download it from the
 official release page, and if it still doesn't match, report it.
 
+## Rebuild it yourself and compare
+
+Checksums prove your download matches what the release page serves. Rebuilding proves the release
+matches the source. `desktop.asar` and `equibop.asar` are reproducible: the build clock is pinned to
+the commit date, so the same commit always produces byte-identical files.
+
+```sh
+git clone https://github.com/KittyCord-Production/Kittycord.git
+cd Kittycord
+git checkout <the commit from version.txt in the release>
+pnpm install --frozen-lockfile
+SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) pnpm buildStandalone
+sha256sum dist/desktop.asar
+```
+
+The printed hash must equal the published `desktop.asar.sha256`. Use the same Node major version the
+release workflow uses (see `.github/workflows/release.yml`); a different Node or pnpm version can
+change the output. The Windows and macOS installers are not reproducible in this way — verify those
+with their checksums.
+
 ## Why your antivirus might warn
 
 The Windows installer isn't code-signed yet, and it modifies the Discord app on disk. Both of those

@@ -9,7 +9,9 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
 import { ShieldIcon } from "@components/Icons";
 import { openSettingsTabModal } from "@components/settings";
+import type { BuildInfo } from "@main/buildInfo";
 import SettingsPlugin from "@plugins/_core/settings";
+import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
@@ -42,6 +44,34 @@ function ConsentToggle({ bridge, title, description }: { bridge: ConsentBridge; 
     );
 }
 
+function BuildIdentity() {
+    const [info, setInfo] = React.useState<BuildInfo | null>(null);
+    React.useEffect(() => { VencordNative.kittycordBuild.get().then(setInfo).catch(err => logger.warn("Could not read the build info", err)); }, []);
+
+    const asarHash = info?.asarHash;
+    if (!info || !asarHash) return null;
+
+    const verified = info.updateVerified === true
+        ? "Your last update was checked against the published checksum."
+        : info.updateVerified === false
+            ? "Your last update came from a build that shipped without a checksum, so it could not be checked."
+            : "This build came from the installer, not from an in-app update.";
+
+    return (
+        <div className="kc-priv-build">
+            <div><b>This build</b> {info.gitHash.slice(0, 9)}</div>
+            <div><b>File on disk</b> <code>{asarHash}</code></div>
+            <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+                {verified} Rebuild the same commit yourself and you get exactly this file back — the steps are in SECURITY.md.
+            </Text>
+            <div className="kc-priv-btns">
+                <Button color={Button.Colors.PRIMARY} onClick={() => copyWithToast(asarHash, "Checksum copied.")}>Copy checksum</Button>
+                <Button color={Button.Colors.PRIMARY} onClick={() => open(`${REPO}/blob/main/SECURITY.md`)}>How to rebuild it</Button>
+            </div>
+        </div>
+    );
+}
+
 function PrivacyTab() {
     return (
         <ErrorBoundary noop>
@@ -61,8 +91,10 @@ function PrivacyTab() {
                     The installer is built automatically from this exact source by GitHub — nothing is added behind the scenes. Compare the published SHA-256 checksum with your download to be 100% sure.
                 </Text>
 
+                <BuildIdentity />
+
                 <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>What leaves your computer</Text>
-                <div className="kc-priv-yes">✅ Only if you turn it on: an anonymous install ID + version, plus any public cosmetics you choose to show (name color, avatar decoration, creator code).</div>
+                <div className="kc-priv-yes">✅ Only if you turn it on: an anonymous install ID + version, your Discord ID for the friend features and the Kittycord badge, plus any public cosmetics you choose to show (name color, avatar decoration, creator code).</div>
                 <div className="kc-priv-no">❌ Never: your login token, your password, your keystrokes, your messages, or your IP address.</div>
 
                 <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>What Kittycord sent</Text>
