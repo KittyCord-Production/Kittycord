@@ -20,7 +20,7 @@
 // @ts-check
 
 import { createPackage } from "@electron/asar";
-import { readdir, writeFile } from "fs/promises";
+import { readdir, readFile, writeFile } from "fs/promises";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
 
@@ -238,6 +238,23 @@ await Promise.all([
         main: "main.js"
     }))
 ]);
+
+async function normalizeSourcemaps() {
+    for (const dir of ["dist/desktop", "dist/equibop"]) {
+        for (const file of await readdir(dir)) {
+            if (!file.endsWith(".map")) continue;
+
+            const full = join(dir, file);
+            const map = JSON.parse(await readFile(full, "utf-8"));
+            if (!Array.isArray(map.sources)) continue;
+
+            map.sources = map.sources.map(source => source.replace(/node_modules\/\.pnpm\/[^/]+\/node_modules\//g, "node_modules/"));
+            await writeFile(full, JSON.stringify(map));
+        }
+    }
+}
+
+await normalizeSourcemaps();
 
 await Promise.all([
     createPackage("dist/desktop", "dist/desktop.asar"),
