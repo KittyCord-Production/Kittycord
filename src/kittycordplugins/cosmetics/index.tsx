@@ -20,6 +20,16 @@ interface Cosmetic {
     effect?: string;
 }
 
+type ColorStrings = Record<"primaryColor" | "secondaryColor" | "tertiaryColor", string | undefined>;
+
+interface MemberContext {
+    user?: { id: string; };
+}
+
+interface MessageContext {
+    message?: { author?: { id: string; }; };
+}
+
 const Native = VencordNative?.pluginHelpers?.KittycordCosmetics as PluginNative<typeof import("./native")> | undefined;
 
 const HEX_RE = /^#[0-9a-f]{6}$/i;
@@ -215,16 +225,16 @@ export default definePlugin({
         {
             find: "#{intl::GUILD_OWNER}),children:",
             replacement: {
-                match: /(?<=roleName:\i,)colorString:/,
-                replace: "colorString:$self.memberListColorString(arguments[0]),kittycordColorString:"
+                match: /(?<=roleName:\i,)colorString:(\i),colorStrings:(\i),/,
+                replace: "...$self.memberListColorProps(arguments[0],$1,$2),"
             },
             noWarn: true
         }
     ],
 
-    wrapMessageColorProps(colorProps: { colorString?: string; colorStrings?: Record<"primaryColor" | "secondaryColor" | "tertiaryColor", string | undefined>; }, context: any) {
+    wrapMessageColorProps(colorProps: { colorString?: string; colorStrings?: ColorStrings; }, context: MessageContext) {
         try {
-            const c = cosmetics.get(context?.message?.author?.id);
+            const c = cosmetics.get(context?.message?.author?.id ?? "");
             if (!c) return colorProps;
             return {
                 ...colorProps,
@@ -240,12 +250,20 @@ export default definePlugin({
         }
     },
 
-    memberListColorString(context: any) {
+    memberListColorProps(context: MemberContext, colorString: string | null, colorStrings: ColorStrings | undefined) {
         try {
-            const c = cosmetics.get(context?.user?.id);
-            return c?.color1 ?? context?.colorString;
+            const c = cosmetics.get(context?.user?.id ?? "");
+            if (!c) return { colorString, colorStrings };
+            return {
+                colorString: c.color1,
+                colorStrings: {
+                    primaryColor: c.color1,
+                    secondaryColor: c.color2,
+                    tertiaryColor: undefined
+                }
+            };
         } catch {
-            return context?.colorString;
+            return { colorString, colorStrings };
         }
     },
 
