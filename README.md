@@ -77,6 +77,46 @@ console alternatives.
 
 > A standalone Kittycord desktop client and a Linux installer are on the roadmap.
 
+## Use it in your browser
+
+Kittycord also runs on discord.com without touching the desktop app. Every
+[release](https://github.com/KittyCord-Production/Kittycord/releases/latest) ships the browser
+builds next to the installer:
+
+| File | For |
+|---|---|
+| `extension-chrome.zip` | Chrome, Edge, Brave and other Chromium browsers |
+| `extension-firefox.zip` | Firefox |
+| `Kittycord.user.js` | Tampermonkey, in any browser |
+
+**Chromium browsers:** unzip the file somewhere permanent, open `chrome://extensions`, switch on
+**Developer mode**, click **Load unpacked** and pick the unzipped folder.
+
+**Firefox:** the zip isn't signed, so it needs Firefox Developer Edition or Nightly with
+`xpinstall.signatures.required` set to `false`. To try it without that, open
+`about:debugging → This Firefox → Load Temporary Add-on` and pick the zip; it stays until you
+close the browser.
+
+**Userscript:** install Tampermonkey, then open `Kittycord.user.js` from the release page and
+confirm. Violentmonkey and Greasemonkey on Firefox can't run it, because they can't replace things
+on `window` on a site that sends a CSP. The release also contains `Kittycord.user.css`, which the
+userscript already includes, so the `.js` file is all you need.
+
+Plugins, themes and QuickCSS all work the same way as on the desktop. Everything that needs a real
+client stays behind: the installer, background updates, and importing a setup from your disk.
+
+## Bring your setup with you
+
+Coming from another client mod? Kittycord can take its configuration over instead of making you
+rebuild it. Open **Settings → Import setup** and it lists what it finds on this computer, each
+with the number of plugins, themes and custom CSS it holds — BetterDiscord, Vesktop, Equibop and
+the other common mods are all read. Click **Bring it over** and tick what you want: the plugins you
+had switched on with their settings, your theme files, your custom CSS, or all three. Nothing on
+the other side is changed or deleted, so you can always go back.
+
+A settings backup you exported yourself works too. The same screen has **Load a backup file** for
+that.
+
 ## 🧩 Writing your own plugin
 
 You don't need to build Kittycord from source to run your own plugin. Open

@@ -6,6 +6,9 @@
     "author": "Kittycord",
     "homepage_url": "https://github.com/KittyCord-Production/Kittycord",
     "icons": {
+        "16": "icon.png",
+        "32": "icon.png",
+        "48": "icon.png",
         "128": "icon.png"
     },
     "permissions": [
