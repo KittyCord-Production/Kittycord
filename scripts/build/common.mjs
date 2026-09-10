@@ -159,7 +159,7 @@ export const globPlugins = kind => ({
 
                 const fullDir = `./src/${dir}`;
                 if (!await exists(fullDir)) continue;
-                const files = await readdir(fullDir, { withFileTypes: true });
+                const files = (await readdir(fullDir, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
                 for (const file of files) {
                     const fileName = file.name;
                     if (fileName.startsWith("_") || fileName.startsWith(".")) continue;

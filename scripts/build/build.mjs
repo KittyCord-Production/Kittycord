@@ -88,7 +88,7 @@ const globNativesPlugin = {
             for (const dir of pluginDirs) {
                 const dirPath = join("src", dir);
                 if (!await exists(dirPath)) continue;
-                const plugins = await readdir(dirPath, { withFileTypes: true });
+                const plugins = (await readdir(dirPath, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
                 for (const file of plugins) {
                     const fileName = file.name;
                     const nativePath = join(dirPath, fileName, "native.ts");

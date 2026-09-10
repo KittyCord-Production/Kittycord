@@ -124,7 +124,7 @@ await buildOrWatchAll(buildConfigs);
 async function globDir(dir) {
     const files = [];
 
-    for (const child of await readdir(dir, { withFileTypes: true })) {
+    for (const child of (await readdir(dir, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
         const p = join(dir, child.name);
         if (child.isDirectory())
             files.push(...await globDir(p));
