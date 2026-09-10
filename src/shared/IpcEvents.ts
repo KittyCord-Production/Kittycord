@@ -80,7 +80,11 @@ export const enum IpcEvents {
     GET_REQUEST_LOG = "KittycordGetRequestLog",
     CLEAR_REQUEST_LOG = "KittycordClearRequestLog",
 
+    GET_BUILD_INFO = "KittycordGetBuildInfo",
+
     GET_CUSTOM_BADGES = "KittycordGetCustomBadges",
     SET_CUSTOM_BADGE = "KittycordSetCustomBadge",
     CLEAR_CUSTOM_BADGE = "KittycordClearCustomBadge",
+
+    GET_LAST_CHANGELOG = "KittycordGetLastChangelog",
 }

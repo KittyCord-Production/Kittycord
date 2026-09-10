@@ -10,13 +10,14 @@ import { isPluginEnabled } from "@api/PluginManager";
 import { Settings, SettingsStore } from "@api/Settings";
 import { coreStyleRootNode } from "@api/Styles";
 import { ChangelogTab, openSettingsTabModal } from "@components/settings";
-import { markUpdateNoticeShown, shouldSurfaceUpdateNotice } from "@components/settings/tabs/changelog/changelogManager";
+import { getStoredChangelogEntries, markUpdateNoticeShown, shouldSurfaceUpdateNotice } from "@components/settings/tabs/changelog/changelogManager";
 import { ACCENT_PRESETS } from "@shared/accentPresets";
 import { createAndAppendStyle } from "@utils/css";
 import { UpdateLogger } from "@utils/updater";
 import { patchResilience } from "@webpack/patcher";
 
 const PERFORMANCE_SUGGESTION_KEY = "Kittycord_PerformanceSuggested";
+const HOST_REPAIR_SEEN_KEY = "Kittycord_HostRepairSeen";
 
 export function applyAccent() {
     const preset = ACCENT_PRESETS[Settings.kittycordAccent] ?? ACCENT_PRESETS.pink;
@@ -35,13 +36,37 @@ async function maybeSurfaceChangelog() {
     try {
         if (!await shouldSurfaceUpdateNotice()) return;
         await markUpdateNoticeShown();
+
+        const highlights = (await getStoredChangelogEntries()).slice(0, 3).map(entry => entry.message);
+
         showNotice(
-            "You're on a new version of Kittycord!",
+            highlights.length > 0
+                ? `New in Kittycord: ${highlights.join(", ")}`
+                : "You're on a new version of Kittycord!",
             "What's New",
             () => { if (ChangelogTab) openSettingsTabModal(ChangelogTab); }
         );
     } catch (err) {
         UpdateLogger.error("Failed to surface changelog notice", err);
+    }
+}
+
+async function maybeMentionHostRepair() {
+    try {
+        const { lastHostRepairAt } = await VencordNative.kittycordBuild.get();
+        if (lastHostRepairAt == null) return;
+
+        const seen = await dsGet<number>(HOST_REPAIR_SEEN_KEY);
+        if (seen === lastHostRepairAt) return;
+        await dsSet(HOST_REPAIR_SEEN_KEY, lastHostRepairAt);
+
+        showNotice(
+            "Discord updated itself, so Kittycord reinstalled itself automatically. Nothing for you to do.",
+            "OK",
+            popNotice
+        );
+    } catch (err) {
+        UpdateLogger.error("Failed to check for a host repair", err);
     }
 }
 
@@ -83,4 +108,5 @@ export function scheduleKittycordNotices() {
     setTimeout(maybeSurfaceChangelog, 6000);
     if (!IS_REPORTER) setTimeout(maybeWarnPatchFailures, 10_000);
     setTimeout(maybeSuggestPerformanceMode, 14_000);
+    if (IS_DISCORD_DESKTOP) setTimeout(maybeMentionHostRepair, 18_000);
 }

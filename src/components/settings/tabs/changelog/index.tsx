@@ -36,6 +36,7 @@ import {
     getNewSettings,
     getNewSettingsEntries,
     getNewSettingsSize,
+    getStoredChangelogEntries,
     getUpdatedPlugins,
     initializeChangelog,
     saveUpdateSession,
@@ -279,6 +280,14 @@ function ChangelogContent() {
         }
     }, []);
 
+    const loadStoredChangelog = React.useCallback(async () => {
+        const stored = await getStoredChangelogEntries();
+        if (stored.length === 0) return false;
+
+        setChangelog(stored);
+        return true;
+    }, []);
+
     const ensureLocalUpdateLogged = React.useCallback(async () => {
         if (repoPending || repoErr) return false;
         const repoUrl = repo;
@@ -439,6 +448,10 @@ function ChangelogContent() {
         const loadInitialData = async () => {
             if (!repoPending && !repoErr) {
                 await loadNewPlugins();
+                if (await loadStoredChangelog()) {
+                    setIsLoading(false);
+                    return;
+                }
                 const logged = await ensureLocalUpdateLogged();
                 if (!logged) {
                     await fetchChangelog();
@@ -457,6 +470,7 @@ function ChangelogContent() {
         repoErr,
         fetchChangelog,
         loadNewPlugins,
+        loadStoredChangelog,
         ensureLocalUpdateLogged,
     ]);
 
@@ -602,7 +616,7 @@ function ChangelogContent() {
                             <div className="vc-changelog-commits-list">
                                 {changelog.map(entry => (
                                     <ChangelogCard
-                                        key={entry.hash}
+                                        key={`${entry.hash}-${entry.message}`}
                                         entry={entry}
                                         repo={repo}
                                         repoPending={repoPending}

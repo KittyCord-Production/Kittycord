@@ -26,7 +26,8 @@ import { writeFileSync } from "original-fs";
 import gitHash from "~git-hash";
 import gitRemote from "~git-remote";
 
-import { ASAR_FILE, serializeErrors } from "./common";
+import { recordUpdateVerified } from "../buildInfo";
+import { ASAR_FILE, serializeErrors, storeChangelog } from "./common";
 
 const API_BASE = `https://api.github.com/repos/${gitRemote}`;
 const RELEASE_BASE = `https://github.com/${gitRemote}/releases`;
@@ -38,6 +39,7 @@ function downloadBase(channel?: string) {
 }
 
 let PendingUpdate: string | null = null;
+let PendingChangelog: string | null = null;
 let remoteHash: string | null = null;
 
 async function githubGet<T = any>(endpoint: string) {
@@ -86,8 +88,22 @@ async function fetchUpdates(channel?: string) {
         return false;
 
     PendingUpdate = `${base}/${ASAR_FILE}`;
+    PendingChangelog = `${base}/changelog.json`;
 
     return true;
+}
+
+async function saveChangelog() {
+    if (!PendingChangelog) return;
+
+    try {
+        const changelog = await fetchBuffer(PendingChangelog, { signal: AbortSignal.timeout(10_000) });
+        storeChangelog(changelog.toString("utf-8"));
+    } catch (err) {
+        console.error("[Kittycord] Could not save the changelog of this update:", err);
+    }
+
+    PendingChangelog = null;
 }
 
 // CI publishes a `<asar>.sha256` asset next to each build. Releases from before that have no
@@ -115,7 +131,11 @@ async function applyUpdates() {
             throw new Error("The update download failed verification (checksum mismatch). A new release may be publishing right now - please try again in a few minutes.");
     }
 
+    recordUpdateVerified(expectedHash != null);
+
     writeFileSync(__dirname, data, { flush: true });
+
+    await saveChangelog();
 
     PendingUpdate = null;
 

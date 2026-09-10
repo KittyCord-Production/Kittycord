@@ -67,6 +67,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
+            # Pins the build clock to the commit date so the same commit always produces a
+            # byte-identical asar - anyone can rebuild it and compare the published checksum.
+            - name: Pin build timestamp to the commit
+              run: echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> "$GITHUB_ENV"
+
             # --standalone makes the in-app updater use the HTTP updater (downloads the new
             # desktop.asar from GitHub Releases) instead of the git updater, which is what an
             # installer/asar distribution needs.
@@ -96,6 +101,41 @@ jobs:
                   ( cd installer && zip -q -X "$GITHUB_WORKSPACE/out/Kittycord-Installer-macOS.zip" Kittycord-Install-macOS.command )
                   sha256sum out/Kittycord-Install-macOS.command | cut -d' ' -f1 > out/Kittycord-Install-macOS.command.sha256
                   sha256sum out/Kittycord-Installer-macOS.zip | cut -d' ' -f1 > out/Kittycord-Installer-macOS.zip.sha256
+
+            # Offline "what's new": the in-app updater downloads changelog.json alongside the asar,
+            # so the changelog tab has real content even when the GitHub API is unreachable or
+            # rate-limited. Never fails the build - a bad step still leaves a valid, empty file.
+            - name: Write the changelog asset
+              run: |
+                  set +e
+                  mkdir -p out
+                  if [ "$GITHUB_REF_NAME" = "stable" ]; then
+                      version_url="https://github.com/$GITHUB_REPOSITORY/releases/latest/download/version.txt"
+                  else
+                      version_url="https://github.com/$GITHUB_REPOSITORY/releases/download/beta/version.txt"
+                  fi
+                  # the published version.txt names the commit of the release users are coming from
+                  previous=$(curl -fsSL --max-time 30 "$version_url" | tr -d '[:space:]')
+                  if [ -n "$previous" ] && git cat-file -e "$previous^{commit}" 2>/dev/null; then
+                      git log --no-merges --pretty=%s "$previous..$GITHUB_SHA" > subjects.txt
+                  else
+                      git log --no-merges --pretty=%s -n 10 > subjects.txt
+                  fi
+                  grep -viE 'equicord|vencord|moggcard|moggcord|fork|upstream|sync' subjects.txt > entries.txt
+                  node -e '
+                      const { readFileSync, writeFileSync } = require("fs");
+                      let entries = [];
+                      try {
+                          entries = readFileSync("entries.txt", "utf-8").split("\n").map(line => line.trim()).filter(Boolean).slice(0, 30);
+                      } catch (err) {
+                          console.error(err);
+                      }
+                      writeFileSync("out/changelog.json", JSON.stringify({ hash: process.env.GITHUB_SHA, generatedAt: Date.now(), entries }));
+                  '
+                  node -e 'JSON.parse(require("fs").readFileSync("out/changelog.json", "utf-8"))' || printf '{"hash":"%s","generatedAt":0,"entries":[]}' "$GITHUB_SHA" > out/changelog.json
+                  rm -f subjects.txt entries.txt
+                  cat out/changelog.json
+                  exit 0
 
             - uses: actions/upload-artifact@v4
               with:

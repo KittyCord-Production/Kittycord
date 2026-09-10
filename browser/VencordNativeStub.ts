@@ -173,6 +173,15 @@ window.VencordNative = {
         friendsCheck: async () => [] as string[],
     },
 
+    kittycordBuild: {
+        // No main process on web -> there is no asar to hash.
+        get: async () => ({ gitHash: "", asarHash: null, updateVerified: null, lastHostRepairAt: null }),
+    },
+
+    kittycordChangelog: {
+        getLast: async () => null,
+    },
+
     kittycordBadges: {
         getBadges: async () => [] as { id: string; emoji: string; label: string; slot: number; }[],
         setBadge: async () => ({ ok: false as boolean, error: "web" as string | undefined }),

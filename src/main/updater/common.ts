@@ -16,7 +16,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { DATA_DIR } from "@main/utils/constants";
+import { IpcEvents } from "@shared/IpcEvents";
+import { ipcMain } from "electron";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
+
 export const ASAR_FILE = IS_VESKTOP ? "vesktop.asar" : IS_EQUIBOP ? "equibop.asar" : "desktop.asar";
+
+export interface StoredChangelog {
+    hash: string;
+    generatedAt: number;
+    entries: string[];
+}
+
+const CHANGELOG_FILE = join(DATA_DIR, "changelog.json");
+
+function isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every(entry => typeof entry === "string");
+}
+
+function parseChangelog(raw: string): StoredChangelog | null {
+    const data: unknown = JSON.parse(raw);
+    if (typeof data !== "object" || data === null) return null;
+
+    const { hash, generatedAt, entries } = data as Record<string, unknown>;
+    if (typeof hash !== "string" || typeof generatedAt !== "number" || !isStringArray(entries)) return null;
+
+    return { hash, generatedAt, entries };
+}
+
+export function storeChangelog(raw: string) {
+    const changelog = parseChangelog(raw);
+    if (!changelog) return;
+
+    if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+    writeFileSync(CHANGELOG_FILE, JSON.stringify(changelog), "utf-8");
+}
+
+function readChangelog(): StoredChangelog | null {
+    try {
+        return parseChangelog(readFileSync(CHANGELOG_FILE, "utf-8"));
+    } catch {
+        return null;
+    }
+}
+
+ipcMain.handle(IpcEvents.GET_LAST_CHANGELOG, () => readChangelog());
 
 export function serializeErrors(func: (...args: any[]) => any) {
     return async function () {

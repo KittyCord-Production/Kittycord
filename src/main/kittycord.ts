@@ -13,7 +13,8 @@ const MODULES = [
     ["crash reporting", () => require("./crashReporter")],
     ["deep links", () => require("./deepLinks")],
     ["the share registry", () => require("./shareRegistry")],
-    ["custom badges", () => require("./customBadges")]
+    ["custom badges", () => require("./customBadges")],
+    ["build info", () => require("./buildInfo")]
 ] as const;
 
 export function installKittycord() {

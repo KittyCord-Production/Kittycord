@@ -401,6 +401,18 @@ export async function getNewSettings(): Promise<Map<string, string[]>> {
     return newSettings;
 }
 
+export async function getStoredChangelogEntries(): Promise<ChangelogEntry[]> {
+    const stored = await VencordNative.kittycordChangelog.getLast();
+    if (!stored || stored.hash !== gitHash) return [];
+
+    return stored.entries.map(message => ({
+        hash: gitHash,
+        author: "Kittycord",
+        message,
+        timestamp: stored.generatedAt,
+    }));
+}
+
 export async function getCommitsSinceLastSeen(
     repoUrl: string,
 ): Promise<ChangelogEntry[]> {

@@ -9,6 +9,7 @@ import type { CspRequestResult } from "@main/csp/manager";
 import type { CustomPluginFile } from "@main/customPlugins";
 import type { PluginIpcMappings } from "@main/ipcPlugins";
 import { UserThemeHeader } from "@main/themes";
+import type { StoredChangelog } from "@main/updater/common";
 import { IpcEvents } from "@shared/IpcEvents";
 import type { IpcRes } from "@utils/types";
 import { ipcRenderer } from "electron/renderer";
@@ -149,6 +150,14 @@ export default {
             totals: Record<string, number>;
         }>(IpcEvents.GET_REQUEST_LOG),
         clearRequestLog: () => invoke<void>(IpcEvents.CLEAR_REQUEST_LOG),
+    },
+
+    kittycordBuild: {
+        get: () => invoke<import("./main/buildInfo").BuildInfo>(IpcEvents.GET_BUILD_INFO),
+    },
+
+    kittycordChangelog: {
+        getLast: () => invoke<StoredChangelog | null>(IpcEvents.GET_LAST_CHANGELOG),
     },
 
     kittycordBadges: {
