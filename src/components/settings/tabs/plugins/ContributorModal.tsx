@@ -7,6 +7,7 @@
 import "./ContributorModal.css";
 
 import { useSettings } from "@api/Settings";
+import { brandAuthorAvatar } from "@branding";
 import { Heading } from "@components/Heading";
 import { Link } from "@components/Link";
 import { Paragraph } from "@components/Paragraph";
@@ -66,7 +67,7 @@ function ContributorModal({ user, modalProps }: { user: User; modalProps: Render
                 <div className={cl("header")}>
                     <img
                         className={cl("avatar")}
-                        src={user.getAvatarURL(void 0, 512, true)}
+                        src={brandAuthorAvatar(user.username, user.getAvatarURL(void 0, 512, true))}
                         alt=""
                     />
                     <Heading tag="h2" className={cl("name")}>{user.username}</Heading>

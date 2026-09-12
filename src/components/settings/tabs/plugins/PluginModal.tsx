@@ -21,6 +21,7 @@ import "./PluginModal.css";
 import { generateId } from "@api/Commands";
 import { hasAnyVisibleSettings, isPluginEnabled, isSettingHidden } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
+import { brandAuthorAvatar } from "@branding";
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -227,7 +228,7 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
                                     >
                                         <img
                                             className={AvatarStyles.avatar}
-                                            src={user.getAvatarURL(void 0, 80, true)}
+                                            src={brandAuthorAvatar(user.username, user.getAvatarURL(void 0, 80, true))}
                                             alt={user.username}
                                             title={user.username}
                                         />
