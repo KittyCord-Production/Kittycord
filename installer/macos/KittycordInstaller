@@ -1,0 +1,150 @@
+#!/bin/bash
+set -uo pipefail
+
+BUNDLE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+RES_DIR="$BUNDLE_DIR/Contents/Resources"
+SCRIPT="$RES_DIR/Kittycord-Install-macOS.command"
+DIALOGS="$RES_DIR/dialogs.applescript"
+ICON="$RES_DIR/Kittycord.icns"
+TITLE="Kittycord Installer"
+TMP="${TMPDIR:-/tmp}"
+LOG="$TMP/Kittycord-Install.log"
+ERR="$TMP/Kittycord-Install.err"
+DATA_ASAR="$HOME/Library/Application Support/Kittycord/desktop.asar"
+
+: > "$LOG" 2>/dev/null || LOG="/tmp/Kittycord-Install.log"
+: > "$ERR" 2>/dev/null || ERR="/tmp/Kittycord-Install.err"
+
+open_in_terminal() {
+    open -a Terminal "$SCRIPT" >/dev/null 2>&1
+    exit 0
+}
+
+ask() {
+    osascript "$DIALOGS" "$@" 2>"$ERR"
+}
+
+was_cancelled() {
+    grep -q -- '-128' "$ERR" 2>/dev/null
+}
+
+fail_out() {
+    local answer
+    answer="$(ask failed "$1" "$TITLE")"
+    if [ "$answer" = "Show log" ]; then
+        open -t "$LOG" >/dev/null 2>&1
+    fi
+    exit 1
+}
+
+if [ ! -f "$SCRIPT" ] || [ ! -f "$DIALOGS" ]; then
+    open_in_terminal
+fi
+
+action_label="$(ask action "Kittycord patches your installed Discord so it loads plugins, themes and everything else Kittycord adds.
+
+Discord closes while this runs." "$TITLE" "$ICON")"
+
+if [ -z "$action_label" ]; then
+    was_cancelled && exit 0
+    open_in_terminal
+fi
+
+case "$action_label" in
+    "Uninstall") action="uninstall" ;;
+    "Install or repair") action="install" ;;
+    *) exit 0 ;;
+esac
+
+targets="$(KC_LIST_TARGETS=1 /bin/bash "$SCRIPT" 2>>"$LOG")"
+
+if [ -z "$targets" ]; then
+    fail_out "No Discord installation was found in Applications.
+
+Install Discord first, then open this installer again."
+fi
+
+names=""
+while IFS=$'\t' read -r name res; do
+    [ -z "${name:-}" ] && continue
+    names="$names$name
+"
+done <<EOF
+$targets
+EOF
+
+count="$(printf '%s' "$names" | grep -c . || true)"
+picked="$names"
+
+if [ "$count" -gt 1 ]; then
+    old_ifs="$IFS"
+    IFS='
+'
+    set --
+    for n in $names; do
+        set -- "$@" "$n"
+    done
+    IFS="$old_ifs"
+    picked="$(ask targets "$TITLE" "$@")"
+    [ -z "$picked" ] && exit 0
+fi
+
+code=""
+if [ "$action" = "install" ]; then
+    code="$(ask code "Have a creator code? Enter it to support whoever sent you here.
+
+This is optional." "$TITLE" "$ICON")"
+fi
+
+ask notify "Working on it, this can take a minute." "$TITLE" >/dev/null
+
+run_one() {
+    local name="$1" res="$2" source="${3:-}"
+    printf '=== %s: %s ===\n' "$action" "$name" >> "$LOG"
+    if [ -n "$source" ]; then
+        KC_ASAR_SOURCE="$source" KC_ACTION="$action" KC_TARGET_NAME="$name" KC_RESOURCES_DIR="$res" KC_CREATOR_CODE="$code" /bin/bash "$SCRIPT" >> "$LOG" 2>&1
+    else
+        KC_ACTION="$action" KC_TARGET_NAME="$name" KC_RESOURCES_DIR="$res" KC_CREATOR_CODE="$code" /bin/bash "$SCRIPT" >> "$LOG" 2>&1
+    fi
+}
+
+failed=""
+done_one=0
+while IFS=$'\t' read -r name res; do
+    [ -z "${name:-}" ] && continue
+    printf '%s' "$picked" | grep -qx -- "$name" || continue
+
+    if [ "$action" = "install" ] && [ "$done_one" = "1" ] && [ -f "$DATA_ASAR" ]; then
+        run_one "$name" "$res" "$DATA_ASAR"
+    else
+        run_one "$name" "$res"
+    fi
+
+    if [ "$?" != "0" ]; then
+        failed="$name"
+        break
+    fi
+    done_one=1
+done <<EOF
+$targets
+EOF
+
+if [ -n "$failed" ]; then
+    fail_out "Kittycord could not finish on $failed.
+
+$(tail -n 6 "$LOG" 2>/dev/null | tr -d '\r')"
+fi
+
+started="$(printf '%s' "$picked" | grep -m1 . || true)"
+
+if [ "$action" = "install" ]; then
+    ask done "Kittycord is installed.
+
+Start Discord again to see it. Open this installer any time to repair after a Discord update." "$TITLE" "$ICON" "$started" >/dev/null
+else
+    ask done "Kittycord was removed.
+
+Start Discord again for the untouched client." "$TITLE" "$ICON" "$started" >/dev/null
+fi
+
+exit 0

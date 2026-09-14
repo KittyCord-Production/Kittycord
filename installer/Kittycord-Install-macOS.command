@@ -241,6 +241,11 @@ resolve_action() {
 }
 
 main() {
+    if [ "${KC_LIST_TARGETS:-0}" = "1" ]; then
+        discover_targets
+        exit 0
+    fi
+
     printf '\033[35m%s\033[0m\n' "Kittycord for macOS"
 
     local action targets

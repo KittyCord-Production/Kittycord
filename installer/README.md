@@ -4,19 +4,21 @@
 |---|---|---|---|
 | `Kittycord-Installer-GUI.ps1` | Windows | **End users** (compiled to `Kittycord-Installer.exe` by CI) | Graphical installer: downloads the latest `desktop.asar` from GitHub Releases and patches Discord. No repo/pnpm needed. |
 | `Kittycord-Install.ps1` | Windows | **Developers** | Patches Discord to load your local `dist/desktop` build (run `pnpm build` first). |
-| `Kittycord-Install-macOS.command` | macOS | **End users** | Downloads the latest `desktop.asar` and patches Discord.app. Double-click (right-click → Open the first time) or run over `curl`. Has Install / Repair / Uninstall built in. |
+| `macos/KittycordInstaller` + `macos/dialogs.applescript` | macOS | **End users** (packed into `Kittycord Installer.app` by `build-macos-app.py`) | The app you double-click: native dialogs for Install / Repair / Uninstall, which Discord to patch and the creator code, then it drives the script below. |
+| `Kittycord-Install-macOS.command` | macOS | **End users**, **Developers** | Downloads the latest `desktop.asar` and patches Discord.app. Runs inside the app, from a double-click, or over `curl`. Has Install / Repair / Uninstall built in. |
 
 `Kittycord-Uninstall.ps1` reverts the Windows installs; the macOS script reverts itself via its Uninstall option.
 
 ## macOS
 
-Download `Kittycord-Installer-macOS.zip` from the latest release and unzip it — the zip keeps the
-executable bit that a plain browser download strips. Discord must be the standard app from
-[discord.com](https://discord.com/download) in `/Applications` (or `~/Applications`), launched once;
-Stable, PTB and Canary are all supported and can be patched in one run. Because the script isn't
-signed, the first launch needs **right-click → Open** rather than a double-click; after that macOS
-remembers your choice. If macOS refuses that too, open **System Settings → Privacy & Security**,
-scroll to the blocked file and click **Open Anyway**. From the Terminal you can run it directly:
+Download `Kittycord-Installer-macOS.zip` from the latest release and unzip it — inside is
+`Kittycord Installer`, an app with the Kittycord icon that asks what to do in normal Mac dialogs.
+Discord must be the standard app from [discord.com](https://discord.com/download) in
+`/Applications` (or `~/Applications`), launched once; Stable, PTB and Canary are all supported and
+can be patched in one run. Because the app isn't signed, the first launch needs
+**right-click → Open** rather than a double-click; after that macOS remembers your choice. If macOS
+refuses that too, open **System Settings → Privacy & Security**, scroll to the blocked app and
+click **Open Anyway**. From the Terminal you can run the script inside it directly:
 
 ```sh
 sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"

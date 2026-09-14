@@ -95,10 +95,10 @@ jobs:
                   cp dist/extension-firefox.zip out/
                   cp dist/Kittycord.user.js out/
                   cp dist/Kittycord.user.css out/
-                  # macOS installer: the raw .command powers the curl one-liner; the zip keeps the +x bit a browser download would strip
-                  chmod +x installer/Kittycord-Install-macOS.command
+                  # macOS installer: the raw .command powers the curl one-liner; the zip holds the double-clickable app around it
+                  chmod +x installer/Kittycord-Install-macOS.command installer/macos/KittycordInstaller
                   cp installer/Kittycord-Install-macOS.command out/
-                  ( cd installer && zip -q -X "$GITHUB_WORKSPACE/out/Kittycord-Installer-macOS.zip" Kittycord-Install-macOS.command )
+                  python3 installer/build-macos-app.py --installer-dir installer --out out/Kittycord-Installer-macOS.zip
                   sha256sum out/Kittycord-Install-macOS.command | cut -d' ' -f1 > out/Kittycord-Install-macOS.command.sha256
                   sha256sum out/Kittycord-Installer-macOS.zip | cut -d' ' -f1 > out/Kittycord-Installer-macOS.zip.sha256
 
@@ -227,6 +227,30 @@ jobs:
             - name: Run installer against a Discord fixture
               run: bash installer/test/macos-install.test.sh
 
+            - name: Run the installer app against a Discord fixture
+              run: bash installer/test/macos-app.test.sh
+
+            # Reports whether a double-click really starts the bundle; never blocks a release,
+            # because a runner without a window session cannot answer that question.
+            - name: Open the app the way a user would
+              continue-on-error: true
+              run: |
+                  python3 installer/build-macos-app.py --installer-dir installer --out "$RUNNER_TEMP/app.zip"
+                  rm -rf "$RUNNER_TEMP/ls" && mkdir -p "$RUNNER_TEMP/ls"
+                  unzip -q "$RUNNER_TEMP/app.zip" -d "$RUNNER_TEMP/ls"
+                  open "$RUNNER_TEMP/ls/Kittycord Installer.app"
+                  for _ in 1 2 3 4 5 6 7 8 9 10; do
+                      if pgrep -f KittycordInstaller >/dev/null 2>&1; then
+                          echo "the bundle launched"
+                          pkill -f KittycordInstaller || true
+                          pkill -x osascript || true
+                          exit 0
+                      fi
+                      sleep 1
+                  done
+                  echo "the bundle did not start"
+                  exit 1
+
     release:
         name: Publish release
         runs-on: ubuntu-latest
@@ -250,7 +274,7 @@ jobs:
 
                       **Install (Windows):** download `Kittycord-Installer.exe` below, run it, then start Discord.
 
-                      **Install (macOS):** download `Kittycord-Installer-macOS.zip`, unzip it, then right-click `Kittycord-Install-macOS.command` and choose Open (it's not signed, so a plain double-click is blocked the first time). Prefer the Terminal? Paste this:
+                      **Install (macOS):** download `Kittycord-Installer-macOS.zip`, unzip it, then right-click `Kittycord Installer` and choose Open (it's not signed, so a plain double-click is blocked the first time). Prefer the Terminal? Paste this:
                       ```
                       sh -c "$(curl -fsSL https://github.com/${{ github.repository }}/releases/latest/download/Kittycord-Install-macOS.command)"
                       ```
