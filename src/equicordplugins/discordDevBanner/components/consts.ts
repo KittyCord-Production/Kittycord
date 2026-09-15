@@ -5,6 +5,7 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { BRAND_NAME } from "@branding";
 import { OptionType } from "@utils/types";
 
 import { FormatSetting } from ".";
@@ -13,7 +14,7 @@ export const settings = definePluginSettings({
     format: {
         component: ({ setValue }) => FormatSetting(setValue),
         type: OptionType.COMPONENT,
-        default: "{equicordIcon} Equicord {equicordVersion} ({equicordHash})",
+        default: `{kittycordIcon} ${BRAND_NAME} {kittycordVersion} ({kittycordHash})`,
         restartNeeded: true
     }
 });
@@ -33,11 +34,12 @@ export const settingVariables = [
     "{buildNumber} - Discord build number (e.g. 123456)",
     "{buildHash} - Discord build hash (e.g. 123456789)",
     "",
-    "Equicord Variables:",
-    "{equicordIcon} - Equicord icon",
-    "{equicordVersion} - Version of Equicord (e.g. 1.0.0)",
-    "{equicordHash} - Equicord build hash (e.g. 123456789)",
-    "{equicordPlatform} - Platform Equicord is running on (e.g. Dev Build)",
+    `${BRAND_NAME} Variables:`,
+    `{kittycordIcon} - ${BRAND_NAME} icon`,
+    `{kittycordName} - The client name (e.g. ${BRAND_NAME})`,
+    `{kittycordVersion} - Version of ${BRAND_NAME} (e.g. 1.0.0)`,
+    `{kittycordHash} - ${BRAND_NAME} build hash (e.g. 123456789)`,
+    `{kittycordPlatform} - Platform ${BRAND_NAME} is running on (e.g. Dev Build)`,
     "",
     "Equibop Specific Variables:",
     "{equibopHash} - Equibop build hash (e.g. 123456789)",
@@ -60,3 +62,7 @@ export const settingVariables = [
     "{newline} or \\n - Newline character",
     "",
 ];
+
+export function rebrandFormat(format: string): string {
+    return format.replace(/Equicord/g, BRAND_NAME).replace(/equicord/g, BRAND_NAME.toLowerCase());
+}

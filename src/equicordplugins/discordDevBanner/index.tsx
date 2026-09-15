@@ -17,6 +17,7 @@ export default definePlugin({
     tags: ["Appearance", "Console", "Developers"],
     authors: [EquicordDevs.KrystalSkull, Devs.thororen],
     settings,
+    isModified: true,
     patches: [
         {
             find: '"isHideDevBanner"',
