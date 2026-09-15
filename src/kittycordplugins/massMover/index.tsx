@@ -10,7 +10,7 @@ import { Logger } from "@utils/Logger";
 import { sleep } from "@utils/misc";
 import definePlugin, { makeRange, OptionType } from "@utils/types";
 import type { Channel } from "@vencord/discord-types";
-import { GuildChannelStore, GuildMemberStore, GuildRoleStore, Menu, PermissionsBits, PermissionStore, RestAPI, showToast, Toasts, VoiceStateStore } from "@webpack/common";
+import { ChannelStore, GuildChannelStore, GuildMemberStore, GuildRoleStore, Menu, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, Toasts, VoiceStateStore } from "@webpack/common";
 
 const logger = new Logger("MassMover");
 
@@ -57,7 +57,14 @@ const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { ch
     if (!PermissionStore.can(PermissionsBits.MOVE_MEMBERS, channel)) return;
 
     const users = getVoiceUsers(channel);
-    if (!users.length) return;
+
+    const myChannelId = SelectedChannelStore.getVoiceChannelId();
+    const myChannel = myChannelId == null || myChannelId === channel.id ? null : ChannelStore.getChannel(myChannelId);
+    const swapChannel = myChannel?.guild_id === channel.guild_id && PermissionStore.can(PermissionsBits.MOVE_MEMBERS, myChannel) ? myChannel : null;
+    const usersHere = swapChannel ? Object.keys(VoiceStateStore.getVoiceStatesForChannel(channel.id)) : [];
+    const usersWithMe = swapChannel ? Object.keys(VoiceStateStore.getVoiceStatesForChannel(swapChannel.id)) : [];
+
+    if (!users.length && !usersHere.length && !usersWithMe.length) return;
 
     const roleIds = new Set<string>();
     for (const userId of users)
@@ -66,11 +73,27 @@ const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { ch
 
     children.splice(-1, 0, (
         <Menu.MenuItem id="vc-mass-move" label="Mass Move">
-            <Menu.MenuItem
-                id="vc-mass-move-everyone"
-                label={`Move everyone here (${users.length})`}
-                action={() => void moveUsers(channel.guild_id, users, channel.id)}
-            />
+            {users.length > 0 && (
+                <Menu.MenuItem
+                    id="vc-mass-move-everyone"
+                    label={`Move everyone here (${users.length})`}
+                    action={() => void moveUsers(channel.guild_id, users, channel.id)}
+                />
+            )}
+            {swapChannel && usersHere.length > 0 && (
+                <Menu.MenuItem
+                    id="vc-mass-move-pull"
+                    label={`Pull this channel to me (${usersHere.length})`}
+                    action={() => void moveUsers(channel.guild_id, usersHere, swapChannel.id)}
+                />
+            )}
+            {swapChannel && usersWithMe.length > 0 && (
+                <Menu.MenuItem
+                    id="vc-mass-move-push"
+                    label={`Move my channel here (${usersWithMe.length})`}
+                    action={() => void moveUsers(channel.guild_id, usersWithMe, channel.id)}
+                />
+            )}
             {roles.length > 0 && (
                 <Menu.MenuItem id="vc-mass-move-role" label="Move role here">
                     {roles.map(role => (
@@ -93,7 +116,7 @@ const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { ch
 
 export default definePlugin({
     name: "MassMover",
-    description: "Right click a voice channel to pull everyone, or everyone with a certain role, from the whole server into it.",
+    description: "Right click a voice channel to pull everyone, or everyone with a certain role, into it, or to swap its members with your own voice channel.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Voice", "Servers"],
     settings,
