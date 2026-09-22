@@ -45,6 +45,7 @@ export const GUILD_IDS = [GUILD_ID];
 export const SUPPORT_CHANNEL_IDS = [SUPPORT_CHANNEL_ID];
 export const DONOR_ROLE_IDS = [DONOR_ROLE_ID, VC_DONOR_ROLE_ID];
 export const CONTRIB_ROLE_IDS = [CONTRIB_ROLE_ID, VENCORD_CONTRIB_ROLE_ID, VC_CONTRIB_ROLE_ID];
+export const KNOWN_ISSUES_CHANNEL_IDS = [KNOWN_ISSUES_CHANNEL_ID, VC_KNOWN_ISSUES_CHANNEL_ID];
 
 const platform = navigator.platform.toLowerCase();
 export const IS_WINDOWS = platform.startsWith("win");
@@ -555,7 +556,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     },
     nyx: {
         name: "verticalsync.",
-        id: 1207087393929171095n
+        id: 1280505961546649633n
     },
     nekohaxx: {
         name: "nekohaxx",
@@ -689,6 +690,10 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     Davri: {
         name: "Davri",
         id: 457579346282938368n
+        },
+    Kaede: {
+        name: "Kaede",
+        id: 1492642701320126504n
     }
 } satisfies Record<string, Dev>);
 
