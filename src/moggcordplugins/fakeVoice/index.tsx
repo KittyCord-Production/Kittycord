@@ -10,6 +10,7 @@ import { definePluginSettings } from "@api/Settings";
 import { UserAreaButton, UserAreaRenderProps } from "@api/UserArea";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { IS_WINDOWS } from "@utils/constants";
+import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, type PluginNative } from "@utils/types";
 import { findByCodeLazy, findByProps } from "@webpack";
 import { ApplicationStreamingStore, ChannelStore, ContextMenuApi, MediaEngineStore, Menu, React, SelectedChannelStore } from "@webpack/common";
@@ -18,6 +19,7 @@ const Native = VencordNative?.pluginHelpers?.FakeVoice as PluginNative<typeof im
 const startStream = findByCodeLazy('type:"STREAM_START"');
 const stopStream = findByCodeLazy('type:"STREAM_STOP"');
 const getDesktopSources = findByCodeLazy("desktop sources");
+const logger = new Logger("FakeVoice");
 
 const settings = definePluginSettings({
     fakeMute: {
@@ -45,11 +47,6 @@ const settings = definePluginSettings({
         description: "Appear undeafened while you are really deafened.",
         default: false
     },
-    fakeClips: {
-        type: OptionType.BOOLEAN,
-        description: "Show the clips icon, so people think you can clip the call.",
-        default: false
-    },
     fakeStream: {
         type: OptionType.BOOLEAN,
         description: "Go LIVE with a black screen instead of your real screen. Viewers see a real stream that shows nothing.",
@@ -59,7 +56,6 @@ const settings = definePluginSettings({
 });
 
 let isGhostActive = false;
-const CLIPS_ENABLED = 1 << 0;
 const BLACK_WINDOW_TITLE = "Kittycord Black Screen";
 let fakeStreamActive = false;
 
@@ -86,15 +82,19 @@ async function refreshFakeStream() {
     if (!Native) return void showNotification({ title: "Fake Stream", body: "Only works in the Discord desktop app." });
     if (key) stopStream(key);
 
-    await Native.openBlackWindow();
-    // the new window takes a moment to show up in the capture list
+    const mediaId = await Native.openBlackWindow();
+    // Discord's list uses its own ids, so match on the window handle Electron gave us, falling back to the title
+    const handle = mediaId.split(":")[1];
     let source: { id: string; name: string; } | undefined;
+    let seen: string[] = [];
     for (let i = 0; i < 10 && !source; i++) {
         const sources: { id: string; name: string; }[] = await getDesktopSources(MediaEngineStore.getMediaEngine(), IS_WINDOWS, ["window"], null) ?? [];
-        source = sources.find(s => s.name === BLACK_WINDOW_TITLE);
+        seen = sources.map(s => `${s.id} ${s.name}`);
+        source = sources.find(s => s.id === mediaId || (handle && s.id.split(":").includes(handle)) || s.name === BLACK_WINDOW_TITLE);
         if (!source) await new Promise(r => setTimeout(r, 300));
     }
     if (!source) {
+        logger.error("Black window not in capture list", mediaId, seen);
         await Native.closeBlackWindow();
         settings.store.fakeStream = false;
         return void showNotification({ title: "Fake Stream", body: "Could not start the black screen. Try again." });
@@ -205,16 +205,6 @@ function GhostContextMenu() {
                     }}
                 />
                 <Menu.MenuCheckboxItem
-                    id="opt-clips"
-                    label="Fake Clips"
-                    checked={settings.store.fakeClips}
-                    action={() => {
-                        settings.store.fakeClips = !settings.store.fakeClips;
-                        syncState();
-                        forceUpdate();
-                    }}
-                />
-                <Menu.MenuCheckboxItem
                     id="opt-stream"
                     label="Fake Stream (black screen)"
                     checked={settings.store.fakeStream}
@@ -261,8 +251,8 @@ export default definePlugin({
         {
             find: "}voiceStateUpdate(",
             replacement: {
-                match: /self_mute:([^,]+),self_deaf:([^,]+),self_video:([^,]+),flags:([^}]+)\}/,
-                replace: "self_mute:$self.toggleMute($1),self_deaf:$self.toggleDeaf($2),self_video:$self.toggleVideo($3),flags:$self.toggleFlags($4)}"
+                match: /self_mute:([^,]+),self_deaf:([^,]+),self_video:([^,]+)/,
+                replace: "self_mute:$self.toggleMute($1),self_deaf:$self.toggleDeaf($2),self_video:$self.toggleVideo($3)"
             }
         }
     ],
@@ -278,10 +268,6 @@ export default definePlugin({
         if (!isGhostActive) return value;
         if (settings.store.fakeUndeafen) return false;
         return settings.store.fakeDeafen ? true : value;
-    },
-
-    toggleFlags(value: number) {
-        return isGhostActive && settings.store.fakeClips ? value | CLIPS_ENABLED : value;
     },
 
     toggleVideo(value: boolean) {
