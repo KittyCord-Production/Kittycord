@@ -76,6 +76,7 @@
         "md5": "^2.3.0",
         "moment": "^2.22.2",
         "p-limit": "^7.3.0",
+        "puppeteer-core": "^25.12.0",
         "standalone-electron-types": "^41.2.1",
         "stylelint": "^17.14.0",
         "stylelint-config-standard": "^40.0.0",

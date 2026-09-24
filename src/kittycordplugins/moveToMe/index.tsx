@@ -53,7 +53,7 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
 
 export default definePlugin({
     name: "MoveToMe",
-    description: "Adds a right click option to pull someone from another voice channel into the one you are in.",
+    description: "Adds a right click option to pull someone from another voice channel into the one you are in. Not recommended: Discord can flag accounts that automate actions, so use it at your own risk.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Voice", "Servers"],
 

@@ -72,11 +72,22 @@ Prefer the Terminal? One line does the same thing:
 sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"
 ```
 
-To uninstall on either platform, run the installer again and choose **Uninstall** — it restores a
+### Linux
+
+Works with the `.deb` and `.tar.gz` Discord from [discord.com](https://discord.com/download).
+Paste this into a terminal:
+
+```sh
+bash -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-Linux.sh)"
+```
+
+If Discord lives in a system folder like `/usr/share` or `/opt`, it asks you to rerun with `sudo`.
+Flatpak and Snap versions of Discord are read-only and can't be patched, so use the browser
+extension below for those.
+
+To uninstall on any platform, run the installer again and choose **Uninstall** — it restores a
 completely clean Discord. See [installer/README.md](installer/README.md) for all the details and
 console alternatives.
-
-> A standalone Kittycord desktop client and a Linux installer are on the roadmap.
 
 ## Use it in your browser
 
@@ -157,6 +168,26 @@ The exe is not code-signed (certificates are expensive), so SmartScreen shows "W
 your PC" on first run — click **"More info" → "Run anyway"**. Some antivirus tools flag it for
 the same reason; the installer is open source (see [installer/](installer/)) and every release
 is built automatically from this repository by CI, so you can verify exactly what it does.
+</details>
+
+<details>
+<summary><b>Is Kittycord safe?</b></summary>
+
+- **Open source:** every line of code, including the installers, is in this repository.
+- **Built by CI, not on someone's PC:** every release comes straight from
+  [GitHub Actions](https://github.com/KittyCord-Production/Kittycord/actions), in public.
+- **Reproducible:** the same commit always produces a byte-identical build, so anyone can
+  rebuild it and compare checksums.
+- **Verified updates:** every download ships with a SHA-256 checksum that the installer and
+  the updater check before applying anything. See [SECURITY.md](SECURITY.md).
+- **Private:** no messages, tokens or personal data leave your client. See the
+  [privacy policy](PRIVACY_POLICY.md).
+- **Tested every night:** an automatic check runs every plugin against live Discord, so breakage
+  after a Discord update is caught fast.
+
+Some plugins automate things on your account (for example ghost typing or auto moving between
+voice channels). They're off by default and are marked as not recommended because Discord can
+flag accounts that use them. Turning them on is your call.
 </details>
 
 <details>

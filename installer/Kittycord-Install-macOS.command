@@ -1,21 +1,32 @@
 #!/bin/bash
 #
-# Kittycord - macOS installer
+# Kittycord - macOS and Linux installer
 #
 # Downloads the latest Kittycord build (desktop.asar) and patches your installed
-# Discord so it loads Kittycord. Works by double-click (right click > Open the
-# first time, since it is not signed) or piped from curl.
+# Discord so it loads Kittycord. Works by double-click on macOS (right click > Open
+# the first time, since it is not signed) or piped from curl.
 #
 #   sh -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-macOS.command)"
+#   bash -c "$(curl -fsSL https://github.com/KittyCord-Production/Kittycord/releases/latest/download/Kittycord-Install-Linux.sh)"
 #
 # Run again any time to repair after a Discord update. Choose Uninstall to revert.
+# The release publishes this same file under both names.
 
 set -euo pipefail
 
+OS="$(uname -s)"
 REPO="KittyCord-Production/Kittycord"
 ASAR_URL="${KC_ASAR_URL:-https://github.com/$REPO/releases/latest/download/desktop.asar}"
-INSTALLER_URL="https://github.com/$REPO/releases/latest/download/Kittycord-Install-macOS.command"
-DATA_DIR="${KC_DATA_DIR:-$HOME/Library/Application Support/Kittycord}"
+if [ "$OS" = "Darwin" ]; then
+    INSTALLER_URL="https://github.com/$REPO/releases/latest/download/Kittycord-Install-macOS.command"
+    DATA_DIR="${KC_DATA_DIR:-$HOME/Library/Application Support/Kittycord}"
+else
+    INSTALLER_URL="https://github.com/$REPO/releases/latest/download/Kittycord-Install-Linux.sh"
+    # sudo on most distros points HOME at /root, but Discord runs as the real user
+    USER_HOME="$HOME"
+    [ -n "${SUDO_USER:-}" ] && USER_HOME="$(getent passwd "$SUDO_USER" | cut -d: -f6)"
+    DATA_DIR="${KC_DATA_DIR:-${XDG_CONFIG_HOME:-$USER_HOME/.config}/Kittycord}"
+fi
 ASAR_PATH="$DATA_DIR/desktop.asar"
 
 info() { printf '\033[36m%s\033[0m\n' "$*"; }
@@ -34,8 +45,8 @@ prompt() {
 
 sudo_hint() {
     case "$0" in
-        *.command) printf 'sudo bash "%s"' "$0" ;;
-        *) printf 'sudo sh -c "$(curl -fsSL %s)"' "$INSTALLER_URL" ;;
+        *.command|*.sh) printf 'sudo bash "%s"' "$0" ;;
+        *) printf 'sudo %s -c "$(curl -fsSL %s)"' "$([ "$OS" = "Darwin" ] && echo sh || echo bash)" "$INSTALLER_URL" ;;
     esac
 }
 
@@ -50,7 +61,7 @@ probe_write() {
 no_write_help() {
     local res="$1"
     fail "No write access to $res"
-    if [ "$(id -u)" = "0" ] || [ "$(stat -f %u "$res" 2>/dev/null)" = "$(id -u)" ]; then
+    if [ "$OS" = "Darwin" ] && { [ "$(id -u)" = "0" ] || [ "$(stat -f %u "$res" 2>/dev/null)" = "$(id -u)" ]; }; then
         fail "macOS is blocking your terminal app from modifying other apps (sudo does not help here)."
         fail "Open System Settings > Privacy & Security > App Management, turn on your terminal app, then run this installer again."
     else
@@ -62,15 +73,30 @@ no_write_help() {
 APP_NAMES=("Discord" "Discord PTB" "Discord Canary")
 
 discover_targets() {
-    local base name res bases
-    bases="${KC_APP_BASES:-/Applications:$HOME/Applications}"
+    local base name dir res bases
+    if [ "$OS" = "Darwin" ]; then
+        bases="${KC_APP_BASES:-/Applications:$HOME/Applications}"
+    else
+        bases="${KC_APP_BASES:-/opt:/usr/share:/usr/lib:/usr/lib64:$USER_HOME/.local/share:$USER_HOME}"
+    fi
     IFS=':'
     set -- $bases
     unset IFS
     for base in "$@"; do
         for name in "${APP_NAMES[@]}"; do
-            res="$base/$name.app/Contents/Resources"
-            [ -d "$res" ] && printf '%s\t%s\n' "$name" "$res"
+            if [ "$OS" = "Darwin" ]; then
+                res="$base/$name.app/Contents/Resources"
+                [ -d "$res" ] && printf '%s\t%s\n' "$name" "$res"
+                continue
+            fi
+            # tarball: /opt/DiscordPTB/resources, deb: /usr/share/discord-ptb/resources
+            for dir in "${name// /}" "$(printf '%s' "$name" | tr 'A-Z ' 'a-z-')"; do
+                res="$base/$dir/resources"
+                if [ -e "$res/app.asar" ] || [ -e "$res/_app.asar" ]; then
+                    printf '%s\t%s\n' "$name" "$res"
+                    break
+                fi
+            done
         done
     done
     return 0
@@ -79,9 +105,9 @@ discover_targets() {
 quit_discord() {
     local name="$1"
     [ "${KC_SKIP_QUIT:-0}" = "1" ] && return 0
-    osascript -e "quit app \"$name\"" >/dev/null 2>&1 || true
-    sleep 1
+    [ "$OS" = "Darwin" ] && osascript -e "quit app \"$name\"" >/dev/null 2>&1 && sleep 1
     pkill -x "$name" >/dev/null 2>&1 || true
+    pkill -x "${name// /}" >/dev/null 2>&1 || true
     sleep 1
 }
 
@@ -102,7 +128,7 @@ download_asar() {
         local expected actual
         expected="$(curl -fsSL "$ASAR_URL.sha256" 2>/dev/null | tr -d '[:space:]' | tr 'A-F' 'a-f' || true)"
         if printf '%s' "$expected" | grep -Eq '^[0-9a-f]{64}$'; then
-            actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"
+            actual="$({ sha256sum "$tmp" 2>/dev/null || shasum -a 256 "$tmp"; } | awk '{print $1}')"
             if [ "$actual" != "$expected" ]; then
                 rm -f "$tmp"
                 fail "Checksum mismatch. The download may be corrupted, or a new release is publishing right now."
@@ -194,8 +220,13 @@ resolve_targets() {
     local found
     found="$(discover_targets)"
     if [ -z "$found" ]; then
-        fail "No Discord installation was found in /Applications or ~/Applications."
-        fail "Install Discord first, then run this again."
+        fail "No Discord installation was found."
+        if [ "$OS" = "Darwin" ]; then
+            fail "Install Discord into /Applications first, then run this again."
+        else
+            fail "Install the .deb or .tar.gz from discord.com/download, then run this again."
+            fail "Flatpak and Snap versions of Discord are read-only and cannot be patched."
+        fi
         exit 1
     fi
     local count
@@ -246,7 +277,7 @@ main() {
         exit 0
     fi
 
-    printf '\033[35m%s\033[0m\n' "Kittycord for macOS"
+    printf '\033[35m%s\033[0m\n' "Kittycord for $([ "$OS" = "Darwin" ] && echo macOS || echo Linux)"
 
     local action targets
     action="$(resolve_action)"

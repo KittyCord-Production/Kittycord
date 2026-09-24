@@ -13,7 +13,7 @@ let rejoinTimes: number[] = [];
 
 export default definePlugin({
     name: "AntiMove",
-    description: "Instantly moves you back to your voice channel when someone drags you somewhere else.",
+    description: "Instantly moves you back to your voice channel when someone drags you somewhere else. Not recommended: Discord can flag accounts that automate actions, so use it at your own risk.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Voice"],
 

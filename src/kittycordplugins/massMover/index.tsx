@@ -116,7 +116,7 @@ const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { ch
 
 export default definePlugin({
     name: "MassMover",
-    description: "Right click a voice channel to pull everyone, or everyone with a certain role, into it, or to swap its members with your own voice channel.",
+    description: "Right click a voice channel to pull everyone, or everyone with a certain role, into it, or to swap its members with your own voice channel. Not recommended: Discord can flag accounts that automate actions, so use it at your own risk.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Voice", "Servers"],
     settings,

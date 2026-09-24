@@ -39,7 +39,7 @@ function rebuild(channelId: string) {
 
 export default definePlugin({
     name: "FollowMajority",
-    description: "Automatically follows the crowd: when most of your voice channel moves somewhere else, you join them.",
+    description: "Automatically follows the crowd: when most of your voice channel moves somewhere else, you join them. Not recommended: Discord can flag accounts that automate actions, so use it at your own risk.",
     authors: [{ name: "Kittycord", id: 0n }],
     tags: ["Voice"],
     settings,

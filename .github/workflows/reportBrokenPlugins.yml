@@ -1,0 +1,48 @@
+name: Nightly plugin check
+
+on:
+    schedule:
+        - cron: 0 3 * * *
+    workflow_dispatch:
+        inputs:
+            discord_branch:
+                type: choice
+                description: Discord branch to test against
+                options: [both, stable, canary]
+                default: both
+
+jobs:
+    report:
+        name: Test plugins against live Discord
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - run: corepack enable
+
+            - run: pnpm install --frozen-lockfile
+
+            - run: pnpm buildReporter
+
+            - name: Run reporter
+              timeout-minutes: 15
+              run: |
+                  export PATH="$PWD/node_modules/.bin:$PATH"
+                  export CHROMIUM_BIN=/usr/bin/google-chrome
+                  esbuild scripts/generateReport.ts > dist/report.mjs
+
+                  branch="${{ inputs.discord_branch || 'both' }}"
+                  pids=""
+                  if [ "$branch" != canary ]; then node dist/report.mjs > stable.md & pids="$pids $!"; fi
+                  if [ "$branch" != stable ]; then USE_CANARY=true node dist/report.mjs > canary.md & pids="$pids $!"; fi
+
+                  code=0
+                  for pid in $pids; do wait "$pid" || code=1; done
+                  cat stable.md canary.md 2>/dev/null >> "$GITHUB_STEP_SUMMARY"
+                  exit $code
+              env:
+                  WEBHOOK_URL: ${{ secrets.REPORTER_WEBHOOK_URL }}
