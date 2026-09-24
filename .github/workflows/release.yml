@@ -194,6 +194,7 @@ jobs:
                   powershell -NoProfile -ExecutionPolicy Bypass -File installer/test/windows-install.test.ps1
 
             - name: Compile GUI installer with ps2exe
+              if: github.ref_name == 'stable'
               shell: powershell
               run: |
                   Install-Module -Name ps2exe -Force -Scope CurrentUser
@@ -209,11 +210,14 @@ jobs:
 
             # checksum so users can verify the .exe they download matches this exact build
             - name: Checksum the installer
+              if: github.ref_name == 'stable'
               shell: powershell
               run: |
                   (Get-FileHash Kittycord-Installer.exe -Algorithm SHA256).Hash.ToLower() | Out-File Kittycord-Installer.exe.sha256 -Encoding ascii -NoNewline
 
+            # beta keeps the last stable exe so its fingerprint only changes on a real release
             - uses: actions/upload-artifact@v4
+              if: github.ref_name == 'stable'
               with:
                   name: installer
                   path: |

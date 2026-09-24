@@ -6,12 +6,15 @@
   <p>
     <a href="https://github.com/KittyCord-Production/Kittycord/stargazers"><img src="https://img.shields.io/github/stars/KittyCord-Production/Kittycord?style=for-the-badge&logo=github&label=stars&color=FF5FA6&labelColor=1f141b" alt="Stars"></a>
     <a href="https://github.com/KittyCord-Production/Kittycord/commits/main"><img src="https://img.shields.io/github/last-commit/KittyCord-Production/Kittycord?style=for-the-badge&label=updated&color=FF8AC4&labelColor=1f141b" alt="Last commit"></a>
+    <a href="https://discord.gg/kittyclient"><img src="https://img.shields.io/badge/discord-join-FF5FA6?style=for-the-badge&logo=discord&logoColor=white&labelColor=1f141b" alt="Discord"></a>
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/KittyCord-Production/Kittycord?style=for-the-badge&color=FF8AC4&labelColor=1f141b" alt="License"></a>
   </p>
   <p>
     <a href="https://github.com/KittyCord-Production/Kittycord/releases/latest"><b>⬇️ Download</b></a>
     &nbsp;·&nbsp;
     <a href="https://kittycord.dev"><b>🐾 kittycord.dev</b></a>
+    &nbsp;·&nbsp;
+    <a href="https://discord.gg/kittyclient"><b>💬 Discord</b></a>
     &nbsp;·&nbsp;
     <a href="#-features"><b>🌸 Features</b></a>
     &nbsp;·&nbsp;
