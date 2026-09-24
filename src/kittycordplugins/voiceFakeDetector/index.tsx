@@ -11,11 +11,12 @@ import { definePluginSettings } from "@api/Settings";
 import { useForceUpdater } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
 import { User } from "@vencord/discord-types";
-import { FluxDispatcher, React, Tooltip, UserStore, VoiceStateStore } from "@webpack/common";
+import { FluxDispatcher, React, SelectedChannelStore, Tooltip, UserStore, VoiceStateStore } from "@webpack/common";
 
 interface FakeState {
     mute: boolean;
     deaf: boolean;
+    video?: boolean;
 }
 
 const caught = new Map<string, FakeState>();
@@ -25,10 +26,11 @@ function rerender() {
     updaters.forEach(update => update());
 }
 
-function label({ mute, deaf }: FakeState) {
+function label({ mute, deaf, video }: FakeState) {
     if (mute && deaf) return "Faking mute & deafen";
     if (deaf) return "Faking deafen";
-    return "Faking mute";
+    if (mute) return "Faking mute";
+    return video ? "Faking camera" : "Faking voice state";
 }
 
 function announce(userId: string, state: FakeState) {
@@ -45,7 +47,7 @@ function announce(userId: string, state: FakeState) {
 
 function mark(userId: string, state: FakeState) {
     const prev = caught.get(userId);
-    if (prev && prev.mute === state.mute && prev.deaf === state.deaf) return;
+    if (prev && prev.mute === state.mute && prev.deaf === state.deaf && prev.video === state.video) return;
     caught.set(userId, state);
     if (!prev) announce(userId, state);
     rerender();
@@ -56,25 +58,65 @@ function clear(userId: string) {
 }
 
 const SPEAKING_VOICE = 1 << 0;
+// fresh mute/deafen state can race with the last audio packets, so ignore speaking right after a change
+const GRACE_MS = 1500;
+const lastChange = new Map<string, number>();
 
+// Detection works for any fake voice tool, not just ours: they all only lie in the voice state
+// they send to Discord and keep the real audio stream open, so the audio gives them away.
 function onSpeaking({ userId, speakingFlags }: { userId: string; speakingFlags: number; }) {
     if (!(speakingFlags & SPEAKING_VOICE) || userId === UserStore.getCurrentUser()?.id) return;
+    if (Date.now() - (lastChange.get(userId) ?? 0) < GRACE_MS) return;
 
     const voiceState = VoiceStateStore.getVoiceStateForUser(userId);
-    if (!voiceState?.channelId) return;
+    // server mute/deafen is enforced by Discord itself, so only self states can be faked
+    if (!voiceState?.channelId || voiceState.mute || voiceState.suppress) return;
 
     if (voiceState.selfMute || voiceState.selfDeaf)
-        mark(userId, { mute: !!voiceState.selfMute, deaf: !!voiceState.selfDeaf });
+        mark(userId, { mute: !!voiceState.selfMute, deaf: !!voiceState.selfDeaf, video: caught.get(userId)?.video });
 }
 
-function onVoiceStateUpdates({ voiceStates }: { voiceStates: Array<{ userId: string; channelId?: string | null; selfMute?: boolean; selfDeaf?: boolean; }>; }) {
-    for (const voiceState of voiceStates) {
-        if (!caught.has(voiceState.userId)) continue;
+// A fake camera shows the camera icon without ever sending a video stream. The media connection
+// reports every real incoming stream, and it only does that while we're in the same channel.
+const realVideo = new Set<string>();
+const videoTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-        if (!voiceState.channelId || (!voiceState.selfMute && !voiceState.selfDeaf))
-            clear(voiceState.userId);
-        else
-            mark(voiceState.userId, { mute: !!voiceState.selfMute, deaf: !!voiceState.selfDeaf });
+function onVideo({ userId, streamId, context }: { userId: string; streamId?: string | null; context?: string; }) {
+    if (context !== "default") return;
+    if (streamId) realVideo.add(userId);
+    else realVideo.delete(userId);
+    if (streamId && caught.get(userId)?.video) clear(userId);
+}
+
+function checkFakeVideo(userId: string) {
+    const voiceState = VoiceStateStore.getVoiceStateForUser(userId);
+    const myChannel = SelectedChannelStore.getVoiceChannelId();
+    if (!voiceState?.selfVideo || voiceState.channelId !== myChannel || realVideo.has(userId)) return;
+    const prev = caught.get(userId);
+    mark(userId, { mute: !!prev?.mute, deaf: !!prev?.deaf, video: true });
+}
+
+function onVoiceStateUpdates({ voiceStates }: { voiceStates: Array<{ userId: string; channelId?: string | null; selfMute?: boolean; selfDeaf?: boolean; selfVideo?: boolean; }>; }) {
+    const meId = UserStore.getCurrentUser()?.id;
+    for (const voiceState of voiceStates) {
+        const { userId } = voiceState;
+        if (userId === meId) continue;
+        lastChange.set(userId, Date.now());
+
+        clearTimeout(videoTimers.get(userId));
+        if (settings.store.fakeCamera && voiceState.channelId && voiceState.selfVideo)
+            videoTimers.set(userId, setTimeout(() => checkFakeVideo(userId), 10_000));
+
+        const prev = caught.get(userId);
+        if (!prev) continue;
+
+        const state = {
+            mute: prev.mute && !!voiceState.selfMute,
+            deaf: prev.deaf && !!voiceState.selfDeaf,
+            video: prev.video && !!voiceState.selfVideo
+        };
+        if (!voiceState.channelId || (!state.mute && !state.deaf && !state.video)) clear(userId);
+        else mark(userId, state);
     }
 }
 
@@ -129,6 +171,11 @@ const settings = definePluginSettings({
         description: "Show the indicator in user profiles",
         default: true
     },
+    fakeCamera: {
+        type: OptionType.BOOLEAN,
+        description: "Also flag people who show a camera icon but never send video. Can misfire if you have incoming video turned off or a very slow connection.",
+        default: false
+    },
     notify: {
         type: OptionType.BOOLEAN,
         description: "Send a notification the first time someone is caught faking",
@@ -138,7 +185,7 @@ const settings = definePluginSettings({
 
 export default definePlugin({
     name: "VoiceFakeDetector",
-    description: "Flags people in your voice channel who appear muted or deafened but are still transmitting audio (e.g. a fake-voice plugin). Catches them the moment they talk; the mark clears when they leave or genuinely unmute.",
+    description: "Flags people in your voice channel who fake their voice state with any client mod: shown as muted or deafened but still talking, or showing a camera icon without sending video. The mark clears when they leave or genuinely unmute.",
     authors: [{ name: "Kittycord", id: 0n }],
     dependencies: ["MemberListDecoratorsAPI", "NicknameIconsAPI"],
     tags: ["Voice", "Utility"],
@@ -167,11 +214,17 @@ export default definePlugin({
     start() {
         FluxDispatcher.subscribe("SPEAKING", onSpeaking);
         FluxDispatcher.subscribe("VOICE_STATE_UPDATES", onVoiceStateUpdates);
+        FluxDispatcher.subscribe("RTC_CONNECTION_VIDEO", onVideo);
     },
 
     stop() {
         FluxDispatcher.unsubscribe("SPEAKING", onSpeaking);
         FluxDispatcher.unsubscribe("VOICE_STATE_UPDATES", onVoiceStateUpdates);
+        FluxDispatcher.unsubscribe("RTC_CONNECTION_VIDEO", onVideo);
+        videoTimers.forEach(clearTimeout);
+        videoTimers.clear();
+        realVideo.clear();
+        lastChange.clear();
         caught.clear();
         rerender();
     }
