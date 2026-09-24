@@ -149,7 +149,7 @@ export default definePlugin({
             find: "#{intl::GUEST_NAME_SUFFIX})]",
             predicate: () => settings.store.voiceRows,
             replacement: {
-                match: /(#{intl::GUEST_NAME_SUFFIX}.{0,50}?"".{0,100})\](?=\}\))(?<=user:(\i).+?)/,
+                match: /(getName\((\i)\),.{0,120}?#{intl::GUEST_NAME_SUFFIX}\)\]\}\):"".{0,100}?)\]/,
                 replace: "$1,$self.renderVoiceRow($2?.id)]"
             }
         }

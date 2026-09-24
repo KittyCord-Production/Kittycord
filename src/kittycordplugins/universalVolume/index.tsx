@@ -10,7 +10,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy } from "@webpack";
 import { SelectedChannelStore, UserStore, VoiceStateStore } from "@webpack/common";
 
-const VoiceVolume: { setLocalVolume(userId: string, volume: number): void; } = findByPropsLazy("setLocalVolume", "getLocalVolume");
+const VoiceVolume: { setLocalVolume(userId: string, volume: number): void; } = findByPropsLazy("setLocalVolume", "toggleLocalMute");
 
 const logger = new Logger("UniversalVolume");
 

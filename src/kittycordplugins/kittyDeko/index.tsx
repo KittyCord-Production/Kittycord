@@ -243,7 +243,7 @@ export default definePlugin({
             noWarn: true
         },
         {
-            find: ".DISPLAY_NAME_STYLES_COACHMARK)",
+            find: "renderNameTag:",
             replacement: {
                 match: /(?<=\i\)\({avatarDecoration:)\i(?=,)(?<=currentUser:(\i).+?)/,
                 replace: "$self.useKittyDekoDecoration($1)??$&"

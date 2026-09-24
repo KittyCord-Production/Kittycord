@@ -138,7 +138,8 @@ export default definePlugin({
             find: "getUserAvatarURL:",
             replacement: [
                 {
-                    match: /(getUserAvatarURL:)(\i),/,
+                    // [^,]+ so this still lands when UserPFP already wrapped the same function
+                    match: /(getUserAvatarURL:)([^,]+),/,
                     replace: "$1$self.avatarHook($2),"
                 },
                 {
@@ -146,7 +147,7 @@ export default definePlugin({
                     replace: "$1$self.avatarSourceHook($2)"
                 },
                 {
-                    match: /(getGuildMemberAvatarURLSimple:)(\i),/,
+                    match: /(getGuildMemberAvatarURLSimple:)([^,]+),/,
                     replace: "$1$self.memberAvatarHook($2),"
                 },
                 {
