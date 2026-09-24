@@ -5,21 +5,12 @@
  */
 
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
-import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
 import { UserAreaButton, UserAreaRenderProps } from "@api/UserArea";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { IS_WINDOWS } from "@utils/constants";
-import { Logger } from "@utils/Logger";
-import definePlugin, { OptionType, type PluginNative } from "@utils/types";
-import { findByCodeLazy, findByProps } from "@webpack";
-import { ApplicationStreamingStore, ChannelStore, ContextMenuApi, MediaEngineStore, Menu, React, SelectedChannelStore } from "@webpack/common";
-
-const Native = VencordNative?.pluginHelpers?.FakeVoice as PluginNative<typeof import("./native")> | undefined;
-const startStream = findByCodeLazy('type:"STREAM_START"');
-const stopStream = findByCodeLazy('type:"STREAM_STOP"');
-const getDesktopSources = findByCodeLazy("desktop sources");
-const logger = new Logger("FakeVoice");
+import definePlugin, { OptionType } from "@utils/types";
+import { findByProps } from "@webpack";
+import { ContextMenuApi, Menu, React } from "@webpack/common";
 
 const settings = definePluginSettings({
     fakeMute: {
@@ -36,81 +27,10 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Appear to have your camera on.",
         default: false
-    },
-    fakeUnmute: {
-        type: OptionType.BOOLEAN,
-        description: "Appear unmuted while you are really muted. Nobody hears you, you just look present.",
-        default: false
-    },
-    fakeUndeafen: {
-        type: OptionType.BOOLEAN,
-        description: "Appear undeafened while you are really deafened.",
-        default: false
-    },
-    fakeStream: {
-        type: OptionType.BOOLEAN,
-        description: "Go LIVE with a black screen instead of your real screen. Viewers see a real stream that shows nothing.",
-        default: false,
-        onChange: () => void refreshFakeStream()
     }
 });
 
 let isGhostActive = false;
-const BLACK_WINDOW_TITLE = "Kittycord Black Screen";
-let fakeStreamActive = false;
-
-function myStreamKey(): string | undefined {
-    const s = ApplicationStreamingStore.getCurrentUserActiveStream();
-    if (!s) return;
-    return (s.guildId ? [s.streamType, s.guildId, s.channelId, s.ownerId] : [s.streamType, s.channelId, s.ownerId]).join(":");
-}
-
-// Streams a black window through Discord's normal Go Live, so viewers get a real stream with nothing in it.
-async function refreshFakeStream() {
-    const want = settings.store.fakeStream;
-    const key = myStreamKey();
-
-    if (!want) {
-        if (key && fakeStreamActive) stopStream(key);
-        fakeStreamActive = false;
-        await Native?.closeBlackWindow();
-        return;
-    }
-
-    const channelId = SelectedChannelStore.getVoiceChannelId();
-    if (!channelId) return void showNotification({ title: "Fake Stream", body: "Join a voice channel first, then turn it on." });
-    if (!Native) return void showNotification({ title: "Fake Stream", body: "Only works in the Discord desktop app." });
-    if (key) stopStream(key);
-
-    const mediaId = await Native.openBlackWindow();
-    // Discord's list uses its own ids, so match on the window handle Electron gave us, falling back to the title
-    const handle = mediaId.split(":")[1];
-    let source: { id: string; name: string; } | undefined;
-    let seen: string[] = [];
-    for (let i = 0; i < 10 && !source; i++) {
-        const sources: { id: string; name: string; }[] = await getDesktopSources(MediaEngineStore.getMediaEngine(), IS_WINDOWS, ["window"], null) ?? [];
-        seen = sources.map(s => `${s.id} ${s.name}`);
-        source = sources.find(s => s.id === mediaId || (handle && s.id.split(":").includes(handle)) || s.name === BLACK_WINDOW_TITLE);
-        if (!source) await new Promise(r => setTimeout(r, 300));
-    }
-    if (!source) {
-        logger.error("Black window not in capture list", mediaId, seen);
-        await Native.closeBlackWindow();
-        settings.store.fakeStream = false;
-        return void showNotification({ title: "Fake Stream", body: "Could not start the black screen. Try again." });
-    }
-
-    const channel = ChannelStore.getChannel(channelId);
-    startStream(channel?.guild_id ?? null, channelId, {
-        pid: null,
-        sourceId: source.id,
-        sourceName: source.name,
-        audioSourceId: null,
-        sound: false,
-        previewDisabled: true
-    });
-    fakeStreamActive = true;
-}
 
 const getVoiceChannelId = (): string | undefined => findByProps("getVoiceChannelId")?.getVoiceChannelId?.();
 
@@ -171,28 +91,6 @@ function GhostContextMenu() {
                     }}
                 />
             </Menu.MenuGroup>
-            <Menu.MenuGroup label="Look present">
-                <Menu.MenuCheckboxItem
-                    id="opt-unmute"
-                    label="Fake Unmute"
-                    checked={settings.store.fakeUnmute}
-                    action={() => {
-                        settings.store.fakeUnmute = !settings.store.fakeUnmute;
-                        syncState();
-                        forceUpdate();
-                    }}
-                />
-                <Menu.MenuCheckboxItem
-                    id="opt-undeafen"
-                    label="Fake Undeafen"
-                    checked={settings.store.fakeUndeafen}
-                    action={() => {
-                        settings.store.fakeUndeafen = !settings.store.fakeUndeafen;
-                        syncState();
-                        forceUpdate();
-                    }}
-                />
-            </Menu.MenuGroup>
             <Menu.MenuGroup label="Server-visible">
                 <Menu.MenuCheckboxItem
                     id="opt-video"
@@ -201,15 +99,6 @@ function GhostContextMenu() {
                     action={() => {
                         settings.store.fakeVideo = !settings.store.fakeVideo;
                         syncState();
-                        forceUpdate();
-                    }}
-                />
-                <Menu.MenuCheckboxItem
-                    id="opt-stream"
-                    label="Fake Stream (black screen)"
-                    checked={settings.store.fakeStream}
-                    action={() => {
-                        settings.store.fakeStream = !settings.store.fakeStream;
                         forceUpdate();
                     }}
                 />
@@ -257,17 +146,12 @@ export default definePlugin({
         }
     ],
 
-    // fake unmute wins over fake mute only for the part it covers, so deafen keeps working on its own
     toggleMute(value: boolean) {
-        if (!isGhostActive) return value;
-        if (settings.store.fakeUnmute) return false;
-        return settings.store.fakeMute ? true : value;
+        return isGhostActive && settings.store.fakeMute ? true : value;
     },
 
     toggleDeaf(value: boolean) {
-        if (!isGhostActive) return value;
-        if (settings.store.fakeUndeafen) return false;
-        return settings.store.fakeDeafen ? true : value;
+        return isGhostActive && settings.store.fakeDeafen ? true : value;
     },
 
     toggleVideo(value: boolean) {
@@ -326,28 +210,5 @@ export default definePlugin({
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Camera** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },
         },
-        {
-            inputType: ApplicationCommandInputType.BUILT_IN,
-            name: "fakestream",
-            description: "Toggle Fake Stream (go LIVE with a black screen)",
-            execute: async (_, ctx) => {
-                settings.store.fakeStream = !settings.store.fakeStream;
-                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Stream** is ${settings.store.fakeStream ? "enabled" : "disabled"}.` });
-            },
-        },
     ],
-
-    flux: {
-        // Discord ends every stream when you leave voice, so the setting and the black window follow along
-        VOICE_CHANNEL_SELECT({ channelId }: { channelId: string | null; }) {
-            if (!channelId && settings.store.fakeStream) settings.store.fakeStream = false;
-        },
-        STREAM_DELETE() {
-            if (fakeStreamActive && !ApplicationStreamingStore.getCurrentUserActiveStream()) settings.store.fakeStream = false;
-        }
-    },
-
-    stop() {
-        if (settings.store.fakeStream) settings.store.fakeStream = false;
-    }
 });
