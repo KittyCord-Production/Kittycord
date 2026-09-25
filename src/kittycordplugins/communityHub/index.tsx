@@ -5,11 +5,12 @@
  */
 
 import { get, set } from "@api/DataStore";
-import { BRAND_WEBSITE } from "@branding";
+import { BRAND_DISCORD_INVITE } from "@branding";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { WebsiteIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
+import { openInviteModal } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
@@ -27,6 +28,10 @@ const Native = VencordNative?.pluginHelpers?.CommunityHub as PluginNative<typeof
 const DISMISSED_KEY = "Kittycord_NewsDismissed";
 
 const open = (url: string) => VencordNative.native.openExternal(url);
+
+function joinDiscord() {
+    openInviteModal(BRAND_DISCORD_INVITE).catch(() => open(`https://discord.gg/${BRAND_DISCORD_INVITE}`));
+}
 
 function Swatches({ params, width = 72, height = 24 }: { params: StudioParams; width?: number | string; height?: number; }) {
     const p = derivePalette(params);
@@ -160,7 +165,7 @@ function CommunityPanel() {
                 <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "2px 0 10px" }}>
                     Chat, swap themes and share your setup with other Kittycord users.
                 </Text>
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={() => open(BRAND_WEBSITE)}>Visit kittycord.dev</Button>
+                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={joinDiscord}>Join our Discord</Button>
             </div>
         </ErrorBoundary>
     );

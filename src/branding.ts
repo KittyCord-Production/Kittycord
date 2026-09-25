@@ -21,6 +21,8 @@ export const BRAND_USER_AGENT_NAME = BRAND_NAME;
 /** The official Kittycord website. */
 export const BRAND_WEBSITE = "https://kittycord.dev";
 
+export const BRAND_DISCORD_INVITE = "KagQ48RCSH";
+
 /** Kittycord's own backend. Every Kittycord service lives under this origin. */
 export const BRAND_API = "https://kittycord-analytics.hell-bullet-hb.workers.dev";
 

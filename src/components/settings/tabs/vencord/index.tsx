@@ -8,7 +8,7 @@ import "./VencordTab.css";
 
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { useSettings } from "@api/Settings";
-import { BRAND_ICON, BRAND_NAME, BRAND_WEBSITE } from "@branding";
+import { BRAND_DISCORD_INVITE, BRAND_ICON, BRAND_NAME, BRAND_WEBSITE } from "@branding";
 import { Button } from "@components/Button";
 import { Divider } from "@components/Divider";
 import { FormSwitch } from "@components/FormSwitch";
@@ -172,8 +172,6 @@ function AccentPicker() {
     );
 }
 
-const COMMUNITY_INVITE = "KaBMzypPHT";
-
 function DiscordIcon({ className }: { className?: string; }) {
     return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -183,8 +181,8 @@ function DiscordIcon({ className }: { className?: string; }) {
 }
 
 function joinCommunity() {
-    openInviteModal(COMMUNITY_INVITE).catch(() =>
-        VencordNative.native.openExternal(`https://discord.gg/${COMMUNITY_INVITE}`)
+    openInviteModal(BRAND_DISCORD_INVITE).catch(() =>
+        VencordNative.native.openExternal(`https://discord.gg/${BRAND_DISCORD_INVITE}`)
     );
 }
 
