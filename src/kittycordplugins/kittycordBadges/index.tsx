@@ -98,7 +98,11 @@ const badges: ProfileBadge[] = ROLES.map(role => ({
     description: role.label,
     iconSrc: role.icon,
     position: BadgePosition.START,
-    link: role.link,
+    // Discord's badge popup only knows its own badges and crashes on ours, so the click opens the link directly
+    onClick: e => {
+        e.preventDefault();
+        VencordNative.native.openExternal(role.link);
+    },
     shouldShow: ({ userId }) => roleMembers.get(role.id)?.has(userId) ?? false
 }));
 

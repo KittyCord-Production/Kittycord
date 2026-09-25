@@ -40,6 +40,8 @@ function makeSlotBadge(slot: number): ProfileBadge {
         key: `kittycord-custom-${slot}`,
         position: BadgePosition.END,
         shouldShow: ({ userId }) => !!customBadges.get(userId)?.[slot],
+        // Discord's badge popup only knows its own badges and crashes on ours, so the click stops here
+        onClick: e => e.preventDefault(),
         component: ({ userId }) => {
             const b = customBadges.get(userId)?.[slot];
             if (!b) return null;

@@ -21,6 +21,8 @@ const UsesKittycordBadge: ProfileBadge = {
     description: "Uses Kittycord",
     iconSrc: BRAND_BADGE_ICON,
     position: BadgePosition.END,
+    // Discord's badge popup only knows its own badges and crashes on ours, so the click stops here
+    onClick: e => e.preventDefault(),
     shouldShow: ({ userId }) => kittycordUsers.has(userId)
 };
 
