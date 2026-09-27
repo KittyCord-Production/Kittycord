@@ -130,9 +130,15 @@ $targets
 EOF
 
 if [ -n "$failed" ]; then
+    if grep -q "App Management" "$LOG" 2>/dev/null; then
+        fail_out "macOS blocked the installer from changing $failed.
+
+Open System Settings > Privacy & Security > App Management, turn on Kittycord Installer, then open this installer again."
+    fi
+    # the script colours its terminal output, which a dialog would show as raw escape codes
     fail_out "Kittycord could not finish on $failed.
 
-$(tail -n 6 "$LOG" 2>/dev/null | tr -d '\r')"
+$(tail -n 6 "$LOG" 2>/dev/null | sed $'s/\033\\[[0-9;]*m//g' | tr -d '\r')"
 fi
 
 started="$(printf '%s' "$picked" | grep -m1 . || true)"
