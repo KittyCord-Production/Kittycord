@@ -60,6 +60,19 @@ on sayFailed(msg, ttl)
 	end try
 end sayFailed
 
+on sayBlocked(msg, ttl)
+	try
+		set pressed to button returned of (display dialog msg with title ttl buttons {"Close", "Open Settings"} default button 2 with icon caution)
+	on error
+		return ""
+	end try
+	if pressed is "Open Settings" then
+		-- App Management pane; older macOS without it falls back to Privacy & Security
+		open location "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles"
+	end if
+	return ""
+end sayBlocked
+
 on notifyUser(msg, ttl)
 	try
 		display notification msg with title ttl
@@ -79,6 +92,8 @@ on run argv
 		return sayDone(item 2 of argv, item 3 of argv, item 4 of argv, item 5 of argv)
 	else if mode is "failed" then
 		return sayFailed(item 2 of argv, item 3 of argv)
+	else if mode is "blocked" then
+		return sayBlocked(item 2 of argv, item 3 of argv)
 	else if mode is "notify" then
 		return notifyUser(item 2 of argv, item 3 of argv)
 	end if

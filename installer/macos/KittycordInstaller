@@ -131,9 +131,12 @@ EOF
 
 if [ -n "$failed" ]; then
     if grep -q "App Management" "$LOG" 2>/dev/null; then
-        fail_out "macOS blocked the installer from changing $failed.
+        ask blocked "macOS blocked Kittycord Installer from changing $failed.
 
-Open System Settings > Privacy & Security > App Management, turn on Kittycord Installer, then open this installer again."
+1. Click Open Settings.
+2. Turn on Kittycord Installer in the list. If it is missing, click + and add it from your Downloads folder.
+3. Quit this installer, then open it again and choose Install or repair." "$TITLE" >/dev/null
+        exit 1
     fi
     # the script colours its terminal output, which a dialog would show as raw escape codes
     fail_out "Kittycord could not finish on $failed.
