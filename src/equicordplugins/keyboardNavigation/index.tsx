@@ -98,7 +98,7 @@ export default definePlugin({
                 id: "openDevSettings",
                 label: "Open Dev tab",
                 callback: () => SettingsRouter.openUserSettings("equicord_patch_helper_panel"),
-                registrar: "Equicord"
+                registrar: "Kittycord"
             });
         }
     },

@@ -31,7 +31,7 @@ const settings = definePluginSettings({
     watermark: {
         type: OptionType.STRING,
         description: "Custom watermark text (max 32 characters)",
-        default: "Made with Equicord"
+        default: "Made with Kittycord"
     },
     grayscale: {
         type: OptionType.BOOLEAN,

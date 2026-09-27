@@ -461,7 +461,7 @@ export default definePlugin({
                 This plugin adds a christmas-y snowfall effect on top of Discord's interface.
                 You can change the type of snow in the settings below.
                 <br /><br />
-                NOTE: While on most computers this plugin will not impact performance any more than your average Equicord extension,
+                NOTE: While on most computers this plugin will not impact performance any more than your average Kittycord extension,
                 it may cause some lag on lower end systems.
             </Paragraph>
         </>

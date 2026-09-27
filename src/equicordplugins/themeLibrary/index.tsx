@@ -15,7 +15,7 @@ import { settings } from "./utils/settings";
 
 export default definePlugin({
     name: "ThemeLibrary",
-    description: "A library of themes for Vencord.",
+    description: "A library of themes for Kittycord.",
     tags: ["Appearance", "Customisation"],
     authors: [EquicordDevs.Fafa],
     settings,
