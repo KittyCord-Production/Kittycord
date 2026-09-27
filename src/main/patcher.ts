@@ -136,6 +136,7 @@ if (!IS_VANILLA) {
     });
 
     process.env.DATA_DIR = DATA_DIR;
+    if (settings.plugins?.NoTrack?.disableStackDumping !== false) process.env.ELECTRON_ENABLE_STACK_DUMPING = "true";
 } else {
     console.log("[Kittycord] Running in vanilla mode. Not loading Kittycord");
 }

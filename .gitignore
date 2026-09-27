@@ -45,3 +45,9 @@ ExtensionCache/
 
 # Standalone analytics backend (separate Cloudflare Worker infra, deployed by hand - not part of the public build)
 analytics-worker/
+
+# discord modules cache
+misc/bundle
+
+# intl scripts
+misc/scripts

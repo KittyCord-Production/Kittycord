@@ -55,13 +55,12 @@ export default definePlugin({
     ],
 
     filterCodecs(codecs: CodecInfo[]) {
-        const { store } = settings;
         const disabled: Record<string, boolean> = {
-            AV1: store.disableAv1Codec,
-            H265: store.disableH265Codec,
-            H264: store.disableH264Codec,
-            VP8: store.disableVP8Codec,
-            VP9: store.disableVP9Codec,
+            AV1: settings.store.disableAv1Codec,
+            H265: settings.store.disableH265Codec,
+            H264: settings.store.disableH264Codec,
+            VP8: settings.store.disableVP8Codec,
+            VP9: settings.store.disableVP9Codec,
         };
         return codecs.map(c => disabled[c.name] ? { ...c, encode: false } : c);
     },
