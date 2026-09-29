@@ -6,11 +6,9 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
-import definePlugin, { OptionType, PluginNative } from "@utils/types";
+import definePlugin, { OptionType } from "@utils/types";
 
 import style from "./style.css?managed";
-
-const Native = VencordNative?.pluginHelpers?.GameMode as PluginNative<typeof import("./native")> | undefined;
 
 const DEBOUNCE_MS = 200;
 let timer = -1;
@@ -26,7 +24,6 @@ function evaluate() {
     cl.toggle("kc-idle", idle);
     cl.toggle("kc-idle-noanim", idle && settings.store.pauseAnimations);
     cl.toggle("kc-idle-noblur", idle && settings.store.pauseBlur);
-    void Native?.setBackgroundThrottle(idle && settings.store.throttleBackground);
 }
 
 function schedule() {
@@ -55,12 +52,6 @@ const settings = definePluginSettings({
         description: "Drop background blur while Discord is in the background (big win on weak GPUs)",
         default: true,
         onChange: evaluate
-    },
-    throttleBackground: {
-        type: OptionType.BOOLEAN,
-        description: "Let Discord idle in the background to free your GPU for games (voice keeps working)",
-        default: true,
-        onChange: evaluate
     }
 });
 
@@ -86,7 +77,6 @@ export default definePlugin({
         window.removeEventListener("focus", schedule);
         document.removeEventListener("visibilitychange", schedule);
         document.documentElement.classList.remove("kc-idle", "kc-idle-noanim", "kc-idle-noblur");
-        void Native?.setBackgroundThrottle(false);
         disableStyle(style);
     }
 });
