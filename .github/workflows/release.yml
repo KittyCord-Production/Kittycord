@@ -204,7 +204,7 @@ jobs:
                   $tree = (git rev-parse HEAD:installer).Trim()
                   # missing on the first run, which simply means "changed"
                   $published = ""
-                  try { $published = (Invoke-WebRequest -UseBasicParsing "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download/installer-tree.txt").Content.Trim() } catch { }
+                  try { $published = (Invoke-RestMethod "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download/installer-tree.txt").Trim() } catch { }
                   Write-Host "installer tree: $tree, published: $published"
                   "changed=$($tree -ne $published)".ToLower() | Out-File $env:GITHUB_OUTPUT -Append -Encoding ascii
                   $tree | Out-File installer-tree.txt -Encoding ascii -NoNewline
