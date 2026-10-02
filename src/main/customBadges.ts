@@ -9,6 +9,7 @@
 // the Discord-impersonation blocklist are enforced server-side too.
 
 import { BRAND_API } from "@branding";
+import { parseBadgeLink } from "@shared/badgeLink";
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 
@@ -23,9 +24,10 @@ interface ServerBadge {
     emoji: string;
     label: string;
     slot?: number;
+    link?: unknown;
 }
 
-async function getBadges(): Promise<{ id: string; emoji: string; label: string; slot: number; }[]> {
+async function getBadges(): Promise<{ id: string; emoji: string; label: string; slot: number; link: string | null; }[]> {
     if (!ENDPOINT) return [];
     try {
         const res = await fetch(`${ENDPOINT}/badges`);
@@ -36,24 +38,31 @@ async function getBadges(): Promise<{ id: string; emoji: string; label: string; 
             .filter((b): b is ServerBadge =>
                 b && typeof b.id === "string" && typeof b.emoji === "string" && typeof b.label === "string")
             .filter(b => b.slot === undefined || (typeof b.slot === "number" && b.slot >= 0 && b.slot < MAX_SLOTS))
-            .map(b => ({ id: b.id, emoji: b.emoji, label: b.label, slot: b.slot ?? 0 }));
+            .map(b => ({ id: b.id, emoji: b.emoji, label: b.label, slot: b.slot ?? 0, link: parseBadgeLink(b.link)?.href ?? null }));
     } catch {
         return [];
     }
 }
 
-async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unknown): Promise<{ ok: boolean; error?: string; }> {
+async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unknown, link?: unknown): Promise<{ ok: boolean; error?: string; }> {
     if (!ENDPOINT) return { ok: false, error: "Not available" };
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof slot !== "number" || !Number.isInteger(slot) || slot < 0 || slot >= MAX_SLOTS) return { ok: false, error: "Invalid slot" };
     if (typeof emoji !== "string" || emoji.length === 0 || emoji.length > MAX_ICON_LEN) return { ok: false, error: "Invalid icon" };
     if (typeof label !== "string" || label.length === 0 || label.length > MAX_LABEL_LEN) return { ok: false, error: "Invalid label" };
 
+    let cleanLink: string | undefined;
+    if (typeof link === "string" && link.trim() !== "") {
+        const parsed = parseBadgeLink(link);
+        if (!parsed) return { ok: false, error: "The link must be a full https:// address, not an IP address." };
+        cleanLink = parsed.href;
+    }
+
     try {
         const res = await fetch(`${ENDPOINT}/badges/set`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id, emoji, label, slot })
+            body: JSON.stringify({ id, emoji, label, slot, link: cleanLink })
         });
         if (res.ok) return { ok: true };
         const body = await res.json().catch(() => ({})) as { error?: string; };
@@ -77,5 +86,5 @@ async function clearBadge(id: unknown, slot: unknown): Promise<void> {
 }
 
 ipcMain.handle(IpcEvents.GET_CUSTOM_BADGES, () => getBadges());
-ipcMain.handle(IpcEvents.SET_CUSTOM_BADGE, (_e, id: unknown, emoji: unknown, label: unknown, slot: unknown) => setBadge(id, emoji, label, slot));
+ipcMain.handle(IpcEvents.SET_CUSTOM_BADGE, (_e, id: unknown, emoji: unknown, label: unknown, slot: unknown, link: unknown) => setBadge(id, emoji, label, slot, link));
 ipcMain.handle(IpcEvents.CLEAR_CUSTOM_BADGE, (_e, id: unknown, slot: unknown) => clearBadge(id, slot));

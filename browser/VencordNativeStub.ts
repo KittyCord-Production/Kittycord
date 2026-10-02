@@ -183,7 +183,7 @@ window.VencordNative = {
     },
 
     kittycordBadges: {
-        getBadges: async () => [] as { id: string; emoji: string; label: string; slot: number; }[],
+        getBadges: async () => [] as { id: string; emoji: string; label: string; slot: number; link: string | null; }[],
         setBadge: async () => ({ ok: false as boolean, error: "web" as string | undefined }),
         clearBadge: NOOP_ASYNC,
     },

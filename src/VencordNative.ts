@@ -161,8 +161,8 @@ export default {
     },
 
     kittycordBadges: {
-        getBadges: () => invoke<{ id: string; emoji: string; label: string; slot: number; }[]>(IpcEvents.GET_CUSTOM_BADGES),
-        setBadge: (id: string, emoji: string, label: string, slot: number) => invoke<{ ok: boolean; error?: string; }>(IpcEvents.SET_CUSTOM_BADGE, id, emoji, label, slot),
+        getBadges: () => invoke<{ id: string; emoji: string; label: string; slot: number; link: string | null; }[]>(IpcEvents.GET_CUSTOM_BADGES),
+        setBadge: (id: string, emoji: string, label: string, slot: number, link?: string) => invoke<{ ok: boolean; error?: string; }>(IpcEvents.SET_CUSTOM_BADGE, id, emoji, label, slot, link),
         clearBadge: (id: string, slot: number) => invoke<void>(IpcEvents.CLEAR_CUSTOM_BADGE, id, slot),
     },
 

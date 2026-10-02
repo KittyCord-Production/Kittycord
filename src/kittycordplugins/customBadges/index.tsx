@@ -7,12 +7,16 @@
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
+import { parseBadgeLink } from "@shared/badgeLink";
 import definePlugin, { OptionType } from "@utils/types";
 import { Button, React, showToast, Text, TextInput, Toasts, Tooltip, UserStore } from "@webpack/common";
+
+import { openBadgeLink } from "./LinkWarningModal";
 
 interface CustomBadge {
     emoji: string;
     label: string;
+    link: string | null;
 }
 
 const MAX_SLOTS = 5;
@@ -27,7 +31,7 @@ export async function refreshBadges() {
     for (const b of list) {
         if (!customBadges.has(b.id)) customBadges.set(b.id, []);
         const slots = customBadges.get(b.id) ?? [];
-        slots[b.slot] = { emoji: b.emoji, label: b.label };
+        slots[b.slot] = { emoji: b.emoji, label: b.label, link: b.link };
         customBadges.set(b.id, slots);
     }
 }
@@ -40,16 +44,18 @@ function makeSlotBadge(slot: number): ProfileBadge {
         key: `kittycord-custom-${slot}`,
         position: BadgePosition.END,
         shouldShow: ({ userId }) => !!customBadges.get(userId)?.[slot],
-        // Discord's badge popup only knows its own badges and crashes on ours, so the click stops here
-        onClick: e => e.preventDefault(),
+        onClick: (e, { userId }) => {
+            e.preventDefault();
+            openBadgeLink(customBadges.get(userId)?.[slot]?.link);
+        },
         component: ({ userId }) => {
             const b = customBadges.get(userId)?.[slot];
             if (!b) return null;
             return (
                 <Tooltip text={b.label}>
                     {tp => isUrl(b.emoji)
-                        ? <img {...tp} src={b.emoji} height={16} style={{ borderRadius: 4, verticalAlign: "middle" }} alt="" />
-                        : <span {...tp} style={{ fontSize: 14, lineHeight: 1, cursor: "default" }}>{b.emoji}</span>}
+                        ? <img {...tp} src={b.emoji} height={16} style={{ borderRadius: 4, verticalAlign: "middle", cursor: b.link ? "pointer" : "default" }} alt="" />
+                        : <span {...tp} style={{ fontSize: 14, lineHeight: 1, cursor: b.link ? "pointer" : "default" }}>{b.emoji}</span>}
                 </Tooltip>
             );
         }
@@ -62,6 +68,7 @@ interface BadgeEntry {
     slot: number;
     icon: string;
     label: string;
+    link: string;
     persisted: boolean;
 }
 
@@ -77,7 +84,7 @@ function BadgeEditor() {
         const loaded: BadgeEntry[] = [];
         for (let i = 0; i < MAX_SLOTS; i++) {
             const b = slots[i];
-            if (b) loaded.push({ slot: i, icon: b.emoji, label: b.label, persisted: true });
+            if (b) loaded.push({ slot: i, icon: b.emoji, label: b.label, link: b.link ?? "", persisted: true });
         }
         setEntries(loaded);
     }
@@ -89,10 +96,10 @@ function BadgeEditor() {
         const usedSlots = new Set(entries.map(e => e.slot));
         let slot = 0;
         while (usedSlots.has(slot)) slot++;
-        setEntries(prev => [...prev, { slot, icon: "", label: "", persisted: false }]);
+        setEntries(prev => [...prev, { slot, icon: "", label: "", link: "", persisted: false }]);
     }
 
-    function updateEntry(slot: number, key: "icon" | "label", value: string) {
+    function updateEntry(slot: number, key: "icon" | "label" | "link", value: string) {
         setEntries(prev => prev.map(e => e.slot === slot ? { ...e, [key]: value } : e));
     }
 
@@ -106,9 +113,11 @@ function BadgeEditor() {
         if (!i) { showToast("Add an emoji or an image/GIF link.", Toasts.Type.FAILURE); return; }
         if (/^https?:\/\//i.test(i) && !isUrl(i)) { showToast("Image links must use https.", Toasts.Type.FAILURE); return; }
         if (!l) { showToast("Add a short label.", Toasts.Type.FAILURE); return; }
+        const link = entry.link.trim();
+        if (link && !parseBadgeLink(link)) { showToast("Links must be a full https:// address, not an IP address.", Toasts.Type.FAILURE); return; }
 
         setBusy(true);
-        const res = await Native.setBadge(me.id, i, l, slot);
+        const res = await Native.setBadge(me.id, i, l, slot, link || undefined);
         setBusy(false);
         if (res.ok) {
             await refreshBadges();
@@ -138,10 +147,11 @@ function BadgeEditor() {
         <>
             <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Your custom badges</Text>
             <Text variant="text-sm/normal" style={{ opacity: 0.8, marginBottom: 8 }}>
-                Use an emoji or an https image/GIF link (Tenor, Imgur, Discord and Catbox load best) plus a short label. Up to {MAX_SLOTS} badges. They show on your profile for everyone using Kittycord.
+                Use an emoji or an https image/GIF link (Tenor, Imgur, Discord and Catbox load best) plus a short label. Optionally add a https link; people who click the badge get a safety warning first. Up to {MAX_SLOTS} badges. They show on your profile for everyone using Kittycord.
             </Text>
             {entries.map(entry => (
-                <Flex key={entry.slot} style={{ gap: 8, alignItems: "center", marginBottom: 8 }}>
+                <div key={entry.slot} style={{ marginBottom: 12 }}>
+                <Flex style={{ gap: 8, alignItems: "center", marginBottom: 4 }}>
                     <div style={{ flex: 1 }}>
                         <TextInput
                             value={entry.icon}
@@ -170,6 +180,13 @@ function BadgeEditor() {
                         Remove
                     </Button>
                 </Flex>
+                <TextInput
+                    value={entry.link}
+                    onChange={v => updateEntry(entry.slot, "link", v)}
+                    placeholder="Optional link — https://… (people see a warning before it opens)"
+                    maxLength={300}
+                />
+                </div>
             ))}
             {entries.length < MAX_SLOTS && (
                 <Button
