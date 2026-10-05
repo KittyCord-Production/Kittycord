@@ -24,8 +24,7 @@ const settings = definePluginSettings({
     noSpotifyAutoPause: {
         description: "Disable Spotify auto-pause",
         type: OptionType.BOOLEAN,
-        default: true,
-        restartNeeded: true
+        default: true
     },
     keepSpotifyActivityOnIdle: {
         description: "Keep Spotify activity playing when idling",
@@ -40,6 +39,7 @@ export default definePlugin({
     description: "Free listen along, no auto-pausing in voice chat, and allows activity to continue playing when idling",
     tags: ["Media", "Utility", "Activity"],
     authors: [Devs.Cyn, Devs.Nuckyz],
+    isModified: true,
     settings,
 
     patches: [
@@ -55,9 +55,8 @@ export default definePlugin({
             find: "}getPlayableComputerDevices(){",
             replacement: [
                 {
-                    predicate: () => settings.store.noSpotifyAutoPause,
                     match: /(?<=function \i\(\){)(?=.{0,200}SPOTIFY_AUTO_PAUSED\))/,
-                    replace: "return;"
+                    replace: "if($self.settings.store.noSpotifyAutoPause)return;"
                 },
                 {
                     predicate: () => settings.store.keepSpotifyActivityOnIdle,
