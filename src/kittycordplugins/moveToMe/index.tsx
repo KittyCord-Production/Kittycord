@@ -8,7 +8,7 @@ import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/Co
 import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
 import type { User } from "@vencord/discord-types";
-import { ChannelStore, Menu, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, Toasts, VoiceStateStore } from "@webpack/common";
+import { ChannelStore, Menu, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, VoiceStateStore } from "@webpack/common";
 
 const logger = new Logger("MoveToMe");
 
@@ -18,10 +18,10 @@ async function moveToMe(guildId: string, user: User, channelId: string) {
             url: `/guilds/${guildId}/members/${user.id}`,
             body: { channel_id: channelId }
         });
-        showToast(`Moved ${user.username} to your channel.`, Toasts.Type.SUCCESS);
+        showToast(`Moved ${user.username} to your channel.`, "success");
     } catch (e) {
         logger.error(`Failed to move ${user.id}`, e);
-        showToast(`Could not move ${user.username}.`, Toasts.Type.FAILURE);
+        showToast(`Could not move ${user.username}.`, "failure");
     }
 }
 

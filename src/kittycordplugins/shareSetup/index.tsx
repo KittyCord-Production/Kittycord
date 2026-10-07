@@ -19,7 +19,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Message, MessageAttachment, RenderModalProps, User } from "@vencord/discord-types";
-import { Alerts, Button, Forms, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, Forms, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { FriendsListModal, KittycordFriendsRoster, KittycordFriendsTab, useKittycordFriends } from "./friends";
@@ -116,10 +116,10 @@ function SendModal({ rootProps, user }: { rootProps: RenderModalProps; user: Use
         setBusy(true);
         try {
             await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
-            showToast("Setup sent.", Toasts.Type.SUCCESS);
+            showToast("Setup sent.", "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the setup."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure");
         } finally {
             setBusy(false);
         }
@@ -165,7 +165,7 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
         try {
             envelope = await fetchShare(attachment);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that setup."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not read that setup."), "failure");
             return;
         }
 
@@ -191,7 +191,7 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
                     await applyShare(envelope);
                     restartPrompt();
                 } catch (e) {
-                    showToast(String((e as Error)?.message ?? "Import failed."), Toasts.Type.FAILURE);
+                    showToast(String((e as Error)?.message ?? "Import failed."), "failure");
                 }
             }
         });
@@ -221,9 +221,9 @@ function FriendsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     async function sendTo(user: User) {
         try {
             await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
-            showToast(`Sent to ${user.globalName || user.username}.`, Toasts.Type.SUCCESS);
+            showToast(`Sent to ${user.globalName || user.username}.`, "success");
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the setup."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure");
         }
     }
 

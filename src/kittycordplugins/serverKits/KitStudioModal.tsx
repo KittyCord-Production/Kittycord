@@ -13,7 +13,7 @@ import { HeadingSecondary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
 import { copyWithToast } from "@utils/discord";
 import type { Guild, RenderModalProps } from "@vencord/discord-types";
-import { Modal, openModal, showToast, TextInput, Toasts, useMemo, UserStore,useState } from "@webpack/common";
+import { Modal, openModal, showToast, TextInput, useMemo, UserStore,useState } from "@webpack/common";
 
 import { settings as commandSettings } from "../commandStudio/settings";
 import { getThemes, loadThemes } from "../kittycordStudio/store";
@@ -69,14 +69,14 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
 
     async function publish() {
         const kit = build();
-        if (!kit) return showToast("Pick at least one thing to put in the kit.", Toasts.Type.FAILURE);
-        if (!Native) return showToast("Kits are only available in the desktop app.", Toasts.Type.FAILURE);
+        if (!kit) return showToast("Pick at least one thing to put in the kit.", "failure");
+        if (!Native) return showToast("Kits are only available in the desktop app.", "failure");
 
         setBusy(true);
         const result = await Native.publishKit(UserStore.getCurrentUser()?.id ?? "", kit);
         setBusy(false);
 
-        if (!result.ok) return showToast(result.error, Toasts.Type.FAILURE);
+        if (!result.ok) return showToast(result.error, "failure");
 
         const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
         tokens[result.id] = result.ownerToken;
@@ -91,17 +91,17 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
 
         const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
         const token = tokens[kitId];
-        if (!token) return showToast("This kit was published from another device, so it can only be taken down there.", Toasts.Type.FAILURE);
+        if (!token) return showToast("This kit was published from another device, so it can only be taken down there.", "failure");
 
         setBusy(true);
         const removed = await Native.deleteKit(kitId, token);
         setBusy(false);
 
-        if (!removed) return showToast("Could not take that kit down. Try again in a moment.", Toasts.Type.FAILURE);
+        if (!removed) return showToast("Could not take that kit down. Try again in a moment.", "failure");
 
         delete tokens[kitId];
         await set(KIT_TOKENS_KEY, tokens);
-        showToast("Kit taken down. The link no longer works.", Toasts.Type.SUCCESS);
+        showToast("Kit taken down. The link no longer works.", "success");
         modalProps.onClose();
     }
 

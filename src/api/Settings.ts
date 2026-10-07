@@ -76,7 +76,7 @@ export interface Settings {
     | undefined;
     windowsMaterial: "none" | "mica" | "tabbed" | "acrylic";
     disableMinSize: boolean;
-    winNativeTitleBar: boolean;
+    nativeTitleBar: boolean;
     kittycordAccent: KittycordAccent;
     enableCustomPlugins: boolean;
     plugins: {
@@ -134,7 +134,7 @@ const DefaultSettings: Settings = {
     macosVibrancyStyle: undefined,
     windowsMaterial: "none",
     disableMinSize: false,
-    winNativeTitleBar: false,
+    nativeTitleBar: false,
     kittycordAccent: "pink",
     enableCustomPlugins: false,
     plugins: {},
@@ -169,6 +169,13 @@ const INHERITED_CLOUD_URLS = ["https://cloud.equicord.org/", "https://api.vencor
 
 if (settings.cloud && !settings.cloud.authenticated && INHERITED_CLOUD_URLS.includes(settings.cloud.url)) {
     settings.cloud.url = DEFAULT_CLOUD_URL;
+}
+
+const legacySettings = settings as Settings & { winNativeTitleBar?: boolean; };
+if (!IS_REPORTER && legacySettings.winNativeTitleBar !== undefined) {
+    settings.nativeTitleBar ||= legacySettings.winNativeTitleBar;
+    delete legacySettings.winNativeTitleBar;
+    VencordNative.settings.set(settings, "nativeTitleBar");
 }
 
 export const SettingsStore = new SettingsStoreClass(settings, {

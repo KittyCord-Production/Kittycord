@@ -16,7 +16,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, ONBOARDING_SEEN_KEY as SEEN_KEY, subscribeFriendAction, takeFriendAction } from "../_shared/friendLink";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -116,7 +116,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
             const theme = await applyGalleryThemeById(action.value);
             if (!theme) return false;
             markFriendConsumed(action);
-            showToast(`"${theme.name}" applied. 🎨`, Toasts.Type.SUCCESS);
+            showToast(`"${theme.name}" applied. 🎨`, "success");
             return true;
         }
         const me = UserStore.getCurrentUser();
@@ -124,7 +124,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         const status = await InvitesNative.claim(me.id, action.value);
         if (status !== "ok") return false;
         markFriendConsumed(action);
-        showToast("Thanks, your inviter just got the credit! 🐱", Toasts.Type.SUCCESS);
+        showToast("Thanks, your inviter just got the credit! 🐱", "success");
         return true;
     }
 
@@ -132,7 +132,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         if (!friend) return;
         const action = friend;
         setFriend(null);
-        if (!await runFriendAction(action)) showToast("Couldn't start from your friend just now. Try their code or link below.", Toasts.Type.FAILURE);
+        if (!await runFriendAction(action)) showToast("Couldn't start from your friend just now. Try their code or link below.", "failure");
     }
 
     async function claimReferral() {
@@ -149,7 +149,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         try {
             setPending(parseEnvelope(await file.text()));
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "That isn't a Kittycord setup file."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "That isn't a Kittycord setup file."), "failure");
         }
     }
 
@@ -166,7 +166,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 onClick: () => (IS_WEB ? location.reload() : relaunch())
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Import failed."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Import failed."), "failure");
         }
     }
 
@@ -174,7 +174,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         set(SEEN_KEY, true);
         if (apply) {
             const restartNeeded = applyPacks(chosen);
-            showToast("You're all set.", Toasts.Type.SUCCESS);
+            showToast("You're all set.", "success");
             if (restartNeeded) {
                 showNotification({
                     title: "Almost done — restart to finish",

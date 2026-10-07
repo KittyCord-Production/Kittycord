@@ -10,7 +10,7 @@ import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
@@ -41,9 +41,9 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
         try {
             const fileName = await saveTheme(theme.params);
             enableTheme(fileName);
-            showToast(`"${theme.name}" applied. 🎨`, Toasts.Type.SUCCESS);
+            showToast(`"${theme.name}" applied. 🎨`, "success");
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not apply that theme."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not apply that theme."), "failure");
         } finally {
             setBusy(false);
         }
@@ -67,10 +67,10 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
             confirmColor: Button.Colors.RED,
             onConfirm: async () => {
                 if (await deleteGalleryTheme(theme.id)) {
-                    showToast("Removed from the gallery.", Toasts.Type.SUCCESS);
+                    showToast("Removed from the gallery.", "success");
                     onChanged();
                 } else {
-                    showToast("Could not remove that theme.", Toasts.Type.FAILURE);
+                    showToast("Could not remove that theme.", "failure");
                 }
             }
         });
@@ -154,10 +154,10 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
         setBusy(true);
         try {
             const id = await publishTheme(params, authorName.trim());
-            showToast(`"${params.name}" published to the gallery! 🎉`, Toasts.Type.SUCCESS);
+            showToast(`"${params.name}" published to the gallery! 🎉`, "success");
             setPublishedId(id);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not publish."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not publish."), "failure");
         } finally {
             setBusy(false);
         }
@@ -167,9 +167,9 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
         if (!publishedId) return;
         try {
             await navigator.clipboard.writeText(themeShareUrl(publishedId));
-            showToast("Share link copied. Paste it anywhere to show off your theme.", Toasts.Type.SUCCESS);
+            showToast("Share link copied. Paste it anywhere to show off your theme.", "success");
         } catch {
-            showToast("Could not copy the link.", Toasts.Type.FAILURE);
+            showToast("Could not copy the link.", "failure");
         }
     }
 
@@ -219,7 +219,7 @@ export function openGallery() {
 
 export function openPublish(params: StudioParams) {
     if (!NAME_RE.test(params.name.trim())) {
-        showToast("Give your theme a valid name before publishing.", Toasts.Type.FAILURE);
+        showToast("Give your theme a valid name before publishing.", "failure");
         return;
     }
     openModal(props => <PublishModal rootProps={props} params={params} />);

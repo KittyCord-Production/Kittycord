@@ -6,7 +6,7 @@
 
 import definePlugin from "@utils/types";
 import { VoiceState } from "@vencord/discord-types";
-import { ChannelActions, ChannelStore, SelectedChannelStore, showToast, Toasts, UserStore } from "@webpack/common";
+import { ChannelActions, ChannelStore, SelectedChannelStore, showToast, UserStore } from "@webpack/common";
 
 let intendedChannelId: string | null = null;
 let rejoinTimes: number[] = [];
@@ -46,13 +46,13 @@ export default definePlugin({
             rejoinTimes = rejoinTimes.filter(t => Date.now() - t < 10_000);
             if (rejoinTimes.length >= 3) {
                 intendedChannelId = myState.channelId;
-                showToast("Stopped moving you back after repeated moves.", Toasts.Type.FAILURE);
+                showToast("Stopped moving you back after repeated moves.", "failure");
                 return;
             }
             rejoinTimes.push(Date.now());
 
             ChannelActions.selectVoiceChannel(intendedChannelId);
-            showToast("Moved you back to your channel.", Toasts.Type.SUCCESS);
+            showToast("Moved you back to your channel.", "success");
         }
     },
 

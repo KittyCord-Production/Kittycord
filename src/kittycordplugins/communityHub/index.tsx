@@ -15,7 +15,7 @@ import { removeFromArray } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text, Toasts } from "@webpack/common";
+import { Button, React, showToast, Text } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { openGallery } from "../kittycordStudio/GalleryModal";
@@ -86,9 +86,9 @@ function CommunityPanel() {
         setBusy(true);
         try {
             enableTheme(await saveTheme(t.params));
-            showToast(`"${t.name}" applied. 🎨`, Toasts.Type.SUCCESS);
+            showToast(`"${t.name}" applied. 🎨`, "success");
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not apply that theme."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not apply that theme."), "failure");
         } finally {
             setBusy(false);
         }

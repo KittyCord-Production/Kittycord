@@ -7,7 +7,7 @@
 import { definePluginSettings } from "@api/Settings";
 import definePlugin, { makeRange, OptionType } from "@utils/types";
 import type { VoiceState } from "@vencord/discord-types";
-import { ChannelActions, ChannelStore, PermissionsBits, PermissionStore, SelectedChannelStore, showToast, Toasts, UserStore, VoiceStateStore } from "@webpack/common";
+import { ChannelActions, ChannelStore, PermissionsBits, PermissionStore, SelectedChannelStore, showToast, UserStore, VoiceStateStore } from "@webpack/common";
 
 const MIN_OTHERS = 2;
 const MIGRATION_WINDOW = 120_000;
@@ -105,7 +105,7 @@ export default definePlugin({
 
             cooldownUntil = now + COOLDOWN;
             ChannelActions.selectVoiceChannel(bestDest);
-            showToast(`Followed your group to ${dest.name}.`, Toasts.Type.SUCCESS);
+            showToast(`Followed your group to ${dest.name}.`, "success");
         }
     },
 

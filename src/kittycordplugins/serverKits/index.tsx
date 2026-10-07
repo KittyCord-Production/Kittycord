@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Guild } from "@vencord/discord-types";
-import { GuildStore, Menu, PermissionsBits, PermissionStore, SelectedGuildStore, showToast, Toasts } from "@webpack/common";
+import { GuildStore, Menu, PermissionsBits, PermissionStore, SelectedGuildStore, showToast } from "@webpack/common";
 
 import { findKitLink, sanitizeKit, ServerKit } from "./kit";
 import { openKitStudio } from "./KitStudioModal";
@@ -112,9 +112,9 @@ export default definePlugin({
             const guildId = SelectedGuildStore.getGuildId();
             const guild = guildId ? GuildStore.getGuild(guildId) : null;
 
-            if (!guild) return showToast("Open the server you want to build a kit for first.", Toasts.Type.FAILURE);
+            if (!guild) return showToast("Open the server you want to build a kit for first.", "failure");
             if (!PermissionStore.can(PermissionsBits.MANAGE_GUILD, guild))
-                return showToast("Only someone who can manage the server can publish its kit.", Toasts.Type.FAILURE);
+                return showToast("Only someone who can manage the server can publish its kit.", "failure");
 
             openKitStudio(guild);
         }

@@ -9,7 +9,7 @@ import { ClockIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
-import { showToast, Toasts, UserStore } from "@webpack/common";
+import { showToast, UserStore } from "@webpack/common";
 
 import { cancelBreak, settings } from "./controls";
 import { WellbeingTab } from "./Dashboard";
@@ -29,7 +29,7 @@ function tick() {
 
     if (settings.store.breakReminders && continuousActiveMin >= (Number(settings.store.breakInterval) || 90)) {
         continuousActiveMin = 0;
-        showToast("You've been on Discord a while — maybe stretch and blink? 🐱", Toasts.Type.MESSAGE);
+        showToast("You've been on Discord a while — maybe stretch and blink? 🐱", "message");
     }
 }
 

@@ -10,7 +10,7 @@ import { Logger } from "@utils/Logger";
 import { sleep } from "@utils/misc";
 import definePlugin, { makeRange, OptionType } from "@utils/types";
 import type { Channel } from "@vencord/discord-types";
-import { ChannelStore, GuildChannelStore, GuildMemberStore, GuildRoleStore, Menu, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, Toasts, VoiceStateStore } from "@webpack/common";
+import { ChannelStore, GuildChannelStore, GuildMemberStore, GuildRoleStore, Menu, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, VoiceStateStore } from "@webpack/common";
 
 const logger = new Logger("MassMover");
 
@@ -49,7 +49,7 @@ async function moveUsers(guildId: string, userIds: string[], targetId: string) {
         if (moveDelay) await sleep(moveDelay * 1000);
     }
 
-    showToast(`Moved ${moved} of ${userIds.length} users.`, moved ? Toasts.Type.SUCCESS : Toasts.Type.FAILURE);
+    showToast(`Moved ${moved} of ${userIds.length} users.`, moved ? "success" : "failure");
 }
 
 const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { channel: Channel; }) => {

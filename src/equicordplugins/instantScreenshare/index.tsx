@@ -11,7 +11,7 @@ import { Devs, EquicordDevs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { VoiceState } from "@vencord/discord-types";
 import { findByCodeLazy } from "@webpack";
-import { ApplicationStreamingSettingsStore, ChannelStore, MediaEngineStore, PermissionsBits, PermissionStore, SelectedChannelStore, showToast, Toasts, UserStore, VoiceActions, WindowStore } from "@webpack/common";
+import { ApplicationStreamingSettingsStore, ChannelStore, MediaEngineStore, PermissionsBits, PermissionStore, SelectedChannelStore, showToast, UserStore, VoiceActions, WindowStore } from "@webpack/common";
 
 import { getCurrentMedia, settings } from "./utils";
 
@@ -140,7 +140,7 @@ export default definePlugin({
     toolboxActions: {
         "Instant Screenshare"() {
             settings.store.toolboxManagement = !settings.store.toolboxManagement;
-            showToast(`Instant Screenshare ${settings.store.toolboxManagement ? "Enabled" : "Disabled"}`, Toasts.Type.SUCCESS);
+            showToast(`Instant Screenshare ${settings.store.toolboxManagement ? "Enabled" : "Disabled"}`, "success");
         }
     }
 });

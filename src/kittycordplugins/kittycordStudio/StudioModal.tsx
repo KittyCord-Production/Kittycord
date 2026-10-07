@@ -10,7 +10,7 @@ import { FormSwitch } from "@components/FormSwitch";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Slider, Text, TextInput, Toasts } from "@webpack/common";
+import { Alerts, Button, React, showToast, Slider, Text, TextInput } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -162,13 +162,13 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
             const cleanParams = { ...params, name: params.name.trim() };
             const fileName = await saveTheme(cleanParams, initialFileName);
             enableTheme(fileName);
-            showToast(`"${cleanParams.name}" saved & applied.`, Toasts.Type.SUCCESS);
+            showToast(`"${cleanParams.name}" saved & applied.`, "success");
             onSaved();
             rootProps.onClose();
             void maybeNudgePublish(cleanParams, fileName);
         } catch (e) {
             logger.error("save failed", e);
-            showToast(String((e as Error)?.message ?? "Could not save the theme."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not save the theme."), "failure");
         } finally {
             setBusy(false);
         }

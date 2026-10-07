@@ -12,7 +12,7 @@ import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import type { GalleryPack } from "./native";
@@ -128,7 +128,7 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalPro
 
     function confirm() {
         commands.forEach(addCommand);
-        showToast(`Added ${commands.length} command${commands.length === 1 ? "" : "s"} from "${pack.name}".`, Toasts.Type.SUCCESS);
+        showToast(`Added ${commands.length} command${commands.length === 1 ? "" : "s"} from "${pack.name}".`, "success");
         rootProps.onClose();
     }
 
@@ -182,7 +182,7 @@ export function openCommandsImport(commands: CustomCommand[], name: string, auth
 export async function openPackImport(id: string) {
     const result = await fetchPack(id);
     if (!result) {
-        showToast("Could not load that command pack.", Toasts.Type.FAILURE);
+        showToast("Could not load that command pack.", "failure");
         return;
     }
     openModal(props => <ImportDialog rootProps={props} pack={result.pack} commands={result.commands} />);
@@ -219,10 +219,10 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
             confirmColor: Button.Colors.RED,
             onConfirm: async () => {
                 if (await deletePack(pack.id)) {
-                    showToast("Removed from the gallery.", Toasts.Type.SUCCESS);
+                    showToast("Removed from the gallery.", "success");
                     onChanged();
                 } else {
-                    showToast("Could not remove that pack.", Toasts.Type.FAILURE);
+                    showToast("Could not remove that pack.", "failure");
                 }
             }
         });
@@ -324,10 +324,10 @@ function PublishDialog({ rootProps, commands }: { rootProps: RenderModalProps; c
         setBusy(true);
         try {
             const id = await publishPack(name.trim(), authorName.trim(), commands);
-            showToast(`"${name.trim()}" published! 🎉`, Toasts.Type.SUCCESS);
+            showToast(`"${name.trim()}" published! 🎉`, "success");
             setPublishedId(id);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not publish."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not publish."), "failure");
         } finally {
             setBusy(false);
         }
@@ -379,7 +379,7 @@ export function openPackGallery() {
 
 export function openPackPublish(commands: CustomCommand[]) {
     if (!commands.length) {
-        showToast("Create a command first — then you can share it as a pack.", Toasts.Type.FAILURE);
+        showToast("Create a command first — then you can share it as a pack.", "failure");
         return;
     }
     openModal(props => <PublishDialog rootProps={props} commands={commands} />);

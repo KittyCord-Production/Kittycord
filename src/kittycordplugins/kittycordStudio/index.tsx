@@ -7,7 +7,7 @@
 import { ErrorBoundary } from "@components/index";
 import definePlugin from "@utils/types";
 import type { Message } from "@vencord/discord-types";
-import { Alerts, Button, showToast, Text, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, showToast, Text, UserStore } from "@webpack/common";
 
 import { openGallery } from "./GalleryModal";
 import { fetchTheme, findThemeAttachment } from "./share";
@@ -45,15 +45,15 @@ function ThemeImportCardInner({ message }: { message: Message; }) {
                 onConfirm: async () => {
                     const fileName = await saveTheme(params);
                     enableTheme(fileName);
-                    showToast(`"${params.name}" applied. 🎨`, Toasts.Type.SUCCESS);
+                    showToast(`"${params.name}" applied. 🎨`, "success");
                 },
                 onConfirmSecondary: async () => {
                     await saveTheme(params);
-                    showToast(`"${params.name}" added to your Studio themes.`, Toasts.Type.SUCCESS);
+                    showToast(`"${params.name}" added to your Studio themes.`, "success");
                 }
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that theme."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not read that theme."), "failure");
         }
     }
 

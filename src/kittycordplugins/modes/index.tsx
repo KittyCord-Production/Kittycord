@@ -13,7 +13,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Message, RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, GuildStore, React, SearchableSelect, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, GuildStore, React, SearchableSelect, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -256,7 +256,7 @@ function ModeImportCardInner({ message }: { message: Message; }) {
                     await saveMode(mode);
                     notifyManualActivation();
                     const { restartNeeded } = await applyMode(mode);
-                    showToast(`Switched to "${mode.name}".`, Toasts.Type.SUCCESS);
+                    showToast(`Switched to "${mode.name}".`, "success");
                     if (restartNeeded) {
                         showNotification({
                             title: "Mode applied — restart needed",
@@ -267,11 +267,11 @@ function ModeImportCardInner({ message }: { message: Message; }) {
                 },
                 onConfirmSecondary: async () => {
                     await saveMode(mode);
-                    showToast(`Added "${mode.name}" to your modes.`, Toasts.Type.SUCCESS);
+                    showToast(`Added "${mode.name}" to your modes.`, "success");
                 }
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that mode."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not read that mode."), "failure");
         }
     }
 
@@ -305,7 +305,7 @@ function ModesModal({ rootProps }: { rootProps: RenderModalProps; }) {
             notifyManualActivation();
             const { restartNeeded } = await applyMode(mode);
             forceUpdate();
-            showToast(`Switched to "${mode.name}".`, Toasts.Type.SUCCESS);
+            showToast(`Switched to "${mode.name}".`, "success");
             if (restartNeeded) {
                 showNotification({
                     title: "Mode applied — restart needed",
@@ -314,7 +314,7 @@ function ModesModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 });
             }
         } catch {
-            showToast("Could not apply that mode.", Toasts.Type.FAILURE);
+            showToast("Could not apply that mode.", "failure");
         }
     }
 

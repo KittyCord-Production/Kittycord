@@ -10,7 +10,7 @@ import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
+import { Button, DraftType, React, showToast, Text, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -50,7 +50,7 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 logger.error("Failed to render look card", e);
                 if (!cancelled) {
                     setData(null);
-                    showToast("Could not render your look card.", Toasts.Type.FAILURE);
+                    showToast("Could not render your look card.", "failure");
                 }
             }
         })();
@@ -63,24 +63,24 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
     function save() {
         if (!blob) return;
         saveFile(fileFromBlob(blob));
-        showToast("Saved your look card.", Toasts.Type.SUCCESS);
+        showToast("Saved your look card.", "success");
     }
 
     async function copy() {
         if (!blob) return;
         try {
             await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-            showToast("Copied to clipboard.", Toasts.Type.SUCCESS);
+            showToast("Copied to clipboard.", "success");
         } catch (e) {
             logger.warn("Clipboard copy failed", e);
-            showToast("Copying images isn't supported here — use Save instead.", Toasts.Type.FAILURE);
+            showToast("Copying images isn't supported here — use Save instead.", "failure");
         }
     }
 
     function postInChat() {
         if (!blob) return;
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to post it there.", Toasts.Type.FAILURE);
+        if (!channel) return showToast("Open a chat first to post it there.", "failure");
         insertTextIntoChatInputBox(CAPTION);
         UploadHandler.promptToUpload([fileFromBlob(blob)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
@@ -91,10 +91,10 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
         setBusy(true);
         try {
             await sendFileToUser(target.id, fileFromBlob(blob), CAPTION);
-            showToast(`Sent to ${target.globalName || target.username}. 💌`, Toasts.Type.SUCCESS);
+            showToast(`Sent to ${target.globalName || target.username}. 💌`, "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send your look."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send your look."), "failure");
         } finally {
             setBusy(false);
         }

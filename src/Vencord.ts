@@ -20,6 +20,8 @@
 import "~plugins";
 import "./fixWeirdAppRegionBug.css";
 
+import nativeTitleBarStyles from "./nativeTitleBar.css?managed";
+
 export * as Api from "./api";
 export * as Plugins from "./api/PluginManager";
 export * as Components from "./components";
@@ -29,13 +31,11 @@ export * as Webpack from "./webpack";
 export * as WebpackPatcher from "./webpack/patchWebpack";
 export { PlainSettings, Settings };
 
-import { coreStyleRootNode, initStyles } from "@api/Styles";
+import { enableStyle, initStyles } from "@api/Styles";
 import { openSettingsTabModal, UpdaterTab } from "@components/settings";
 import { debounce } from "@shared/debounce";
-import { IS_WINDOWS } from "@utils/constants";
-import { createAndAppendStyle } from "@utils/css";
 import { StartAt } from "@utils/types";
-import { SettingsRouter, showToast, Toasts } from "@webpack/common";
+import { SettingsRouter, showToast } from "@webpack/common";
 
 import { get as dsGet } from "./api/DataStore";
 import { popNotice, showNotice } from "./api/Notices";
@@ -124,7 +124,7 @@ async function syncSettings() {
 let notifiedForUpdatesThisSession = false;
 
 async function updateAndRelaunch() {
-    showToast("Getting the latest Kittycord update…", Toasts.Type.MESSAGE);
+    showToast("Getting the latest Kittycord update…", "message");
     try {
         if (await checkForUpdates()) await update();
     } catch (err) {
@@ -261,8 +261,7 @@ init();
 document.addEventListener("DOMContentLoaded", () => {
     startAllPlugins(StartAt.DOMContentLoaded);
 
-    // FIXME
-    if (IS_DISCORD_DESKTOP && Settings.winNativeTitleBar && IS_WINDOWS) {
-        createAndAppendStyle("vencord-native-titlebar-style", coreStyleRootNode).textContent = "[class*=titleBar]{display: none!important}";
+    if (IS_DISCORD_DESKTOP && Settings.nativeTitleBar) {
+        enableStyle(nativeTitleBarStyles);
     }
 }, { once: true });

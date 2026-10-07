@@ -11,7 +11,7 @@ import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, DraftType, React, showToast, Text, Toasts, UploadHandler } from "@webpack/common";
+import { Alerts, Button, DraftType, React, showToast, Text, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { renderCard, renderShareCard, SKINS, type WrappedVariant } from "./card";
@@ -55,7 +55,7 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
                 setPreviewUrl(url);
             } catch (e) {
                 logger.error("Failed to render card", e);
-                if (!cancelled) showToast("Could not render your Wrapped card.", Toasts.Type.FAILURE);
+                if (!cancelled) showToast("Could not render your Wrapped card.", "failure");
             }
         })();
         return () => {
@@ -72,13 +72,13 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
     function save() {
         if (!blob) return;
         saveFile(fileFromBlob(blob, variant));
-        showToast("Saved your card.", Toasts.Type.SUCCESS);
+        showToast("Saved your card.", "success");
     }
 
     function send() {
         if (!blob) return;
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to send it there.", Toasts.Type.FAILURE);
+        if (!channel) return showToast("Open a chat first to send it there.", "failure");
         insertTextIntoChatInputBox(CAPTIONS[variant]);
         UploadHandler.promptToUpload([fileFromBlob(blob, variant)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
@@ -88,10 +88,10 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
         if (!blob) return;
         try {
             await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-            showToast("Copied to clipboard.", Toasts.Type.SUCCESS);
+            showToast("Copied to clipboard.", "success");
         } catch (e) {
             logger.warn("Clipboard copy failed", e);
-            showToast("Copying images isn't supported here — use Save instead.", Toasts.Type.FAILURE);
+            showToast("Copying images isn't supported here — use Save instead.", "failure");
         }
     }
 
@@ -111,7 +111,7 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                     setBlob(result);
                     setPreviewUrl(URL.createObjectURL(result));
-                    showToast("Your Wrapped stats were reset.", Toasts.Type.SUCCESS);
+                    showToast("Your Wrapped stats were reset.", "success");
                 } catch (e) {
                     logger.error("Reset failed", e);
                 } finally {

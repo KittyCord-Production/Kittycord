@@ -9,7 +9,7 @@ import { ErrorBoundary } from "@components/index";
 import { openPrivateChannel, openUserProfile } from "@utils/discord";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, Toasts, UserStore, useStateFromStores } from "@webpack/common";
+import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, UserStore, useStateFromStores } from "@webpack/common";
 import type { ReactNode } from "react";
 
 import { sendFileToUser } from "../_shared/dm";
@@ -202,10 +202,10 @@ function SendModeModal({ rootProps, user }: { rootProps: RenderModalProps; user:
         setBusy(true);
         try {
             await sendFileToUser(user.id, buildModeFile(mode), `Here's my "${mode.name}" mode — open it in Kittycord to use it.`);
-            showToast(`Sent "${mode.name}" to ${displayName(user)}.`, Toasts.Type.SUCCESS);
+            showToast(`Sent "${mode.name}" to ${displayName(user)}.`, "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the mode."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send the mode."), "failure");
         } finally {
             setBusy(false);
         }
@@ -253,8 +253,8 @@ function FriendsListBody() {
 
     function sendSetup(user: User) {
         sendShare(user.id, "plugins", DEFAULT_NOTE)
-            .then(() => showToast(`Sent to ${displayName(user)}.`, Toasts.Type.SUCCESS))
-            .catch(e => showToast(String((e as Error)?.message ?? "Could not send the setup."), Toasts.Type.FAILURE));
+            .then(() => showToast(`Sent to ${displayName(user)}.`, "success"))
+            .catch(e => showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure"));
     }
 
     return (

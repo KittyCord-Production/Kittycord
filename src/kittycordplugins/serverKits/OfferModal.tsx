@@ -10,7 +10,7 @@ import { FormSwitch } from "@components/FormSwitch";
 import { Paragraph } from "@components/Paragraph";
 import { relaunch } from "@utils/native";
 import { RenderModalProps } from "@vencord/discord-types";
-import { Modal, openModal, showToast, Toasts, useState } from "@webpack/common";
+import { Modal, openModal, showToast, useState } from "@webpack/common";
 
 import { addCommand, getCommand } from "../commandStudio/settings";
 import { enableTheme, saveTheme } from "../kittycordStudio/store";
@@ -73,17 +73,17 @@ function OfferDialog({ modalProps, kit, onDecided }: {
 
             if (kit.plugins && picks.plugins) restartNeeded = applyPlugins(kit.plugins);
 
-            showToast(`Applied "${kit.name}".`, Toasts.Type.SUCCESS);
+            showToast(`Applied "${kit.name}".`, "success");
             onDecided("applied");
             modalProps.onClose();
 
             if (restartNeeded) {
-                showToast("Restart Discord to finish turning those plugins on.", Toasts.Type.MESSAGE);
+                showToast("Restart Discord to finish turning those plugins on.", "message");
                 setTimeout(() => (IS_WEB ? location.reload() : relaunch()), 2500);
             }
         } catch {
             setBusy(false);
-            showToast("Could not apply that kit.", Toasts.Type.FAILURE);
+            showToast("Could not apply that kit.", "failure");
         }
     }
 

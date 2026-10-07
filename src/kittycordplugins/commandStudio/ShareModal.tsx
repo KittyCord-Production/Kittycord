@@ -9,7 +9,7 @@ import { sendMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, React, showToast, Text, Toasts } from "@webpack/common";
+import { Button, React, showToast, Text } from "@webpack/common";
 
 import { ensureDmChannel } from "../_shared/dm";
 import { FriendPicker } from "../_shared/FriendPicker";
@@ -52,10 +52,10 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalPro
             if (!channelId) throw new Error("Could not open a DM with them.");
 
             await sendMessage(channelId, { content: `Here's a command for you 🐱\n${payload}` });
-            showToast(`Sent to ${target.globalName || target.username}.`, Toasts.Type.SUCCESS);
+            showToast(`Sent to ${target.globalName || target.username}.`, "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send that."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send that."), "failure");
         } finally {
             setBusy(false);
         }
@@ -93,7 +93,7 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalPro
 
 export function openShareModal(commands: CustomCommand[], label: string) {
     if (!commands.length) {
-        showToast("Create a command first — then you can share it.", Toasts.Type.FAILURE);
+        showToast("Create a command first — then you can share it.", "failure");
         return;
     }
     openModal(props => <ShareDialog rootProps={props} commands={commands} label={label} />);

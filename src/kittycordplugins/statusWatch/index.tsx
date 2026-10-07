@@ -12,7 +12,7 @@ import { Paragraph } from "@components/Paragraph";
 import { getUniqueUsername, openUserProfile } from "@utils/discord";
 import definePlugin from "@utils/types";
 import type { User } from "@vencord/discord-types";
-import { lodash, Menu, PresenceStore, showToast, Toasts, UserStore, UserUtils } from "@webpack/common";
+import { lodash, Menu, PresenceStore, showToast, UserStore, UserUtils } from "@webpack/common";
 import type { DebouncedFunc } from "lodash";
 
 import { loadHistory, record } from "./history";
@@ -92,10 +92,10 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
                 if (toggleWatch(user.id)) {
                     const bucket = currentBucket(user.id);
                     if (bucket) lastNotified.set(user.id, bucket);
-                    showToast("You'll get a notification when their status changes.", Toasts.Type.SUCCESS);
+                    showToast("You'll get a notification when their status changes.", "success");
                 } else {
                     lastNotified.delete(user.id);
-                    showToast("No longer watching their status.", Toasts.Type.SUCCESS);
+                    showToast("No longer watching their status.", "success");
                 }
             }}
         />

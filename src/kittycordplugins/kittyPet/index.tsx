@@ -10,7 +10,7 @@ import { Flex } from "@components/Flex";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, SelectedChannelStore, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Button, React, SelectedChannelStore, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { animalArt } from "./animalArt";
@@ -165,7 +165,7 @@ function onPet() {
         const yesterday = new Date(Date.now() - 864e5).toDateString();
         const streak = save.lastPetDay === yesterday ? save.streak + 1 : 1;
         updateSave(profile, { pets: save.pets + 1, lastPetDay: today, streak }).then(() => controller?.setLastPetDay(today));
-        showToast(`Daily pet! 🐱 ${streak} day streak.`, Toasts.Type.SUCCESS);
+        showToast(`Daily pet! 🐱 ${streak} day streak.`, "success");
     } else {
         updateSave(profile, { pets: save.pets + 1 });
     }
@@ -225,7 +225,7 @@ function notifyLevel(level: number | null) {
         .map(([id]) => set.registry[id].label.toLowerCase());
     const who = getSave(profile).name || PET_COPY[profile].who;
     const note = unlocked.length ? ` ${who} unlocked the ${unlocked.join(" and ")}!` : "";
-    showToast(`🎉 Level ${level}!${note}`, Toasts.Type.SUCCESS);
+    showToast(`🎉 Level ${level}!${note}`, "success");
 }
 
 function PetPanel() {

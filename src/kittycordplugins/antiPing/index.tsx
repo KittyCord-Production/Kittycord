@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Guild, MessageJSON, User } from "@vencord/discord-types";
-import { FluxDispatcher, GuildMemberStore, Menu, RelationshipStore, showToast, Toasts, UserStore } from "@webpack/common";
+import { FluxDispatcher, GuildMemberStore, Menu, RelationshipStore, showToast, UserStore } from "@webpack/common";
 
 const logger = new Logger("AntiPing");
 
@@ -119,7 +119,7 @@ const GuildContext: NavContextMenuPatchCallback = (children, { guild }: { guild?
             checked={allowed}
             action={() => {
                 const added = toggleId("guildWhitelist", guild.id);
-                showToast(added ? "Pings on this server will come through." : "Pings on this server are hidden again.", Toasts.Type.SUCCESS);
+                showToast(added ? "Pings on this server will come through." : "Pings on this server are hidden again.", "success");
             }}
         />
     ));
@@ -136,7 +136,7 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
             checked={allowed}
             action={() => {
                 const added = toggleId("userWhitelist", user.id);
-                showToast(added ? "Their pings will always come through." : "Their pings follow your normal settings again.", Toasts.Type.SUCCESS);
+                showToast(added ? "Their pings will always come through." : "Their pings follow your normal settings again.", "success");
             }}
         />
     ));
@@ -164,7 +164,7 @@ export default definePlugin({
                         label={`End snooze (${Math.ceil(remaining / 60_000)}m left)`}
                         action={() => {
                             settings.store.snoozeUntil = 0;
-                            showToast("Snooze ended.", Toasts.Type.SUCCESS);
+                            showToast("Snooze ended.", "success");
                         }}
                     />
                 )}
@@ -175,7 +175,7 @@ export default definePlugin({
                         label={option.label}
                         action={() => {
                             settings.store.snoozeUntil = Date.now() + option.ms;
-                            showToast(`All pings snoozed for ${option.label}.`, Toasts.Type.SUCCESS);
+                            showToast(`All pings snoozed for ${option.label}.`, "success");
                         }}
                     />
                 ))}

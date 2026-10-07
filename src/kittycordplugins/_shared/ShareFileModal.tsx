@@ -8,7 +8,7 @@ import { Flex } from "@components/Flex";
 import { getCurrentChannel } from "@utils/discord";
 import { ModalSize } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, DraftType, React, showToast, Text, TextInput, Toasts, UploadHandler } from "@webpack/common";
+import { Button, DraftType, React, showToast, Text, TextInput, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -30,10 +30,10 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
         setBusy(true);
         try {
             await sendFileToUser(target.id, buildFile(), note.trim());
-            showToast(`Sent to ${target.globalName || target.username}.`, Toasts.Type.SUCCESS);
+            showToast(`Sent to ${target.globalName || target.username}.`, "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send that."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send that."), "failure");
         } finally {
             setBusy(false);
         }
@@ -41,7 +41,7 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
 
     function postInChat() {
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to post it there.", Toasts.Type.FAILURE);
+        if (!channel) return showToast("Open a chat first to post it there.", "failure");
         UploadHandler.promptToUpload([buildFile()], channel, DraftType.ChannelMessage);
         rootProps.onClose();
     }

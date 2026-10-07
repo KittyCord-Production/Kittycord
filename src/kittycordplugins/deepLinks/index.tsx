@@ -6,7 +6,7 @@
 
 import { isPluginEnabled } from "@api/PluginManager";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { showToast, Toasts, UserStore } from "@webpack/common";
+import { showToast, UserStore } from "@webpack/common";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, onboardingPending, stashFriendAction } from "../_shared/friendLink";
 import { openPackImport } from "../commandStudio/PackGallery";
@@ -23,40 +23,40 @@ async function claim(code: string) {
     if (friendConsumed({ kind: "claim", value: code })) return;
     const me = UserStore.getCurrentUser();
     if (!me) { pendingCode = code; return; }
-    if (!Invites) { showToast("Invite codes work on the Kittycord desktop app.", Toasts.Type.FAILURE); return; }
+    if (!Invites) { showToast("Invite codes work on the Kittycord desktop app.", "failure"); return; }
 
     const status = await Invites.claim(me.id, code);
-    if (status === "ok") { markFriendConsumed({ kind: "claim", value: code }); showToast("Invite claimed — your friend just got the credit. 🐱", Toasts.Type.SUCCESS); }
-    else if (status === "rejected") showToast("That code couldn't be counted (already used, or it's your own).", Toasts.Type.MESSAGE);
-    else showToast("Couldn't reach Kittycord to claim that code — try again later.", Toasts.Type.FAILURE);
+    if (status === "ok") { markFriendConsumed({ kind: "claim", value: code }); showToast("Invite claimed — your friend just got the credit. 🐱", "success"); }
+    else if (status === "rejected") showToast("That code couldn't be counted (already used, or it's your own).", "message");
+    else showToast("Couldn't reach Kittycord to claim that code — try again later.", "failure");
 }
 
 async function openTheme(id: string) {
-    showToast("Opening that theme…", Toasts.Type.MESSAGE);
+    showToast("Opening that theme…", "message");
     try {
         const theme = await applyGalleryThemeById(id);
-        if (theme) showToast(`"${theme.name}" applied. 🎨`, Toasts.Type.SUCCESS);
-        else showToast("That theme couldn't be found.", Toasts.Type.FAILURE);
+        if (theme) showToast(`"${theme.name}" applied. 🎨`, "success");
+        else showToast("That theme couldn't be found.", "failure");
     } catch {
-        showToast("That theme couldn't be applied.", Toasts.Type.FAILURE);
+        showToast("That theme couldn't be applied.", "failure");
     }
 }
 
 async function openPack(id: string) {
-    showToast("Opening that command pack…", Toasts.Type.MESSAGE);
+    showToast("Opening that command pack…", "message");
     try {
         await openPackImport(id);
     } catch {
-        showToast("That command pack couldn't be opened.", Toasts.Type.FAILURE);
+        showToast("That command pack couldn't be opened.", "failure");
     }
 }
 
 async function openKit(id: string) {
-    showToast("Opening that server kit…", Toasts.Type.MESSAGE);
+    showToast("Opening that server kit…", "message");
     const { fetchKit } = await import("../serverKits");
     const kit = await fetchKit(id);
 
-    if (!kit) return showToast("That server kit couldn't be opened.", Toasts.Type.FAILURE);
+    if (!kit) return showToast("That server kit couldn't be opened.", "failure");
 
     const { openOfferModal } = await import("../serverKits/OfferModal");
     openOfferModal(kit, () => { });

@@ -15,7 +15,7 @@ import { DeleteIcon } from "@components/Icons";
 import { Margins } from "@components/margins";
 import { Paragraph } from "@components/Paragraph";
 import { copyWithToast } from "@utils/discord";
-import { ChannelStore, GuildStore, React, showToast, Toasts, UserStore } from "@webpack/common";
+import { ChannelStore, GuildStore, React, showToast, UserStore } from "@webpack/common";
 
 import {
     addAudio,
@@ -53,7 +53,7 @@ function targetName(rule: SoundRule): string {
 function preview(rule: SoundRule) {
     const audio = resolveSound(rule.sound);
     if (!audio) {
-        showToast("That sound file is missing.", Toasts.Type.FAILURE);
+        showToast("That sound file is missing.", "failure");
         return;
     }
     playAudio(audio, { volume: rule.volume });
@@ -75,11 +75,11 @@ export function RuleList() {
         if (!file) return;
 
         if (!isAllowedMime(file.type)) {
-            showToast("That file type isn't supported.", Toasts.Type.FAILURE);
+            showToast("That file type isn't supported.", "failure");
             return;
         }
         if (file.size > MAX_FILE_BYTES) {
-            showToast(`Sounds have to stay under ${Math.round(MAX_FILE_BYTES / 1000)} KB.`, Toasts.Type.FAILURE);
+            showToast(`Sounds have to stay under ${Math.round(MAX_FILE_BYTES / 1000)} KB.`, "failure");
             return;
         }
 
@@ -88,9 +88,9 @@ export function RuleList() {
             try {
                 await addAudio(file.name.replace(/\.[^.]+$/, "").slice(0, 60), file.type, String(reader.result));
                 setFiles(listAudio());
-                showToast("Sound added — pick it from a right-click menu.", Toasts.Type.SUCCESS);
+                showToast("Sound added — pick it from a right-click menu.", "success");
             } catch (e) {
-                showToast(String((e as Error)?.message ?? "Could not add that sound."), Toasts.Type.FAILURE);
+                showToast(String((e as Error)?.message ?? "Could not add that sound."), "failure");
             }
         };
         reader.readAsDataURL(file);
@@ -99,12 +99,12 @@ export function RuleList() {
     async function importCode() {
         const result = await importRules(code);
         if (!result) {
-            showToast("That isn't a valid sound pack.", Toasts.Type.FAILURE);
+            showToast("That isn't a valid sound pack.", "failure");
             return;
         }
         setCode("");
         setFiles(listAudio());
-        showToast(`Added ${result.added} rule${result.added === 1 ? "" : "s"}.`, Toasts.Type.SUCCESS);
+        showToast(`Added ${result.added} rule${result.added === 1 ? "" : "s"}.`, "success");
     }
 
     function share() {

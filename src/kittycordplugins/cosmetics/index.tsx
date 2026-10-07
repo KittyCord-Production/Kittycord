@@ -9,7 +9,7 @@ import { Flex } from "@components/Flex";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType, type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
 import type { CSSProperties } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -99,8 +99,8 @@ function NameStyleEditor() {
         if (!me?.id || !Native) return;
         const c1 = color1.trim();
         const c2 = color2.trim();
-        if (!HEX_RE.test(c1)) { showToast("Pick a first color like #FF5FA6.", Toasts.Type.FAILURE); return; }
-        if (c2 && !HEX_RE.test(c2)) { showToast("The second color must look like #FF8AC4.", Toasts.Type.FAILURE); return; }
+        if (!HEX_RE.test(c1)) { showToast("Pick a first color like #FF5FA6.", "failure"); return; }
+        if (c2 && !HEX_RE.test(c2)) { showToast("The second color must look like #FF8AC4.", "failure"); return; }
 
         setBusy(true);
         const res = await Native.setCosmetic(me.id, c1, c2 || undefined, undefined);
@@ -108,9 +108,9 @@ function NameStyleEditor() {
         if (res.ok) {
             cosmetics.set(me.id, { color1: c1, color2: c2 || undefined });
             setPersisted(true);
-            showToast("Name style saved.", Toasts.Type.SUCCESS);
+            showToast("Name style saved.", "success");
         } else {
-            showToast(res.error ?? "Could not save the style.", Toasts.Type.FAILURE);
+            showToast(res.error ?? "Could not save the style.", "failure");
         }
     }
 
@@ -124,7 +124,7 @@ function NameStyleEditor() {
         setColor1("");
         setColor2("");
         setPersisted(false);
-        showToast("Name style removed.", Toasts.Type.SUCCESS);
+        showToast("Name style removed.", "success");
     }
 
     const me = UserStore.getCurrentUser();

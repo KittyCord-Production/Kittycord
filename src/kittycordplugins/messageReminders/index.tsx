@@ -11,7 +11,7 @@ import { Flex } from "@components/Flex";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message, RenderModalProps } from "@vencord/discord-types";
-import { Button, ChannelStore, Menu, MessageActions, React, showToast, Text, Toasts } from "@webpack/common";
+import { Button, ChannelStore, Menu, MessageActions, React, showToast, Text } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -61,7 +61,7 @@ async function addReminder(msg: Message, remindAt: number) {
         remindAt
     }];
     await save();
-    showToast(`Reminder set for ${new Date(remindAt).toLocaleString()}.`, Toasts.Type.SUCCESS);
+    showToast(`Reminder set for ${new Date(remindAt).toLocaleString()}.`, "success");
 }
 
 function fire(r: Reminder) {

@@ -13,7 +13,7 @@ import { copyWithToast } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
 import { openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore, UserUtils } from "@webpack/common";
+import { Button, IconUtils, React, showToast, Text, TextInput, UserStore, UserUtils } from "@webpack/common";
 
 import { INVITE_STATS_FILENAME, renderInviteStatsCard } from "../_shared/inviteStatsCard";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -47,7 +47,7 @@ async function tryClaim() {
 async function openInviteStatsShare() {
     const me = UserStore.getCurrentUser();
     if (!Native || !me) {
-        showToast("Invite stats are available on the Kittycord desktop app.", Toasts.Type.FAILURE);
+        showToast("Invite stats are available on the Kittycord desktop app.", "failure");
         return;
     }
     try {
@@ -66,7 +66,7 @@ async function openInviteStatsShare() {
             />
         ));
     } catch {
-        showToast("Couldn't build your card — try again.", Toasts.Type.FAILURE);
+        showToast("Couldn't build your card — try again.", "failure");
     }
 }
 
@@ -116,10 +116,10 @@ function InvitesTab() {
         const res = await Native.setCode(me.id, code.trim());
         setSaving(false);
         if (res.ok) {
-            showToast("Creator code saved!", Toasts.Type.SUCCESS);
+            showToast("Creator code saved!", "success");
             load();
         } else {
-            showToast(res.error, Toasts.Type.FAILURE);
+            showToast(res.error, "failure");
         }
     }
 
@@ -129,13 +129,13 @@ function InvitesTab() {
         const status = await Native.claim(me.id, claimInput.trim());
         setClaiming(false);
         if (status === "ok") {
-            showToast("Thanks — your inviter just got the credit! 🐱", Toasts.Type.SUCCESS);
+            showToast("Thanks — your inviter just got the credit! 🐱", "success");
             setClaimInput("");
             load();
         } else if (status === "error") {
-            showToast("Couldn't reach the server — check your connection and try again.", Toasts.Type.FAILURE);
+            showToast("Couldn't reach the server — check your connection and try again.", "failure");
         } else {
-            showToast("Couldn't count that — wrong code, your own code, or you were already counted.", Toasts.Type.FAILURE);
+            showToast("Couldn't count that — wrong code, your own code, or you were already counted.", "failure");
         }
     }
 

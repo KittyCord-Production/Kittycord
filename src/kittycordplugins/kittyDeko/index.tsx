@@ -11,7 +11,7 @@ import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import { isOverlayWindow } from "@utils/overlay";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Alerts, Button, IconUtils, React, showToast,Text, Toasts, UserStore } from "@webpack/common";
+import { Alerts, Button, IconUtils, React, showToast,Text, UserStore } from "@webpack/common";
 
 import { assetUrl, byId, CATALOG, Deko, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
@@ -89,9 +89,9 @@ function DekoShop() {
                         setCoins(res.balance);
                         setOwned(prev => [...prev, d.id]);
                         deko.set(me.id, d.id);
-                        showToast(`${d.label} is yours — equipped!`, Toasts.Type.SUCCESS);
+                        showToast(`${d.label} is yours — equipped!`, "success");
                     } else {
-                        showToast(res.error, Toasts.Type.FAILURE);
+                        showToast(res.error, "failure");
                     }
                 } finally {
                     setSaving(null);
@@ -108,11 +108,11 @@ function DekoShop() {
             const d = byId.get(id);
             if (!d) return;
             if (d.supporterOnly && !supporter) {
-                showToast("This frame is for Kittycord supporters.", Toasts.Type.FAILURE);
+                showToast("This frame is for Kittycord supporters.", "failure");
                 return;
             }
             if (inviteLock(id) > 0) {
-                showToast(`Invite ${d.minInvites} friends to unlock this frame.`, Toasts.Type.FAILURE);
+                showToast(`Invite ${d.minInvites} friends to unlock this frame.`, "failure");
                 return;
             }
         }
@@ -122,17 +122,17 @@ function DekoShop() {
                 const ok = await Native.clearDeko(me.id);
                 if (ok) {
                     deko.delete(me.id);
-                    showToast("Decoration removed.", Toasts.Type.SUCCESS);
+                    showToast("Decoration removed.", "success");
                 } else {
-                    showToast("Could not remove decoration.", Toasts.Type.FAILURE);
+                    showToast("Could not remove decoration.", "failure");
                 }
             } else {
                 const res = await Native.setDeko(me.id, id);
                 if (res.ok) {
                     deko.set(me.id, id);
-                    showToast("Decoration equipped!", Toasts.Type.SUCCESS);
+                    showToast("Decoration equipped!", "success");
                 } else {
-                    showToast(res.error, Toasts.Type.FAILURE);
+                    showToast(res.error, "failure");
                 }
             }
         } finally {

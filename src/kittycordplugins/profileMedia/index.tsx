@@ -10,7 +10,7 @@ import { openImageModal } from "@utils/discord";
 import definePlugin from "@utils/types";
 import { saveFile } from "@utils/web";
 import { User } from "@vencord/discord-types";
-import { IconUtils, Menu, showToast, Toasts, UserProfileStore } from "@webpack/common";
+import { IconUtils, Menu, showToast, UserProfileStore } from "@webpack/common";
 
 function getAvatarUrl(user: User, size: number) {
     return IconUtils.getUserAvatarURL(user, true, size);
@@ -38,7 +38,7 @@ async function downloadImage(url: string, filename: string) {
 
         saveFile(new File([await res.blob()], filename));
     } catch {
-        showToast("Failed to download image", Toasts.Type.FAILURE);
+        showToast("Failed to download image", "failure");
     }
 }
 

@@ -9,7 +9,7 @@ import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, IconUtils, React, showToast, Text, TextInput, Toasts, UserStore } from "@webpack/common";
+import { Button, IconUtils, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -49,7 +49,7 @@ function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: U
                 setPreviewUrl(url);
             } catch (e) {
                 logger.error("Failed to render invite card", e);
-                if (!cancelled) showToast("Could not render the invite card.", Toasts.Type.FAILURE);
+                if (!cancelled) showToast("Could not render the invite card.", "failure");
             }
         })();
         return () => {
@@ -93,10 +93,10 @@ function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: U
             const message = (!editedRef.current && code ? withCodeMessage(code) : note.trim()) || DEFAULT_MESSAGE;
             const file = new File([blob], INVITE_FILENAME, { type: "image/png" });
             await sendFileToUser(target.id, file, message);
-            showToast(`Invite sent to ${target.globalName || target.username}. 💌`, Toasts.Type.SUCCESS);
+            showToast(`Invite sent to ${target.globalName || target.username}. 💌`, "success");
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the invite."), Toasts.Type.FAILURE);
+            showToast(String((e as Error)?.message ?? "Could not send the invite."), "failure");
         } finally {
             setBusy(false);
         }

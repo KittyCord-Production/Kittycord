@@ -18,7 +18,7 @@ import { relaunch } from "@utils/native";
 import definePlugin from "@utils/types";
 import { checkForUpdates, update } from "@utils/updater";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text, Toasts } from "@webpack/common";
+import { Alerts, Button, React, showToast, Text } from "@webpack/common";
 import { getBuildNumber, patchResilience } from "@webpack/patcher";
 import type { ReactNode } from "react";
 
@@ -106,10 +106,10 @@ function DoctorPanel() {
         setBusy(true);
         try {
             await update();
-            showToast("Updated — restarting to finish.", Toasts.Type.SUCCESS);
+            showToast("Updated — restarting to finish.", "success");
             relaunch();
         } catch {
-            showToast("Update failed. Try the Updater tab.", Toasts.Type.FAILURE);
+            showToast("Update failed. Try the Updater tab.", "failure");
         } finally {
             setBusy(false);
         }
@@ -124,7 +124,7 @@ function DoctorPanel() {
             onConfirm: async () => {
                 try {
                     if (!await VencordNative.tray?.repairHost?.()) {
-                        showToast("Nothing to repair. If features are missing, run the Kittycord installer and choose Repair.", Toasts.Type.FAILURE);
+                        showToast("Nothing to repair. If features are missing, run the Kittycord installer and choose Repair.", "failure");
                         return;
                     }
                     try {
@@ -133,7 +133,7 @@ function DoctorPanel() {
                     } catch { /* offline or nothing to update — still relaunch to apply the repair */ }
                     relaunch();
                 } catch {
-                    showToast("Repair failed. Try the Kittycord installer's Repair option.", Toasts.Type.FAILURE);
+                    showToast("Repair failed. Try the Kittycord installer's Repair option.", "failure");
                 }
             }
         });
@@ -143,8 +143,8 @@ function DoctorPanel() {
         const p = plugins.PerformanceMode;
         if (!p) return;
         Settings.plugins.PerformanceMode.enabled = true;
-        if (startPlugin(p)) showToast("PerformanceMode is on.", Toasts.Type.SUCCESS);
-        else showToast("Restart Discord to finish turning on PerformanceMode.", Toasts.Type.MESSAGE);
+        if (startPlugin(p)) showToast("PerformanceMode is on.", "success");
+        else showToast("Restart Discord to finish turning on PerformanceMode.", "message");
         setData(scan());
     }
 

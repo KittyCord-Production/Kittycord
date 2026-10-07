@@ -9,7 +9,7 @@ import { Paragraph } from "@components/Paragraph";
 import { classNameFactory } from "@utils/css";
 import { fetchUserProfile } from "@utils/discord";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Avatar, IconUtils, Modal, showToast, TextInput, Toasts, UserStore,useState } from "@webpack/common";
+import { Avatar, IconUtils, Modal, showToast, TextInput, UserStore,useState } from "@webpack/common";
 
 import { FriendPicker } from "../_shared/FriendPicker";
 import { getDisguise, removeDisguise, setDisguise } from "./settings";
@@ -34,11 +34,11 @@ export function DisguiseModal({ modalProps, userId }: { modalProps: RenderModalP
 
     async function save() {
         if (!ID_RE.test(templateId)) {
-            showToast("That is not a valid account ID.", Toasts.Type.FAILURE);
+            showToast("That is not a valid account ID.", "failure");
             return;
         }
         if (templateId === userId) {
-            showToast("Pick a different account than the one you are hiding.", Toasts.Type.FAILURE);
+            showToast("Pick a different account than the one you are hiding.", "failure");
             return;
         }
 
@@ -46,7 +46,7 @@ export function DisguiseModal({ modalProps, userId }: { modalProps: RenderModalP
         const template = await resolveUser(templateId);
         if (!template) {
             setBusy(false);
-            showToast("No account with that ID exists.", Toasts.Type.FAILURE);
+            showToast("No account with that ID exists.", "failure");
             return;
         }
 

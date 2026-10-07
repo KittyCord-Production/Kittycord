@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
 import { parseBadgeLink } from "@shared/badgeLink";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, React, showToast, Text, TextInput, Toasts, Tooltip, UserStore } from "@webpack/common";
+import { Button, React, showToast, Text, TextInput, Tooltip, UserStore } from "@webpack/common";
 
 import { openBadgeLink } from "./LinkWarningModal";
 
@@ -110,11 +110,11 @@ function BadgeEditor() {
         if (!entry) return;
         const i = entry.icon.trim();
         const l = entry.label.trim();
-        if (!i) { showToast("Add an emoji or an image/GIF link.", Toasts.Type.FAILURE); return; }
-        if (/^https?:\/\//i.test(i) && !isUrl(i)) { showToast("Image links must use https.", Toasts.Type.FAILURE); return; }
-        if (!l) { showToast("Add a short label.", Toasts.Type.FAILURE); return; }
+        if (!i) { showToast("Add an emoji or an image/GIF link.", "failure"); return; }
+        if (/^https?:\/\//i.test(i) && !isUrl(i)) { showToast("Image links must use https.", "failure"); return; }
+        if (!l) { showToast("Add a short label.", "failure"); return; }
         const link = entry.link.trim();
-        if (link && !parseBadgeLink(link)) { showToast("Links must be a full https:// address, not an IP address.", Toasts.Type.FAILURE); return; }
+        if (link && !parseBadgeLink(link)) { showToast("Links must be a full https:// address, not an IP address.", "failure"); return; }
 
         setBusy(true);
         const res = await Native.setBadge(me.id, i, l, slot, link || undefined);
@@ -122,9 +122,9 @@ function BadgeEditor() {
         if (res.ok) {
             await refreshBadges();
             setEntries(prev => prev.map(e => e.slot === slot ? { ...e, persisted: true } : e));
-            showToast("Badge saved.", Toasts.Type.SUCCESS);
+            showToast("Badge saved.", "success");
         } else {
-            showToast(res.error ?? "Could not save the badge.", Toasts.Type.FAILURE);
+            showToast(res.error ?? "Could not save the badge.", "failure");
         }
     }
 
@@ -138,7 +138,7 @@ function BadgeEditor() {
             await Native.clearBadge(me.id, slot);
             setBusy(false);
             await refreshBadges();
-            showToast("Badge removed.", Toasts.Type.SUCCESS);
+            showToast("Badge removed.", "success");
         }
         setEntries(prev => prev.filter(e => e.slot !== slot));
     }

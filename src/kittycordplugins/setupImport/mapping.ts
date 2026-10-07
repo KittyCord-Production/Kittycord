@@ -18,7 +18,7 @@ export const TOP_LEVEL_ALLOW = [
     "transparent",
     "winCtrlQ",
     "disableMinSize",
-    "winNativeTitleBar"
+    "nativeTitleBar"
 ] as const;
 
 export interface PluginPlan {

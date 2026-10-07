@@ -14,7 +14,7 @@ import { DeleteIcon, InfoIcon } from "@components/Icons";
 import { Paragraph } from "@components/Paragraph";
 import { chooseFile } from "@utils/web";
 import { RenderModalProps } from "@vencord/discord-types";
-import { GuildStore, Modal, openModal, Select, showToast, TextArea, TextInput, Toasts, useMemo, useState } from "@webpack/common";
+import { GuildStore, Modal, openModal, Select, showToast, TextArea, TextInput, useMemo, useState } from "@webpack/common";
 
 import { expand, PLACEHOLDERS, splitSteps } from "./placeholders";
 import { addCommand, categories, CommandScope, CustomCommand, getCommand, importCommands, MAX_ALIASES, MAX_CATEGORY, MAX_DESCRIPTION, removeCommand, settings, SLASH_NAME_RE, takenNames } from "./settings";
@@ -56,7 +56,7 @@ function ImportDialog({ modalProps }: { modalProps: RenderModalProps; }) {
                     onClick: () => {
                         if (!parsed) return;
                         parsed.forEach(addCommand);
-                        showToast(`Imported ${parsed.length} command${parsed.length === 1 ? "" : "s"}.`, Toasts.Type.SUCCESS);
+                        showToast(`Imported ${parsed.length} command${parsed.length === 1 ? "" : "s"}.`, "success");
                         modalProps.onClose();
                     },
                     disabled: !parsed
@@ -150,7 +150,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
         if (!file) return;
 
         const result = await addFile(file);
-        if ("error" in result) return showToast(result.error, Toasts.Type.FAILURE);
+        if ("error" in result) return showToast(result.error, "failure");
 
         setAttachments(list => [...list, result.id]);
     }
