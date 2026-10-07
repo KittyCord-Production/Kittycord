@@ -330,3 +330,25 @@ jobs:
 
                       **Verify your download:** every file ships with a matching `.sha256` checksum — see [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md).
                   files: assets/**/*
+
+            - name: Check the published release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  tag=beta
+                  [ "$GITHUB_REF_NAME" = "stable" ] && tag=latest
+                  gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[] | "\(.name) \(.size)"' > published.txt
+                  failed=0
+                  for f in $(find assets -type f); do
+                      line="$(basename "$f") $(stat -c%s "$f")"
+                      grep -qxF "$line" published.txt || { echo "::error::$line is missing from the $tag release"; failed=1; }
+                  done
+                  if [ "$tag" = "latest" ]; then
+                      for name in Kittycord-Installer.exe Kittycord-Installer.exe.sha256 installer-tree.txt; do
+                          grep -q "^$name " published.txt || { echo "::error::$name is missing from the $tag release"; failed=1; }
+                      done
+                  fi
+                  version=$(gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern version.txt --output - | tr -d '[:space:]')
+                  [ "$version" = "$GITHUB_SHA" ] || { echo "::error::version.txt of the $tag release is $version, expected $GITHUB_SHA"; failed=1; }
+                  echo "$(wc -l < published.txt) assets on the $tag release, version.txt = $version"
+                  exit $failed
