@@ -170,8 +170,8 @@ export default definePlugin({
         {
             find: "#{intl::KEYBIND_IN_BROSWER_NOTICE}",
             replacement: {
-                match: /,{type:"info",children:(?=.{0,50}?#{intl::KEYBIND_IN_BROSWER_NOTICE})/,
-                replace: ',{type:"info",children:$self.renderKeybindsButton(),_children:',
+                match: /,{type:"info",(children|message):(?=.{0,50}?#{intl::KEYBIND_IN_BROSWER_NOTICE})/,
+                replace: ',{type:"info",$1:$self.renderKeybindsButton(),_$1:',
                 predicate: () => !IS_USERSCRIPT
             }
         }

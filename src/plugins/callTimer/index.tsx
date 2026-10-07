@@ -124,8 +124,8 @@ export default definePlugin({
             predicate: () => settings.store.allCallTimers,
             replacement: [
                 {
-                    match: /user:(\i).*?\.isEmbedded.{0,25};(?=return 0!==(\i)\.length)/,
-                    replace: "$&$2.push($self.renderTimer($1.id));",
+                    match: /(?=0!==(\i)\.length\|\|0!==\i\.length\|\|)/,
+                    replace: "$1.push($self.renderTimer(arguments[0].user.id)),",
                     predicate: () => !settings.store.showWithoutHover,
                 },
                 {
@@ -138,7 +138,7 @@ export default definePlugin({
         {
             find: '"RTCConnectionMenu"',
             replacement: {
-                match: /("RTCConnectionMenu".{0,200}?lineClamp:1,children:)(\i)(?=,|}\))/,
+                match: /("RTCConnectionMenu".{0,400}?lineClamp:1,children:)(\i)(?=,|}\))/,
                 replace: "$1[$2,$self.renderConnectionTimer({ channelId: this?.props?.channel?.id })]"
             }
         },

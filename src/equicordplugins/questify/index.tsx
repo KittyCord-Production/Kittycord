@@ -157,7 +157,7 @@ export default definePlugin({
             // Exports the guildless server list item component used by the Quest button.
             find: '="DOWNLOAD_APPS";function',
             replacement: {
-                match: /(?=\i:\(\)=>\i.{0,30000}?asContainer:!\i.{0,50};let (\i)=\i.forwardRef\(function)/,
+                match: /(?=\i:\(\)=>\i.{0,30000}?asContainer:!\i.{0,50};let (\i)=(?:\i\.forwardRef\()?function)/,
                 replace: "GuildlessServerListItemComponent:()=>$1,"
             }
         },
@@ -346,7 +346,7 @@ export default definePlugin({
             replacement: [
                 {
                     // Subscribes the Quest page sort/filter state to Questify rerenders.
-                    match: /(let \i,\i,\i,\i,\i=\i\.useRef\(null\),)/,
+                    match: /(let \i,\i,\i,\i,(?:\{ref:\i,\.\.\.\i\}=\i,)?\i=\i\.useRef\(null\),)/,
                     replace: "$1questRerenderTrigger=$self.useQuestRerender(),"
                 },
                 {
