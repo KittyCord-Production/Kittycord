@@ -169,7 +169,7 @@ const REMOVE_OVERLAY_JS = `
 
 app.on("browser-window-created", (_, win) => {
     try {
-        if (win.webContents.isOffscreen()) return;
+        if (win.webContents.isOffscreen() || win.getTitle() === "Discord Overlay") return;
         win.on("always-on-top-changed", (_e, isAlwaysOnTop) => {
             if (isAlwaysOnTop) win.webContents.executeJavaScript(REMOVE_OVERLAY_JS).catch(() => { });
         });
