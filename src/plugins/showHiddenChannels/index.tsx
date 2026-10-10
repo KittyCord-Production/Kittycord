@@ -398,7 +398,7 @@ export default definePlugin({
             ]
         },
         {
-            find: '"HasBeenInStageChannel"',
+            find: '"124px"',
             replacement: [
                 {
                     // Render our HiddenChannelLockScreen component instead of the main stage channel component
@@ -423,7 +423,7 @@ export default definePlugin({
             ]
         },
         {
-            find: "#{intl::STAGE_FULL_MODERATOR_TITLE}",
+            find: "numRequestToSpeak:",
             replacement: [
                 {
                     // Remove the divider and amount of users in stage channel components for the HiddenChannelLockScreen
