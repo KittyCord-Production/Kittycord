@@ -71,9 +71,10 @@ export const CspPolicies: PolicyMap = {
     "usrbg.is-hardly.online": ImageSrc, // USRBG API
     "icons.duckduckgo.com": ImageSrc, // DuckDuckGo Favicon API (Reverse Image Search)
 
-    // Tenor, used by TenorSearch plugin and some themes
+    // Tenor & Giphy, used by GifProviderSwitcher plugin and some themes
     "*.tenor.com": ImageAndMediaSrc,
     "*.tenor.co": ImageAndMediaSrc,
+    "*.giphy.com": ImageAndMediaSrc,
 
     [new URL(BRAND_API).host]: ImageAndMediaSrc,
     "i.scdn.co": ImageSrc,
