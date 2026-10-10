@@ -124,16 +124,15 @@ function applyToPopout(popoutWindow: Window | undefined, key: string) {
 
     doc.querySelector("vencord-root")?.remove();
 
+    if (/overlay/i.test(key) || isOverlayContext(popoutWindow)) return;
+
     const clonedRoot = vencordRootNode.cloneNode(false) as HTMLElement;
 
     clonedRoot.append(
         coreStyleRootNode.cloneNode(true),
-        managedStyleRootNode.cloneNode(true)
+        managedStyleRootNode.cloneNode(true),
+        userStyleRootNode.cloneNode(true)
     );
-
-    if (!/overlay/i.test(key) && !isOverlayContext(popoutWindow)) {
-        clonedRoot.append(userStyleRootNode.cloneNode(true));
-    }
 
     doc.documentElement.appendChild(clonedRoot);
 }
