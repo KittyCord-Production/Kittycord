@@ -6,6 +6,7 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
+import { lodash } from "@webpack/common";
 
 import { CommandList } from "./CommandList";
 
@@ -67,14 +68,14 @@ export function resolveCommand(name: string): CustomCommand | undefined {
 }
 
 export function addCommand(command: CustomCommand) {
-    settings.store.commands = {
+    settings.store.commands = lodash.cloneDeep({
         ...settings.store.commands,
         [command.trigger.toLowerCase()]: command
-    };
+    });
 }
 
 export function removeCommand(trigger: string) {
-    const next = { ...settings.store.commands };
+    const next = lodash.cloneDeep(settings.store.commands);
     delete next[trigger.toLowerCase()];
     settings.store.commands = next;
 }
