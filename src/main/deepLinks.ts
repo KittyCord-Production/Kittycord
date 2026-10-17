@@ -32,7 +32,12 @@ function parse(url: string): DeepLinkAction | null {
     if (u.protocol !== `${SCHEME}:`) return null;
 
     const kind = u.hostname.toLowerCase();
-    const value = decodeURIComponent(u.pathname.replace(/^\/+/, "").replace(/\/+$/, ""));
+    let value: string;
+    try {
+        value = decodeURIComponent(u.pathname.replace(/^\/+/, "").replace(/\/+$/, ""));
+    } catch {
+        return null;
+    }
 
     if (kind === "claim" && CODE_RE.test(value.toLowerCase())) return { kind: "claim", value: value.toLowerCase() };
     if (kind === "theme" && UUID_RE.test(value)) return { kind: "theme", value };

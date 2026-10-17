@@ -21,6 +21,10 @@ const MAX_MSG = 500;
 const MAX_STACK = 4000;
 const MAX_PLUGIN = 64;
 
+const redactPaths = (s: string) => s
+    .replace(/[A-Z]:[\\/]+Users[\\/]+[^\\/\s]+/gi, "~")
+    .replace(/\/(?:Users|home)\/[^/\s]+/g, "~");
+
 interface CrashState {
     consent: boolean | null;
 }
@@ -59,8 +63,8 @@ ipcMain.handle(IpcEvents.REPORT_CRASH, async (_e, payload: unknown) => {
     const body = {
         version: gitHash.slice(0, 7),
         platform: process.platform,
-        message: message.slice(0, MAX_MSG),
-        stack: typeof stack === "string" ? stack.slice(0, MAX_STACK) : undefined,
+        message: redactPaths(message).slice(0, MAX_MSG),
+        stack: typeof stack === "string" ? redactPaths(stack).slice(0, MAX_STACK) : undefined,
         plugin: typeof plugin === "string" ? plugin.slice(0, MAX_PLUGIN) : undefined
     };
 

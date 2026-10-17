@@ -100,7 +100,9 @@ async function publishPack(name: string, authorName: string, commands: CustomCom
     const me = UserStore.getCurrentUser();
     if (!me) throw new Error("Could not read your account.");
 
-    const result = await Native.publishPack(me.id, authorName, name, commands, false);
+    const auth = await getKittyAuth();
+    if (!auth) throw new Error("Log in with Discord to publish.");
+    const result = await Native.publishPack(me.id, authorName, name, commands, false, auth);
     if (!result.ok) throw new Error(result.error);
 
     const tokens = await getTokens();
@@ -115,7 +117,9 @@ export async function quickShare(name: string, commands: CustomCommand[]): Promi
     if (!me) throw new Error("Could not read your account.");
 
     const authorName = (me.globalName as string) || me.username || "Someone";
-    const result = await Native.publishPack(me.id, authorName, name, commands, true);
+    const auth = await getKittyAuth();
+    if (!auth) throw new Error("Log in with Discord to publish.");
+    const result = await Native.publishPack(me.id, authorName, name, commands, true, auth);
     if (!result.ok) throw new Error(result.error);
 
     return packShareUrl(result.id);

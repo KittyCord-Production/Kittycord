@@ -148,7 +148,9 @@ export async function publishTheme(params: StudioParams, authorName: string): Pr
     const me = UserStore.getCurrentUser();
     if (!me) throw new Error("Could not read your account.");
 
-    const result = await Native.publishTheme(me.id, authorName, params);
+    const auth = await getKittyAuth();
+    if (!auth) throw new Error("Log in with Discord to publish.");
+    const result = await Native.publishTheme(me.id, authorName, params, auth);
     if (!result.ok) throw new Error(result.error);
 
     const tokens = await getTokens();

@@ -11,6 +11,7 @@ import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { HeadingSecondary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { copyWithToast } from "@utils/discord";
 import type { Guild, RenderModalProps } from "@vencord/discord-types";
 import { Modal, openModal, showToast, TextInput, useMemo, UserStore,useState } from "@webpack/common";
@@ -72,8 +73,10 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
         if (!kit) return showToast("Pick at least one thing to put in the kit.", "failure");
         if (!Native) return showToast("Kits are only available in the desktop app.", "failure");
 
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setBusy(true);
-        const result = await Native.publishKit(UserStore.getCurrentUser()?.id ?? "", kit);
+        const result = await Native.publishKit(UserStore.getCurrentUser()?.id ?? "", kit, auth);
         setBusy(false);
 
         if (!result.ok) return showToast(result.error, "failure");

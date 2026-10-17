@@ -51,7 +51,7 @@ export async function downloadSetup(_: IpcMainInvokeEvent, url: unknown): Promis
     }
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, { redirect: "error" });
         if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
         if (Number(res.headers.get("content-length") ?? "0") > MAX_DOWNLOAD_BYTES) return { ok: false, error: "Too large" };
 
@@ -98,12 +98,12 @@ export async function getGalleryTheme(_: IpcMainInvokeEvent, id: unknown): Promi
     }
 }
 
-export async function publishTheme(_: IpcMainInvokeEvent, id: unknown, authorName: unknown, params: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
+export async function publishTheme(_: IpcMainInvokeEvent, id: unknown, authorName: unknown, params: unknown, auth: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     try {
         const res = await fetch(`${ENDPOINT}/themes/publish`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, authorName, params })
         });
         const body = await res.json().catch(() => ({})) as { id?: string; ownerToken?: string; error?: string; };

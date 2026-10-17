@@ -58,7 +58,7 @@ export async function getPack(_: IpcMainInvokeEvent, id: unknown): Promise<Galle
     }
 }
 
-export async function publishPack(_: IpcMainInvokeEvent, id: unknown, authorName: unknown, name: unknown, commands: unknown, unlisted: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
+export async function publishPack(_: IpcMainInvokeEvent, id: unknown, authorName: unknown, name: unknown, commands: unknown, unlisted: unknown, auth: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (!Array.isArray(commands) || commands.length === 0) return { ok: false, error: "Nothing to publish" };
 
@@ -68,7 +68,7 @@ export async function publishPack(_: IpcMainInvokeEvent, id: unknown, authorName
     try {
         const res = await fetch(`${ENDPOINT}/packs/publish`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: payload
         });
         const body = await res.json().catch(() => ({})) as { id?: string; ownerToken?: string; error?: string; };

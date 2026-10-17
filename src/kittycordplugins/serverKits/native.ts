@@ -7,6 +7,8 @@
 import { BRAND_API } from "@branding";
 import { IpcMainInvokeEvent } from "electron";
 
+import { authHeaders } from "../_shared/authHeaders";
+
 const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -25,7 +27,7 @@ export async function getKit(_: IpcMainInvokeEvent, id: unknown): Promise<unknow
     }
 }
 
-export async function publishKit(_: IpcMainInvokeEvent, userId: unknown, kit: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
+export async function publishKit(_: IpcMainInvokeEvent, userId: unknown, kit: unknown, auth: unknown): Promise<{ ok: true; id: string; ownerToken: string; } | { ok: false; error: string; }> {
     if (typeof userId !== "string" || !SNOWFLAKE_RE.test(userId)) return { ok: false, error: "Not signed in." };
     if (!kit || typeof kit !== "object") return { ok: false, error: "That kit is empty." };
 
@@ -35,7 +37,7 @@ export async function publishKit(_: IpcMainInvokeEvent, userId: unknown, kit: un
     try {
         const res = await fetch(`${ENDPOINT}/kits/publish`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: payload
         });
 

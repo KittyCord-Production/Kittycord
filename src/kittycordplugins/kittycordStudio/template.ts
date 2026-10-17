@@ -108,7 +108,7 @@ function sanitizeBg(raw: any): StudioBg {
     if (raw.kind === "hosted" && BG_IDS.includes(String(raw.id))) return { kind: "hosted", id: String(raw.id) };
     if (raw.kind === "url") {
         const url = String(raw.url ?? "");
-        if (url.startsWith("/img?url=") && url.length <= 1000) return { kind: "url", url };
+        if (url.length <= 1000 && /^\/img\?url=[A-Za-z0-9%._~-]+$/.test(url)) return { kind: "url", url };
         if (url.length <= MAX_BG_URL_LEN && BG_URL_RE.test(url)) return { kind: "url", url };
     }
     return { kind: "none" };

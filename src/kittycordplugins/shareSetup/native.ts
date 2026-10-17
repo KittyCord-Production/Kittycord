@@ -24,7 +24,7 @@ export async function downloadSetup(_: IpcMainInvokeEvent, url: unknown): Promis
     }
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, { redirect: "error" });
         if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
         if (Number(res.headers.get("content-length") ?? "0") > MAX_BYTES) return { ok: false, error: "Too large" };
 

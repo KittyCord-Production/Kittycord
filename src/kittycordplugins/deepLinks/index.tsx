@@ -7,7 +7,7 @@
 import { isPluginEnabled } from "@api/PluginManager";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { showToast, UserStore } from "@webpack/common";
+import { Alerts, showToast, UserStore } from "@webpack/common";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, onboardingPending, stashFriendAction } from "../_shared/friendLink";
 import { openPackImport } from "../commandStudio/PackGallery";
@@ -26,6 +26,18 @@ async function claim(code: string) {
     if (!me) { pendingCode = code; return; }
     if (!Invites) { showToast("Invite codes work on the Kittycord desktop app.", "failure"); return; }
 
+    Alerts.show({
+        title: "Claim this invite code?",
+        body: `The person behind the code "${code}" gets the credit for inviting you. You can only do this once.`,
+        confirmText: "Claim",
+        cancelText: "Cancel",
+        onConfirm: () => sendClaim(code)
+    });
+}
+
+async function sendClaim(code: string) {
+    const me = UserStore.getCurrentUser();
+    if (!me || !Invites) return;
     const auth = await getKittyAuth();
     if (!auth) return;
     const status = await Invites.claim(me.id, code, auth);
@@ -34,7 +46,17 @@ async function claim(code: string) {
     else showToast("Couldn't reach Kittycord to claim that code — try again later.", "failure");
 }
 
-async function openTheme(id: string) {
+function openTheme(id: string) {
+    Alerts.show({
+        title: "Apply this theme?",
+        body: "A theme someone shared with you will be installed and turned on. You can turn it off again under Themes.",
+        confirmText: "Apply",
+        cancelText: "Cancel",
+        onConfirm: () => applyTheme(id)
+    });
+}
+
+async function applyTheme(id: string) {
     showToast("Opening that theme…", "message");
     try {
         const theme = await applyGalleryThemeById(id);
