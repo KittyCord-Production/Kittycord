@@ -5,6 +5,7 @@
  */
 
 import { isPluginEnabled } from "@api/PluginManager";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import definePlugin, { type PluginNative } from "@utils/types";
 import { showToast, UserStore } from "@webpack/common";
 
@@ -25,7 +26,9 @@ async function claim(code: string) {
     if (!me) { pendingCode = code; return; }
     if (!Invites) { showToast("Invite codes work on the Kittycord desktop app.", "failure"); return; }
 
-    const status = await Invites.claim(me.id, code);
+    const auth = await getKittyAuth();
+    if (!auth) return;
+    const status = await Invites.claim(me.id, code, auth);
     if (status === "ok") { markFriendConsumed({ kind: "claim", value: code }); showToast("Invite claimed — your friend just got the credit. 🐱", "success"); }
     else if (status === "rejected") showToast("That code couldn't be counted (already used, or it's your own).", "message");
     else showToast("Couldn't reach Kittycord to claim that code — try again later.", "failure");

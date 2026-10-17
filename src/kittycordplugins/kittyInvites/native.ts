@@ -10,6 +10,8 @@ import { app, IpcMainInvokeEvent } from "electron";
 import { readFileSync, unlinkSync } from "fs";
 import { join } from "path";
 
+import { authHeaders } from "../_shared/authHeaders";
+
 const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const CODE_RE = /^[a-z0-9_-]{3,20}$/;
@@ -68,13 +70,13 @@ export async function clearReferralCode(_: IpcMainInvokeEvent): Promise<void> {
     }
 }
 
-export async function setCode(_: IpcMainInvokeEvent, id: unknown, code: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
+export async function setCode(_: IpcMainInvokeEvent, id: unknown, code: unknown, auth: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof code !== "string" || !CODE_RE.test(code.toLowerCase())) return { ok: false, error: "Code must be 3-20 letters, numbers, - or _" };
     try {
         const res = await fetch(`${ENDPOINT}/invites/setcode`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, code: code.toLowerCase() })
         });
         if (res.ok) return { ok: true };
@@ -87,13 +89,13 @@ export async function setCode(_: IpcMainInvokeEvent, id: unknown, code: unknown)
 
 export type ClaimResult = "ok" | "rejected" | "error";
 
-export async function claim(_: IpcMainInvokeEvent, inviteeId: unknown, code: unknown): Promise<ClaimResult> {
+export async function claim(_: IpcMainInvokeEvent, inviteeId: unknown, code: unknown, auth: unknown): Promise<ClaimResult> {
     if (typeof inviteeId !== "string" || !SNOWFLAKE_RE.test(inviteeId)) return "rejected";
     if (typeof code !== "string" || !CODE_RE.test(code.toLowerCase())) return "rejected";
     try {
         const res = await fetch(`${ENDPOINT}/invites/claim`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ inviteeId, code: code.toLowerCase() })
         });
         if (res.ok) {

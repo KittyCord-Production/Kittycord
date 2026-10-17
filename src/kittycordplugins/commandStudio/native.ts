@@ -7,6 +7,8 @@
 import { BRAND_API } from "@branding";
 import { IpcMainInvokeEvent } from "electron";
 
+import { authHeaders } from "../_shared/authHeaders";
+
 const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const MAX_PAYLOAD_BYTES = 20_000;
@@ -77,12 +79,12 @@ export async function publishPack(_: IpcMainInvokeEvent, id: unknown, authorName
     }
 }
 
-export async function likePack(_: IpcMainInvokeEvent, id: unknown, packId: unknown): Promise<{ likes: number; } | null> {
+export async function likePack(_: IpcMainInvokeEvent, id: unknown, packId: unknown, auth: unknown): Promise<{ likes: number; } | null> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id) || typeof packId !== "string") return null;
     try {
         const res = await fetch(`${ENDPOINT}/packs/like`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, packId })
         });
         if (!res.ok) return null;

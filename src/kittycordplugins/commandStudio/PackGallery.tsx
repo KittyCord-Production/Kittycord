@@ -7,6 +7,7 @@
 import { get, set } from "@api/DataStore";
 import { packShareUrl } from "@branding";
 import { Flex } from "@components/Flex";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
@@ -75,7 +76,9 @@ async function likePack(packId: string): Promise<number | null> {
     if (!Native) return null;
     const me = UserStore.getCurrentUser();
     if (!me) return null;
-    const result = await Native.likePack(me.id, packId);
+    const auth = await getKittyAuth();
+    if (!auth) return null;
+    const result = await Native.likePack(me.id, packId, auth);
     return result ? result.likes : null;
 }
 

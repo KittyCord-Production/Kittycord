@@ -7,6 +7,7 @@
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { parseBadgeLink } from "@shared/badgeLink";
 import definePlugin, { OptionType } from "@utils/types";
 import { Button, React, showToast, Text, TextInput, Tooltip, UserStore } from "@webpack/common";
@@ -116,8 +117,10 @@ function BadgeEditor() {
         const link = entry.link.trim();
         if (link && !parseBadgeLink(link)) { showToast("Links must be a full https:// address, not an IP address.", "failure"); return; }
 
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setBusy(true);
-        const res = await Native.setBadge(me.id, i, l, slot, link || undefined);
+        const res = await Native.setBadge(me.id, i, l, slot, link || undefined, auth);
         setBusy(false);
         if (res.ok) {
             await refreshBadges();
@@ -134,8 +137,10 @@ function BadgeEditor() {
         if (entry.persisted) {
             const me = UserStore.getCurrentUser();
             if (!me?.id) return;
+            const auth = await getKittyAuth();
+            if (!auth) return;
             setBusy(true);
-            await Native.clearBadge(me.id, slot);
+            await Native.clearBadge(me.id, slot, auth);
             setBusy(false);
             await refreshBadges();
             showToast("Badge removed.", "success");

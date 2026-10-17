@@ -7,6 +7,7 @@
 import { disableStyle, enableStyle } from "@api/Styles";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { PaintbrushIcon } from "@components/Icons";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import { isOverlayWindow } from "@utils/overlay";
@@ -82,9 +83,11 @@ function DekoShop() {
             cancelText: "Cancel",
             onConfirm: async () => {
                 if (!Native || !me) return;
+                const auth = await getKittyAuth();
+                if (!auth) return;
                 setSaving(d.id);
                 try {
-                    const res = await Native.buyDeko(me.id, d.id);
+                    const res = await Native.buyDeko(me.id, d.id, auth);
                     if (res.ok) {
                         setCoins(res.balance);
                         setOwned(prev => [...prev, d.id]);
@@ -116,10 +119,12 @@ function DekoShop() {
                 return;
             }
         }
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setSaving(id ?? "none");
         try {
             if (id === null) {
-                const ok = await Native.clearDeko(me.id);
+                const ok = await Native.clearDeko(me.id, auth);
                 if (ok) {
                     deko.delete(me.id);
                     showToast("Decoration removed.", "success");
@@ -127,7 +132,7 @@ function DekoShop() {
                     showToast("Could not remove decoration.", "failure");
                 }
             } else {
-                const res = await Native.setDeko(me.id, id);
+                const res = await Native.setDeko(me.id, id, auth);
                 if (res.ok) {
                     deko.set(me.id, id);
                     showToast("Decoration equipped!", "success");

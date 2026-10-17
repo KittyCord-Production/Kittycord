@@ -11,6 +11,7 @@ import { Settings } from "@api/Settings";
 import { BRAND_WEBSITE } from "@branding";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { parseUrl } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
@@ -121,7 +122,9 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         }
         const me = UserStore.getCurrentUser();
         if (!InvitesNative || !me) return false;
-        const status = await InvitesNative.claim(me.id, action.value);
+        const auth = await getKittyAuth();
+        if (!auth) return false;
+        const status = await InvitesNative.claim(me.id, action.value, auth);
         if (status !== "ok") return false;
         markFriendConsumed(action);
         showToast("Thanks, your inviter just got the credit! 🐱", "success");

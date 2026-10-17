@@ -7,6 +7,7 @@
 import { BRAND_API } from "@branding";
 import { IpcMainInvokeEvent } from "electron";
 
+import { authHeaders } from "../_shared/authHeaders";
 import { CATALOG, PRICED_IDS } from "./catalog";
 
 const ENDPOINT = BRAND_API;
@@ -38,13 +39,13 @@ export async function getCoins(_: IpcMainInvokeEvent, id: unknown): Promise<Coin
     }
 }
 
-export async function buyDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown): Promise<{ ok: true; balance: number; } | { ok: false; error: string; }> {
+export async function buyDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown, auth: unknown): Promise<{ ok: true; balance: number; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof deco !== "string" || !PRICED_IDS.has(deco)) return { ok: false, error: "That frame isn't for sale." };
     try {
         const res = await fetch(`${ENDPOINT}/deko/buy`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, deco })
         });
         const body = await res.json().catch(() => ({})) as { balance?: unknown; error?: string; };
@@ -55,13 +56,13 @@ export async function buyDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown)
     }
 }
 
-export async function setDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
+export async function setDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown, auth: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof deco !== "string" || !DEKO_IDS.has(deco)) return { ok: false, error: "Invalid decoration" };
     try {
         const res = await fetch(`${ENDPOINT}/deko/set`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, deco })
         });
         if (res.ok) return { ok: true };
@@ -72,12 +73,12 @@ export async function setDeko(_: IpcMainInvokeEvent, id: unknown, deco: unknown)
     }
 }
 
-export async function clearDeko(_: IpcMainInvokeEvent, id: unknown): Promise<boolean> {
+export async function clearDeko(_: IpcMainInvokeEvent, id: unknown, auth: unknown): Promise<boolean> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return false;
     try {
         const res = await fetch(`${ENDPOINT}/deko/clear`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id })
         });
         return res.ok;

@@ -8,6 +8,7 @@ import { disableStyle, enableStyle } from "@api/Styles";
 import { inviteClaimUrl } from "@branding";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { OwnerCrownIcon } from "@components/Icons";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import SettingsPlugin from "@plugins/_core/settings";
 import { copyWithToast } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
@@ -34,7 +35,9 @@ async function tryClaim() {
     try {
         const code = await Native.readReferralCode();
         if (!code) { claimed = true; return; }
-        const status = await Native.claim(me.id, code);
+        const auth = await getKittyAuth(false);
+        if (!auth) return;
+        const status = await Native.claim(me.id, code, auth);
         if (status === "ok" || status === "rejected") {
             claimed = true;
             await Native.clearReferralCode();
@@ -112,8 +115,10 @@ function InvitesTab() {
 
     async function save() {
         if (!Native || !me) return;
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setSaving(true);
-        const res = await Native.setCode(me.id, code.trim());
+        const res = await Native.setCode(me.id, code.trim(), auth);
         setSaving(false);
         if (res.ok) {
             showToast("Creator code saved!", "success");
@@ -125,8 +130,10 @@ function InvitesTab() {
 
     async function doClaim() {
         if (!Native || !me) return;
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setClaiming(true);
-        const status = await Native.claim(me.id, claimInput.trim());
+        const status = await Native.claim(me.id, claimInput.trim(), auth);
         setClaiming(false);
         if (status === "ok") {
             showToast("Thanks — your inviter just got the credit! 🐱", "success");

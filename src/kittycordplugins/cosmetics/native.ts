@@ -7,6 +7,8 @@
 import { BRAND_API } from "@branding";
 import { IpcMainInvokeEvent } from "electron";
 
+import { authHeaders } from "../_shared/authHeaders";
+
 const ENDPOINT = BRAND_API;
 const SNOWFLAKE_RE = /^\d{17,20}$/;
 const HEX_RE = /^#[0-9a-f]{6}$/i;
@@ -19,7 +21,7 @@ export interface Cosmetic {
     effect?: string;
 }
 
-export async function setCosmetic(_: IpcMainInvokeEvent, id: unknown, color1: unknown, color2: unknown, effect: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
+export async function setCosmetic(_: IpcMainInvokeEvent, id: unknown, color1: unknown, color2: unknown, effect: unknown, auth: unknown): Promise<{ ok: true; } | { ok: false; error: string; }> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof color1 !== "string" || !HEX_RE.test(color1)) return { ok: false, error: "Invalid color" };
     if (color2 != null && (typeof color2 !== "string" || !HEX_RE.test(color2))) return { ok: false, error: "Invalid color" };
@@ -27,7 +29,7 @@ export async function setCosmetic(_: IpcMainInvokeEvent, id: unknown, color1: un
     try {
         const res = await fetch(`${ENDPOINT}/cosmetics/set`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, color1, color2: color2 ?? undefined, effect: effect ?? undefined })
         });
         if (res.ok) return { ok: true };
@@ -38,12 +40,12 @@ export async function setCosmetic(_: IpcMainInvokeEvent, id: unknown, color1: un
     }
 }
 
-export async function clearCosmetic(_: IpcMainInvokeEvent, id: unknown): Promise<boolean> {
+export async function clearCosmetic(_: IpcMainInvokeEvent, id: unknown, auth: unknown): Promise<boolean> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return false;
     try {
         const res = await fetch(`${ENDPOINT}/cosmetics/clear`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id })
         });
         return res.ok;

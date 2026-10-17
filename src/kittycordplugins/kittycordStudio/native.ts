@@ -10,6 +10,8 @@ import { ensureSafePath } from "@main/utils/ensureSafePath";
 import { IpcMainInvokeEvent } from "electron";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 
+import { authHeaders } from "../_shared/authHeaders";
+
 const FILE_NAME_RE = /^Kittycord Studio - [\w\-'!&. ]{1,40}\.theme\.css$/;
 const MAX_CSS_BYTES = 200_000;
 const MAX_DOWNLOAD_BYTES = 2_000_000;
@@ -112,12 +114,12 @@ export async function publishTheme(_: IpcMainInvokeEvent, id: unknown, authorNam
     }
 }
 
-export async function likeGalleryTheme(_: IpcMainInvokeEvent, id: unknown, themeId: unknown): Promise<{ likes: number; } | null> {
+export async function likeGalleryTheme(_: IpcMainInvokeEvent, id: unknown, themeId: unknown, auth: unknown): Promise<{ likes: number; } | null> {
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id) || typeof themeId !== "string") return null;
     try {
         const res = await fetch(`${ENDPOINT}/themes/like`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, themeId })
         });
         if (!res.ok) return null;

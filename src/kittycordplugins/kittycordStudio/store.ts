@@ -6,6 +6,7 @@
 
 import { get, set } from "@api/DataStore";
 import { Settings } from "@api/Settings";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { Logger } from "@utils/Logger";
 import type { PluginNative } from "@utils/types";
 import { UserStore } from "@webpack/common";
@@ -160,7 +161,9 @@ export async function likeGalleryTheme(themeId: string): Promise<number | null> 
     if (!Native) return null;
     const me = UserStore.getCurrentUser();
     if (!me) return null;
-    const result = await Native.likeGalleryTheme(me.id, themeId);
+    const auth = await getKittyAuth();
+    if (!auth) return null;
+    const result = await Native.likeGalleryTheme(me.id, themeId, auth);
     return result ? result.likes : null;
 }
 

@@ -9,6 +9,7 @@
 // the Discord-impersonation blocklist are enforced server-side too.
 
 import { BRAND_API } from "@branding";
+import { authHeaders } from "@kittycordplugins/_shared/authHeaders";
 import { parseBadgeLink } from "@shared/badgeLink";
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
@@ -44,7 +45,7 @@ async function getBadges(): Promise<{ id: string; emoji: string; label: string; 
     }
 }
 
-async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unknown, link?: unknown): Promise<{ ok: boolean; error?: string; }> {
+async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unknown, link: unknown, auth: unknown): Promise<{ ok: boolean; error?: string; }> {
     if (!ENDPOINT) return { ok: false, error: "Not available" };
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return { ok: false, error: "Invalid id" };
     if (typeof slot !== "number" || !Number.isInteger(slot) || slot < 0 || slot >= MAX_SLOTS) return { ok: false, error: "Invalid slot" };
@@ -61,7 +62,7 @@ async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unkno
     try {
         const res = await fetch(`${ENDPOINT}/badges/set`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, emoji, label, slot, link: cleanLink })
         });
         if (res.ok) return { ok: true };
@@ -72,19 +73,19 @@ async function setBadge(id: unknown, emoji: unknown, label: unknown, slot: unkno
     }
 }
 
-async function clearBadge(id: unknown, slot: unknown): Promise<void> {
+async function clearBadge(id: unknown, slot: unknown, auth: unknown): Promise<void> {
     if (!ENDPOINT) return;
     if (typeof id !== "string" || !SNOWFLAKE_RE.test(id)) return;
     if (typeof slot !== "number" || !Number.isInteger(slot) || slot < 0 || slot >= MAX_SLOTS) return;
     try {
         await fetch(`${ENDPOINT}/badges/clear`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(auth),
             body: JSON.stringify({ id, slot })
         });
     } catch { /* offline / endpoint down -> ignore */ }
 }
 
 ipcMain.handle(IpcEvents.GET_CUSTOM_BADGES, () => getBadges());
-ipcMain.handle(IpcEvents.SET_CUSTOM_BADGE, (_e, id: unknown, emoji: unknown, label: unknown, slot: unknown, link: unknown) => setBadge(id, emoji, label, slot, link));
-ipcMain.handle(IpcEvents.CLEAR_CUSTOM_BADGE, (_e, id: unknown, slot: unknown) => clearBadge(id, slot));
+ipcMain.handle(IpcEvents.SET_CUSTOM_BADGE, (_e, id: unknown, emoji: unknown, label: unknown, slot: unknown, link: unknown, auth: unknown) => setBadge(id, emoji, label, slot, link, auth));
+ipcMain.handle(IpcEvents.CLEAR_CUSTOM_BADGE, (_e, id: unknown, slot: unknown, auth: unknown) => clearBadge(id, slot, auth));

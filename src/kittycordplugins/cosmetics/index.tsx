@@ -6,6 +6,7 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
+import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType, type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
@@ -102,8 +103,10 @@ function NameStyleEditor() {
         if (!HEX_RE.test(c1)) { showToast("Pick a first color like #FF5FA6.", "failure"); return; }
         if (c2 && !HEX_RE.test(c2)) { showToast("The second color must look like #FF8AC4.", "failure"); return; }
 
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setBusy(true);
-        const res = await Native.setCosmetic(me.id, c1, c2 || undefined, undefined);
+        const res = await Native.setCosmetic(me.id, c1, c2 || undefined, undefined, auth);
         setBusy(false);
         if (res.ok) {
             cosmetics.set(me.id, { color1: c1, color2: c2 || undefined });
@@ -117,8 +120,10 @@ function NameStyleEditor() {
     async function remove() {
         const me = UserStore.getCurrentUser();
         if (!me?.id || !Native) return;
+        const auth = await getKittyAuth();
+        if (!auth) return;
         setBusy(true);
-        await Native.clearCosmetic(me.id);
+        await Native.clearCosmetic(me.id, auth);
         setBusy(false);
         cosmetics.delete(me.id);
         setColor1("");
