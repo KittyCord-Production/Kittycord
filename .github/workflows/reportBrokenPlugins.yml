@@ -40,9 +40,14 @@ jobs:
                   if [ "$branch" != canary ]; then node dist/report.mjs > stable.md & pids="$pids $!"; fi
                   if [ "$branch" != stable ]; then USE_CANARY=true node dist/report.mjs > canary.md & pids="$pids $!"; fi
 
-                  code=0
-                  for pid in $pids; do wait "$pid" || code=1; done
+                  for pid in $pids; do wait "$pid" || true; done
                   cat stable.md canary.md 2>/dev/null >> "$GITHUB_STEP_SUMMARY"
+
+                  code=0
+                  for f in stable.md canary.md; do
+                      [ -f "$f" ] && ! grep -q "^# Kittycord Report" "$f" && code=1
+                  done
+                  awk '/^## /{bad=/^## Bad/} bad && /^- /' stable.md canary.md 2>/dev/null | grep -q . && code=1
                   exit $code
               env:
                   WEBHOOK_URL: ${{ secrets.REPORTER_WEBHOOK_URL }}
