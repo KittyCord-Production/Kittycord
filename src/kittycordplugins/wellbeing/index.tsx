@@ -29,7 +29,7 @@ function tick() {
 
     if (settings.store.breakReminders && continuousActiveMin >= (Number(settings.store.breakInterval) || 90)) {
         continuousActiveMin = 0;
-        showToast("You've been on Discord a while — maybe stretch and blink? 🐱", "message");
+        showToast({ text: "You've been on Discord a while — maybe stretch and blink? 🐱" });
     }
 }
 

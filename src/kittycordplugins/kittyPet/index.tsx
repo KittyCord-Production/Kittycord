@@ -165,7 +165,7 @@ function onPet() {
         const yesterday = new Date(Date.now() - 864e5).toDateString();
         const streak = save.lastPetDay === yesterday ? save.streak + 1 : 1;
         updateSave(profile, { pets: save.pets + 1, lastPetDay: today, streak }).then(() => controller?.setLastPetDay(today));
-        showToast(`Daily pet! 🐱 ${streak} day streak.`, "success");
+        showToast({ text: `Daily pet! 🐱 ${streak} day streak.`, variant: "success" });
     } else {
         updateSave(profile, { pets: save.pets + 1 });
     }
@@ -225,7 +225,7 @@ function notifyLevel(level: number | null) {
         .map(([id]) => set.registry[id].label.toLowerCase());
     const who = getSave(profile).name || PET_COPY[profile].who;
     const note = unlocked.length ? ` ${who} unlocked the ${unlocked.join(" and ")}!` : "";
-    showToast(`🎉 Level ${level}!${note}`, "success");
+    showToast({ text: `🎉 Level ${level}!${note}`, variant: "success" });
 }
 
 function PetPanel() {

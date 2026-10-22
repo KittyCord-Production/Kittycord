@@ -256,7 +256,7 @@ function ModeImportCardInner({ message }: { message: Message; }) {
                     await saveMode(mode);
                     notifyManualActivation();
                     const { restartNeeded } = await applyMode(mode);
-                    showToast(`Switched to "${mode.name}".`, "success");
+                    showToast({ text: `Switched to "${mode.name}".`, variant: "success" });
                     if (restartNeeded) {
                         showNotification({
                             title: "Mode applied — restart needed",
@@ -267,11 +267,11 @@ function ModeImportCardInner({ message }: { message: Message; }) {
                 },
                 onConfirmSecondary: async () => {
                     await saveMode(mode);
-                    showToast(`Added "${mode.name}" to your modes.`, "success");
+                    showToast({ text: `Added "${mode.name}" to your modes.`, variant: "success" });
                 }
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that mode."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not read that mode."), variant: "critical" });
         }
     }
 
@@ -305,7 +305,7 @@ function ModesModal({ rootProps }: { rootProps: RenderModalProps; }) {
             notifyManualActivation();
             const { restartNeeded } = await applyMode(mode);
             forceUpdate();
-            showToast(`Switched to "${mode.name}".`, "success");
+            showToast({ text: `Switched to "${mode.name}".`, variant: "success" });
             if (restartNeeded) {
                 showNotification({
                     title: "Mode applied — restart needed",
@@ -314,7 +314,7 @@ function ModesModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 });
             }
         } catch {
-            showToast("Could not apply that mode.", "failure");
+            showToast({ text: "Could not apply that mode.", variant: "critical" });
         }
     }
 

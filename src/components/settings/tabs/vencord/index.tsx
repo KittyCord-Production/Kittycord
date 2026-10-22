@@ -28,7 +28,8 @@ import { openInviteModal } from "@utils/discord";
 import { Margins } from "@utils/margins";
 import { isAnyPluginDev } from "@utils/misc";
 import { relaunch } from "@utils/native";
-import { Alerts, React, UserStore } from "@webpack/common";
+import { promptToRestart } from "@utils/promptToRestart";
+import { React, UserStore } from "@webpack/common";
 
 import gitHash from "~git-hash";
 
@@ -138,13 +139,7 @@ function Switches() {
                     settings[key] = v;
 
                     if (restartRequired) {
-                        Alerts.show({
-                            title: "Restart Required",
-                            body: "A restart is required to apply this change",
-                            confirmText: "Restart now",
-                            cancelText: "Later!",
-                            onConfirm: relaunch
-                        });
+                        promptToRestart("relaunch");
                     }
                 }}
             />

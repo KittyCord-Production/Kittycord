@@ -92,10 +92,10 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
                 if (toggleWatch(user.id)) {
                     const bucket = currentBucket(user.id);
                     if (bucket) lastNotified.set(user.id, bucket);
-                    showToast("You'll get a notification when their status changes.", "success");
+                    showToast({ text: "You'll get a notification when their status changes.", variant: "success" });
                 } else {
                     lastNotified.delete(user.id);
-                    showToast("No longer watching their status.", "success");
+                    showToast({ text: "No longer watching their status.", variant: "success" });
                 }
             }}
         />

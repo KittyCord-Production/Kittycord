@@ -124,7 +124,7 @@ async function syncSettings() {
 let notifiedForUpdatesThisSession = false;
 
 async function updateAndRelaunch() {
-    showToast("Getting the latest Kittycord update…", "message");
+    showToast({ text: "Getting the latest Kittycord update…" });
     try {
         if (await checkForUpdates()) await update();
     } catch (err) {

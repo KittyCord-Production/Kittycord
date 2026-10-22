@@ -30,10 +30,10 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
         setBusy(true);
         try {
             await sendFileToUser(target.id, buildFile(), note.trim());
-            showToast(`Sent to ${target.globalName || target.username}.`, "success");
+            showToast({ text: `Sent to ${target.globalName || target.username}.`, variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send that."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send that."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -41,7 +41,7 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
 
     function postInChat() {
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to post it there.", "failure");
+        if (!channel) return showToast({ text: "Open a chat first to post it there.", variant: "critical" });
         UploadHandler.promptToUpload([buildFile()], channel, DraftType.ChannelMessage);
         rootProps.onClose();
     }

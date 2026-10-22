@@ -119,7 +119,7 @@ const GuildContext: NavContextMenuPatchCallback = (children, { guild }: { guild?
             checked={allowed}
             action={() => {
                 const added = toggleId("guildWhitelist", guild.id);
-                showToast(added ? "Pings on this server will come through." : "Pings on this server are hidden again.", "success");
+                showToast({ text: added ? "Pings on this server will come through." : "Pings on this server are hidden again.", variant: "success" });
             }}
         />
     ));
@@ -136,7 +136,7 @@ const UserContext: NavContextMenuPatchCallback = (children, { user }: { user?: U
             checked={allowed}
             action={() => {
                 const added = toggleId("userWhitelist", user.id);
-                showToast(added ? "Their pings will always come through." : "Their pings follow your normal settings again.", "success");
+                showToast({ text: added ? "Their pings will always come through." : "Their pings follow your normal settings again.", variant: "success" });
             }}
         />
     ));
@@ -164,7 +164,7 @@ export default definePlugin({
                         label={`End snooze (${Math.ceil(remaining / 60_000)}m left)`}
                         action={() => {
                             settings.store.snoozeUntil = 0;
-                            showToast("Snooze ended.", "success");
+                            showToast({ text: "Snooze ended.", variant: "success" });
                         }}
                     />
                 )}
@@ -175,7 +175,7 @@ export default definePlugin({
                         label={option.label}
                         action={() => {
                             settings.store.snoozeUntil = Date.now() + option.ms;
-                            showToast(`All pings snoozed for ${option.label}.`, "success");
+                            showToast({ text: `All pings snoozed for ${option.label}.`, variant: "success" });
                         }}
                     />
                 ))}

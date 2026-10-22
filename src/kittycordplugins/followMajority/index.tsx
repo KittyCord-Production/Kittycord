@@ -105,7 +105,7 @@ export default definePlugin({
 
             cooldownUntil = now + COOLDOWN;
             ChannelActions.selectVoiceChannel(bestDest);
-            showToast(`Followed your group to ${dest.name}.`, "success");
+            showToast({ text: `Followed your group to ${dest.name}.`, variant: "success" });
         }
     },
 

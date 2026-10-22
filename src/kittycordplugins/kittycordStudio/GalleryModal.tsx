@@ -41,9 +41,9 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
         try {
             const fileName = await saveTheme(theme.params);
             enableTheme(fileName);
-            showToast(`"${theme.name}" applied. 🎨`, "success");
+            showToast({ text: `"${theme.name}" applied. 🎨`, variant: "success" });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not apply that theme."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not apply that theme."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -67,10 +67,10 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
             confirmColor: Button.Colors.RED,
             onConfirm: async () => {
                 if (await deleteGalleryTheme(theme.id)) {
-                    showToast("Removed from the gallery.", "success");
+                    showToast({ text: "Removed from the gallery.", variant: "success" });
                     onChanged();
                 } else {
-                    showToast("Could not remove that theme.", "failure");
+                    showToast({ text: "Could not remove that theme.", variant: "critical" });
                 }
             }
         });
@@ -154,10 +154,10 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
         setBusy(true);
         try {
             const id = await publishTheme(params, authorName.trim());
-            showToast(`"${params.name}" published to the gallery! 🎉`, "success");
+            showToast({ text: `"${params.name}" published to the gallery! 🎉`, variant: "success" });
             setPublishedId(id);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not publish."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not publish."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -167,9 +167,9 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
         if (!publishedId) return;
         try {
             await navigator.clipboard.writeText(themeShareUrl(publishedId));
-            showToast("Share link copied. Paste it anywhere to show off your theme.", "success");
+            showToast({ text: "Share link copied. Paste it anywhere to show off your theme.", variant: "success" });
         } catch {
-            showToast("Could not copy the link.", "failure");
+            showToast({ text: "Could not copy the link.", variant: "critical" });
         }
     }
 
@@ -219,7 +219,7 @@ export function openGallery() {
 
 export function openPublish(params: StudioParams) {
     if (!NAME_RE.test(params.name.trim())) {
-        showToast("Give your theme a valid name before publishing.", "failure");
+        showToast({ text: "Give your theme a valid name before publishing.", variant: "critical" });
         return;
     }
     openModal(props => <PublishModal rootProps={props} params={params} />);

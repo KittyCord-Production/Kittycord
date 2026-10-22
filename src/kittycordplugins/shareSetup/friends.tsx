@@ -202,10 +202,10 @@ function SendModeModal({ rootProps, user }: { rootProps: RenderModalProps; user:
         setBusy(true);
         try {
             await sendFileToUser(user.id, buildModeFile(mode), `Here's my "${mode.name}" mode — open it in Kittycord to use it.`);
-            showToast(`Sent "${mode.name}" to ${displayName(user)}.`, "success");
+            showToast({ text: `Sent "${mode.name}" to ${displayName(user)}.`, variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the mode."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send the mode."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -253,8 +253,8 @@ function FriendsListBody() {
 
     function sendSetup(user: User) {
         sendShare(user.id, "plugins", DEFAULT_NOTE)
-            .then(() => showToast(`Sent to ${displayName(user)}.`, "success"))
-            .catch(e => showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure"));
+            .then(() => showToast({ text: `Sent to ${displayName(user)}.`, variant: "success" }))
+            .catch(e => showToast({ text: String((e as Error)?.message ?? "Could not send the setup."), variant: "critical" }));
     }
 
     return (

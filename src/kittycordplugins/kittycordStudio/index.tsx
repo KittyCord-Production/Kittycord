@@ -45,15 +45,15 @@ function ThemeImportCardInner({ message }: { message: Message; }) {
                 onConfirm: async () => {
                     const fileName = await saveTheme(params);
                     enableTheme(fileName);
-                    showToast(`"${params.name}" applied. 🎨`, "success");
+                    showToast({ text: `"${params.name}" applied. 🎨`, variant: "success" });
                 },
                 onConfirmSecondary: async () => {
                     await saveTheme(params);
-                    showToast(`"${params.name}" added to your Studio themes.`, "success");
+                    showToast({ text: `"${params.name}" added to your Studio themes.`, variant: "success" });
                 }
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that theme."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not read that theme."), variant: "critical" });
         }
     }
 

@@ -46,13 +46,13 @@ export default definePlugin({
             rejoinTimes = rejoinTimes.filter(t => Date.now() - t < 10_000);
             if (rejoinTimes.length >= 3) {
                 intendedChannelId = myState.channelId;
-                showToast("Stopped moving you back after repeated moves.", "failure");
+                showToast({ text: "Stopped moving you back after repeated moves.", variant: "critical" });
                 return;
             }
             rejoinTimes.push(Date.now());
 
             ChannelActions.selectVoiceChannel(intendedChannelId);
-            showToast("Moved you back to your channel.", "success");
+            showToast({ text: "Moved you back to your channel.", variant: "success" });
         }
     },
 

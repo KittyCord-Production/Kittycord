@@ -49,7 +49,7 @@ function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: U
                 setPreviewUrl(url);
             } catch (e) {
                 logger.error("Failed to render invite card", e);
-                if (!cancelled) showToast("Could not render the invite card.", "failure");
+                if (!cancelled) showToast({ text: "Could not render the invite card.", variant: "critical" });
             }
         })();
         return () => {
@@ -93,10 +93,10 @@ function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: U
             const message = (!editedRef.current && code ? withCodeMessage(code) : note.trim()) || DEFAULT_MESSAGE;
             const file = new File([blob], INVITE_FILENAME, { type: "image/png" });
             await sendFileToUser(target.id, file, message);
-            showToast(`Invite sent to ${target.globalName || target.username}. 💌`, "success");
+            showToast({ text: `Invite sent to ${target.globalName || target.username}. 💌`, variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the invite."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send the invite."), variant: "critical" });
         } finally {
             setBusy(false);
         }

@@ -38,7 +38,7 @@ async function downloadImage(url: string, filename: string) {
 
         saveFile(new File([await res.blob()], filename));
     } catch {
-        showToast("Failed to download image", "failure");
+        showToast({ text: "Failed to download image", variant: "critical" });
     }
 }
 

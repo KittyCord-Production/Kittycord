@@ -56,7 +56,7 @@ function ImportDialog({ modalProps }: { modalProps: RenderModalProps; }) {
                     onClick: () => {
                         if (!parsed) return;
                         parsed.forEach(addCommand);
-                        showToast(`Imported ${parsed.length} command${parsed.length === 1 ? "" : "s"}.`, "success");
+                        showToast({ text: `Imported ${parsed.length} command${parsed.length === 1 ? "" : "s"}.`, variant: "success" });
                         modalProps.onClose();
                     },
                     disabled: !parsed
@@ -150,7 +150,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
         if (!file) return;
 
         const result = await addFile(file);
-        if ("error" in result) return showToast(result.error, "failure");
+        if ("error" in result) return showToast({ text: result.error, variant: "critical" });
 
         setAttachments(list => [...list, result.id]);
     }

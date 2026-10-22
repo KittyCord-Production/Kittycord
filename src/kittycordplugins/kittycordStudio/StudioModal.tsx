@@ -162,13 +162,13 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
             const cleanParams = { ...params, name: params.name.trim() };
             const fileName = await saveTheme(cleanParams, initialFileName);
             enableTheme(fileName);
-            showToast(`"${cleanParams.name}" saved & applied.`, "success");
+            showToast({ text: `"${cleanParams.name}" saved & applied.`, variant: "success" });
             onSaved();
             rootProps.onClose();
             void maybeNudgePublish(cleanParams, fileName);
         } catch (e) {
             logger.error("save failed", e);
-            showToast(String((e as Error)?.message ?? "Could not save the theme."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not save the theme."), variant: "critical" });
         } finally {
             setBusy(false);
         }

@@ -135,7 +135,7 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalPro
 
     function confirm() {
         commands.forEach(addCommand);
-        showToast(`Added ${commands.length} command${commands.length === 1 ? "" : "s"} from "${pack.name}".`, "success");
+        showToast({ text: `Added ${commands.length} command${commands.length === 1 ? "" : "s"} from "${pack.name}".`, variant: "success" });
         rootProps.onClose();
     }
 
@@ -189,7 +189,7 @@ export function openCommandsImport(commands: CustomCommand[], name: string, auth
 export async function openPackImport(id: string) {
     const result = await fetchPack(id);
     if (!result) {
-        showToast("Could not load that command pack.", "failure");
+        showToast({ text: "Could not load that command pack.", variant: "critical" });
         return;
     }
     openModal(props => <ImportDialog rootProps={props} pack={result.pack} commands={result.commands} />);
@@ -226,10 +226,10 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
             confirmColor: Button.Colors.RED,
             onConfirm: async () => {
                 if (await deletePack(pack.id)) {
-                    showToast("Removed from the gallery.", "success");
+                    showToast({ text: "Removed from the gallery.", variant: "success" });
                     onChanged();
                 } else {
-                    showToast("Could not remove that pack.", "failure");
+                    showToast({ text: "Could not remove that pack.", variant: "critical" });
                 }
             }
         });
@@ -331,10 +331,10 @@ function PublishDialog({ rootProps, commands }: { rootProps: RenderModalProps; c
         setBusy(true);
         try {
             const id = await publishPack(name.trim(), authorName.trim(), commands);
-            showToast(`"${name.trim()}" published! 🎉`, "success");
+            showToast({ text: `"${name.trim()}" published! 🎉`, variant: "success" });
             setPublishedId(id);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not publish."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not publish."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -386,7 +386,7 @@ export function openPackGallery() {
 
 export function openPackPublish(commands: CustomCommand[]) {
     if (!commands.length) {
-        showToast("Create a command first — then you can share it as a pack.", "failure");
+        showToast({ text: "Create a command first — then you can share it as a pack.", variant: "critical" });
         return;
     }
     openModal(props => <PublishDialog rootProps={props} commands={commands} />);

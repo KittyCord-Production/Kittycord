@@ -100,8 +100,8 @@ function NameStyleEditor() {
         if (!me?.id || !Native) return;
         const c1 = color1.trim();
         const c2 = color2.trim();
-        if (!HEX_RE.test(c1)) { showToast("Pick a first color like #FF5FA6.", "failure"); return; }
-        if (c2 && !HEX_RE.test(c2)) { showToast("The second color must look like #FF8AC4.", "failure"); return; }
+        if (!HEX_RE.test(c1)) { showToast({ text: "Pick a first color like #FF5FA6.", variant: "critical" }); return; }
+        if (c2 && !HEX_RE.test(c2)) { showToast({ text: "The second color must look like #FF8AC4.", variant: "critical" }); return; }
 
         const auth = await getKittyAuth();
         if (!auth) return;
@@ -111,9 +111,9 @@ function NameStyleEditor() {
         if (res.ok) {
             cosmetics.set(me.id, { color1: c1, color2: c2 || undefined });
             setPersisted(true);
-            showToast("Name style saved.", "success");
+            showToast({ text: "Name style saved.", variant: "success" });
         } else {
-            showToast(res.error ?? "Could not save the style.", "failure");
+            showToast({ text: res.error ?? "Could not save the style.", variant: "critical" });
         }
     }
 
@@ -129,7 +129,7 @@ function NameStyleEditor() {
         setColor1("");
         setColor2("");
         setPersisted(false);
-        showToast("Name style removed.", "success");
+        showToast({ text: "Name style removed.", variant: "success" });
     }
 
     const me = UserStore.getCurrentUser();

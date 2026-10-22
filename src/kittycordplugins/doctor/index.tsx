@@ -106,10 +106,10 @@ function DoctorPanel() {
         setBusy(true);
         try {
             await update();
-            showToast("Updated — restarting to finish.", "success");
+            showToast({ text: "Updated — restarting to finish.", variant: "success" });
             relaunch();
         } catch {
-            showToast("Update failed. Try the Updater tab.", "failure");
+            showToast({ text: "Update failed. Try the Updater tab.", variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -124,7 +124,7 @@ function DoctorPanel() {
             onConfirm: async () => {
                 try {
                     if (!await VencordNative.tray?.repairHost?.()) {
-                        showToast("Nothing to repair. If features are missing, run the Kittycord installer and choose Repair.", "failure");
+                        showToast({ text: "Nothing to repair. If features are missing, run the Kittycord installer and choose Repair.", variant: "critical" });
                         return;
                     }
                     try {
@@ -133,7 +133,7 @@ function DoctorPanel() {
                     } catch { /* offline or nothing to update — still relaunch to apply the repair */ }
                     relaunch();
                 } catch {
-                    showToast("Repair failed. Try the Kittycord installer's Repair option.", "failure");
+                    showToast({ text: "Repair failed. Try the Kittycord installer's Repair option.", variant: "critical" });
                 }
             }
         });
@@ -143,8 +143,8 @@ function DoctorPanel() {
         const p = plugins.PerformanceMode;
         if (!p) return;
         Settings.plugins.PerformanceMode.enabled = true;
-        if (startPlugin(p)) showToast("PerformanceMode is on.", "success");
-        else showToast("Restart Discord to finish turning on PerformanceMode.", "message");
+        if (startPlugin(p)) showToast({ text: "PerformanceMode is on.", variant: "success" });
+        else showToast({ text: "Restart Discord to finish turning on PerformanceMode." });
         setData(scan());
     }
 

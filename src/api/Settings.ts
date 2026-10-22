@@ -106,8 +106,6 @@ export interface Settings {
         settingsSync: boolean;
         settingsSyncVersion: number;
     };
-
-    ignoreResetWarning: boolean;
 }
 
 export const DEFAULT_CLOUD_URL = `${BRAND_API}/`;
@@ -158,8 +156,6 @@ const DefaultSettings: Settings = {
         settingsSync: false,
         settingsSyncVersion: 0
     },
-
-    ignoreResetWarning: false,
 };
 
 const settings = !IS_REPORTER ? VencordNative.settings.get() : {} as Settings;

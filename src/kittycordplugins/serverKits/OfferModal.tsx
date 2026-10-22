@@ -73,17 +73,17 @@ function OfferDialog({ modalProps, kit, onDecided }: {
 
             if (kit.plugins && picks.plugins) restartNeeded = applyPlugins(kit.plugins);
 
-            showToast(`Applied "${kit.name}".`, "success");
+            showToast({ text: `Applied "${kit.name}".`, variant: "success" });
             onDecided("applied");
             modalProps.onClose();
 
             if (restartNeeded) {
-                showToast("Restart Discord to finish turning those plugins on.", "message");
+                showToast({ text: "Restart Discord to finish turning those plugins on." });
                 setTimeout(() => (IS_WEB ? location.reload() : relaunch()), 2500);
             }
         } catch {
             setBusy(false);
-            showToast("Could not apply that kit.", "failure");
+            showToast({ text: "Could not apply that kit.", variant: "critical" });
         }
     }
 

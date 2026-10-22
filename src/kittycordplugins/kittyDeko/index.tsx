@@ -92,9 +92,9 @@ function DekoShop() {
                         setCoins(res.balance);
                         setOwned(prev => [...prev, d.id]);
                         deko.set(me.id, d.id);
-                        showToast(`${d.label} is yours — equipped!`, "success");
+                        showToast({ text: `${d.label} is yours — equipped!`, variant: "success" });
                     } else {
-                        showToast(res.error, "failure");
+                        showToast({ text: res.error, variant: "critical" });
                     }
                 } finally {
                     setSaving(null);
@@ -111,11 +111,11 @@ function DekoShop() {
             const d = byId.get(id);
             if (!d) return;
             if (d.supporterOnly && !supporter) {
-                showToast("This frame is for Kittycord supporters.", "failure");
+                showToast({ text: "This frame is for Kittycord supporters.", variant: "critical" });
                 return;
             }
             if (inviteLock(id) > 0) {
-                showToast(`Invite ${d.minInvites} friends to unlock this frame.`, "failure");
+                showToast({ text: `Invite ${d.minInvites} friends to unlock this frame.`, variant: "critical" });
                 return;
             }
         }
@@ -127,17 +127,17 @@ function DekoShop() {
                 const ok = await Native.clearDeko(me.id, auth);
                 if (ok) {
                     deko.delete(me.id);
-                    showToast("Decoration removed.", "success");
+                    showToast({ text: "Decoration removed.", variant: "success" });
                 } else {
-                    showToast("Could not remove decoration.", "failure");
+                    showToast({ text: "Could not remove decoration.", variant: "critical" });
                 }
             } else {
                 const res = await Native.setDeko(me.id, id, auth);
                 if (res.ok) {
                     deko.set(me.id, id);
-                    showToast("Decoration equipped!", "success");
+                    showToast({ text: "Decoration equipped!", variant: "success" });
                 } else {
-                    showToast(res.error, "failure");
+                    showToast({ text: res.error, variant: "critical" });
                 }
             }
         } finally {

@@ -18,10 +18,10 @@ async function moveToMe(guildId: string, user: User, channelId: string) {
             url: `/guilds/${guildId}/members/${user.id}`,
             body: { channel_id: channelId }
         });
-        showToast(`Moved ${user.username} to your channel.`, "success");
+        showToast({ text: `Moved ${user.username} to your channel.`, variant: "success" });
     } catch (e) {
         logger.error(`Failed to move ${user.id}`, e);
-        showToast(`Could not move ${user.username}.`, "failure");
+        showToast({ text: `Could not move ${user.username}.`, variant: "critical" });
     }
 }
 

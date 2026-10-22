@@ -55,7 +55,7 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
                 setPreviewUrl(url);
             } catch (e) {
                 logger.error("Failed to render card", e);
-                if (!cancelled) showToast("Could not render your Wrapped card.", "failure");
+                if (!cancelled) showToast({ text: "Could not render your Wrapped card.", variant: "critical" });
             }
         })();
         return () => {
@@ -72,13 +72,13 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
     function save() {
         if (!blob) return;
         saveFile(fileFromBlob(blob, variant));
-        showToast("Saved your card.", "success");
+        showToast({ text: "Saved your card.", variant: "success" });
     }
 
     function send() {
         if (!blob) return;
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to send it there.", "failure");
+        if (!channel) return showToast({ text: "Open a chat first to send it there.", variant: "critical" });
         insertTextIntoChatInputBox(CAPTIONS[variant]);
         UploadHandler.promptToUpload([fileFromBlob(blob, variant)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
@@ -88,10 +88,10 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
         if (!blob) return;
         try {
             await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-            showToast("Copied to clipboard.", "success");
+            showToast({ text: "Copied to clipboard.", variant: "success" });
         } catch (e) {
             logger.warn("Clipboard copy failed", e);
-            showToast("Copying images isn't supported here — use Save instead.", "failure");
+            showToast({ text: "Copying images isn't supported here — use Save instead.", variant: "critical" });
         }
     }
 
@@ -111,7 +111,7 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                     setBlob(result);
                     setPreviewUrl(URL.createObjectURL(result));
-                    showToast("Your Wrapped stats were reset.", "success");
+                    showToast({ text: "Your Wrapped stats were reset.", variant: "success" });
                 } catch (e) {
                     logger.error("Reset failed", e);
                 } finally {

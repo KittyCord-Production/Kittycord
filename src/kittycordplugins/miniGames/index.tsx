@@ -22,7 +22,7 @@ import { getPending, removePending, storePending } from "./store";
 async function sendGameMessage(userId: string, payload: GamePayload, fallback: string): Promise<boolean> {
     const channelId = await ensureDmChannel(userId);
     if (!channelId) {
-        showToast("Could not open a DM with that user.", "failure");
+        showToast({ text: "Could not open a DM with that user.", variant: "critical" });
         return false;
     }
     sendMessage(channelId, { content: encodeGameMessage(payload, fallback) });
@@ -32,7 +32,7 @@ async function sendGameMessage(userId: string, payload: GamePayload, fallback: s
 async function startTtt(user: User) {
     const payload: GamePayload = { v: 1, t: "ttt", g: newGameId(), n: 0, vs: user.id };
     if (await sendGameMessage(user.id, payload, startFallback("ttt"))) {
-        showToast(`Tic-tac-toe started — ${user.username} goes first.`, "success");
+        showToast({ text: `Tic-tac-toe started — ${user.username} goes first.`, variant: "success" });
     }
 }
 
@@ -43,7 +43,7 @@ async function startRps(user: User, choice: number) {
     await storePending(g, choice, nonce);
     const payload: GamePayload = { v: 1, t: "rps", g, n: 0, vs: user.id, c };
     if (await sendGameMessage(user.id, payload, startFallback("rps"))) {
-        showToast(`You sealed ${RPS_CHOICES[choice]} — waiting for ${user.username}.`, "success");
+        showToast({ text: `You sealed ${RPS_CHOICES[choice]} — waiting for ${user.username}.`, variant: "success" });
     } else {
         await removePending(g);
     }
@@ -194,7 +194,7 @@ export default definePlugin({
             const recipientId = channel?.isPrivate?.() ? channel.recipients?.find((id: string) => id !== me?.id) : null;
             const user = recipientId ? UserStore.getUser(recipientId) : null;
             if (user) openGamePicker(user);
-            else showToast("Open a DM first, then start a game.", "message");
+            else showToast({ text: "Open a DM first, then start a game." });
         }
     },
 

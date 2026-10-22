@@ -70,8 +70,8 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
 
     async function publish() {
         const kit = build();
-        if (!kit) return showToast("Pick at least one thing to put in the kit.", "failure");
-        if (!Native) return showToast("Kits are only available in the desktop app.", "failure");
+        if (!kit) return showToast({ text: "Pick at least one thing to put in the kit.", variant: "critical" });
+        if (!Native) return showToast({ text: "Kits are only available in the desktop app.", variant: "critical" });
 
         const auth = await getKittyAuth();
         if (!auth) return;
@@ -79,7 +79,7 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
         const result = await Native.publishKit(UserStore.getCurrentUser()?.id ?? "", kit, auth);
         setBusy(false);
 
-        if (!result.ok) return showToast(result.error, "failure");
+        if (!result.ok) return showToast({ text: result.error, variant: "critical" });
 
         const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
         tokens[result.id] = result.ownerToken;
@@ -94,17 +94,17 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
 
         const tokens = await get<Record<string, string>>(KIT_TOKENS_KEY) ?? {};
         const token = tokens[kitId];
-        if (!token) return showToast("This kit was published from another device, so it can only be taken down there.", "failure");
+        if (!token) return showToast({ text: "This kit was published from another device, so it can only be taken down there.", variant: "critical" });
 
         setBusy(true);
         const removed = await Native.deleteKit(kitId, token);
         setBusy(false);
 
-        if (!removed) return showToast("Could not take that kit down. Try again in a moment.", "failure");
+        if (!removed) return showToast({ text: "Could not take that kit down. Try again in a moment.", variant: "critical" });
 
         delete tokens[kitId];
         await set(KIT_TOKENS_KEY, tokens);
-        showToast("Kit taken down. The link no longer works.", "success");
+        showToast({ text: "Kit taken down. The link no longer works.", variant: "success" });
         modalProps.onClose();
     }
 

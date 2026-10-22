@@ -24,7 +24,7 @@ async function claim(code: string) {
     if (friendConsumed({ kind: "claim", value: code })) return;
     const me = UserStore.getCurrentUser();
     if (!me) { pendingCode = code; return; }
-    if (!Invites) { showToast("Invite codes work on the Kittycord desktop app.", "failure"); return; }
+    if (!Invites) { showToast({ text: "Invite codes work on the Kittycord desktop app.", variant: "critical" }); return; }
 
     Alerts.show({
         title: "Claim this invite code?",
@@ -41,9 +41,9 @@ async function sendClaim(code: string) {
     const auth = await getKittyAuth();
     if (!auth) return;
     const status = await Invites.claim(me.id, code, auth);
-    if (status === "ok") { markFriendConsumed({ kind: "claim", value: code }); showToast("Invite claimed — your friend just got the credit. 🐱", "success"); }
-    else if (status === "rejected") showToast("That code couldn't be counted (already used, or it's your own).", "message");
-    else showToast("Couldn't reach Kittycord to claim that code — try again later.", "failure");
+    if (status === "ok") { markFriendConsumed({ kind: "claim", value: code }); showToast({ text: "Invite claimed — your friend just got the credit. 🐱", variant: "success" }); }
+    else if (status === "rejected") showToast({ text: "That code couldn't be counted (already used, or it's your own)." });
+    else showToast({ text: "Couldn't reach Kittycord to claim that code — try again later.", variant: "critical" });
 }
 
 function openTheme(id: string) {
@@ -57,31 +57,31 @@ function openTheme(id: string) {
 }
 
 async function applyTheme(id: string) {
-    showToast("Opening that theme…", "message");
+    showToast({ text: "Opening that theme…" });
     try {
         const theme = await applyGalleryThemeById(id);
-        if (theme) showToast(`"${theme.name}" applied. 🎨`, "success");
-        else showToast("That theme couldn't be found.", "failure");
+        if (theme) showToast({ text: `"${theme.name}" applied. 🎨`, variant: "success" });
+        else showToast({ text: "That theme couldn't be found.", variant: "critical" });
     } catch {
-        showToast("That theme couldn't be applied.", "failure");
+        showToast({ text: "That theme couldn't be applied.", variant: "critical" });
     }
 }
 
 async function openPack(id: string) {
-    showToast("Opening that command pack…", "message");
+    showToast({ text: "Opening that command pack…" });
     try {
         await openPackImport(id);
     } catch {
-        showToast("That command pack couldn't be opened.", "failure");
+        showToast({ text: "That command pack couldn't be opened.", variant: "critical" });
     }
 }
 
 async function openKit(id: string) {
-    showToast("Opening that server kit…", "message");
+    showToast({ text: "Opening that server kit…" });
     const { fetchKit } = await import("../serverKits");
     const kit = await fetchKit(id);
 
-    if (!kit) return showToast("That server kit couldn't be opened.", "failure");
+    if (!kit) return showToast({ text: "That server kit couldn't be opened.", variant: "critical" });
 
     const { openOfferModal } = await import("../serverKits/OfferModal");
     openOfferModal(kit, () => { });

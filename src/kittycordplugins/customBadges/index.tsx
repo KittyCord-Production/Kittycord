@@ -111,11 +111,11 @@ function BadgeEditor() {
         if (!entry) return;
         const i = entry.icon.trim();
         const l = entry.label.trim();
-        if (!i) { showToast("Add an emoji or an image/GIF link.", "failure"); return; }
-        if (/^https?:\/\//i.test(i) && !isUrl(i)) { showToast("Image links must use https.", "failure"); return; }
-        if (!l) { showToast("Add a short label.", "failure"); return; }
+        if (!i) { showToast({ text: "Add an emoji or an image/GIF link.", variant: "critical" }); return; }
+        if (/^https?:\/\//i.test(i) && !isUrl(i)) { showToast({ text: "Image links must use https.", variant: "critical" }); return; }
+        if (!l) { showToast({ text: "Add a short label.", variant: "critical" }); return; }
         const link = entry.link.trim();
-        if (link && !parseBadgeLink(link)) { showToast("Links must be a full https:// address, not an IP address.", "failure"); return; }
+        if (link && !parseBadgeLink(link)) { showToast({ text: "Links must be a full https:// address, not an IP address.", variant: "critical" }); return; }
 
         const auth = await getKittyAuth();
         if (!auth) return;
@@ -125,9 +125,9 @@ function BadgeEditor() {
         if (res.ok) {
             await refreshBadges();
             setEntries(prev => prev.map(e => e.slot === slot ? { ...e, persisted: true } : e));
-            showToast("Badge saved.", "success");
+            showToast({ text: "Badge saved.", variant: "success" });
         } else {
-            showToast(res.error ?? "Could not save the badge.", "failure");
+            showToast({ text: res.error ?? "Could not save the badge.", variant: "critical" });
         }
     }
 
@@ -143,7 +143,7 @@ function BadgeEditor() {
             await Native.clearBadge(me.id, slot, auth);
             setBusy(false);
             await refreshBadges();
-            showToast("Badge removed.", "success");
+            showToast({ text: "Badge removed.", variant: "success" });
         }
         setEntries(prev => prev.filter(e => e.slot !== slot));
     }

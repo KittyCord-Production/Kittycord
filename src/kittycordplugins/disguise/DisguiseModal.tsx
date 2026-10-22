@@ -34,11 +34,11 @@ export function DisguiseModal({ modalProps, userId }: { modalProps: RenderModalP
 
     async function save() {
         if (!ID_RE.test(templateId)) {
-            showToast("That is not a valid account ID.", "failure");
+            showToast({ text: "That is not a valid account ID.", variant: "critical" });
             return;
         }
         if (templateId === userId) {
-            showToast("Pick a different account than the one you are hiding.", "failure");
+            showToast({ text: "Pick a different account than the one you are hiding.", variant: "critical" });
             return;
         }
 
@@ -46,7 +46,7 @@ export function DisguiseModal({ modalProps, userId }: { modalProps: RenderModalP
         const template = await resolveUser(templateId);
         if (!template) {
             setBusy(false);
-            showToast("No account with that ID exists.", "failure");
+            showToast({ text: "No account with that ID exists.", variant: "critical" });
             return;
         }
 

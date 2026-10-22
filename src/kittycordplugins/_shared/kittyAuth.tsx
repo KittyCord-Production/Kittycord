@@ -22,7 +22,7 @@ async function login(userId: string): Promise<string | null> {
     try {
         ({ clientId, redirectUri } = await (await fetch(`${BRAND_API}/v1/oauth/settings`)).json());
     } catch {
-        showToast("Could not reach the Kittycord server. Try again in a moment.", "failure");
+        showToast({ text: "Could not reach the Kittycord server. Try again in a moment.", variant: "critical" });
         return null;
     }
 
@@ -47,7 +47,7 @@ async function login(userId: string): Promise<string | null> {
                         resolve(secret);
                     } catch (e) {
                         logger.error("Login failed", e);
-                        showToast("Discord login failed. Please try again.", "failure");
+                        showToast({ text: "Discord login failed. Please try again.", variant: "critical" });
                         resolve(null);
                     }
                 }}

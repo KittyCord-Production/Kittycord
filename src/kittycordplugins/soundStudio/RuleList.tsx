@@ -53,7 +53,7 @@ function targetName(rule: SoundRule): string {
 function preview(rule: SoundRule) {
     const audio = resolveSound(rule.sound);
     if (!audio) {
-        showToast("That sound file is missing.", "failure");
+        showToast({ text: "That sound file is missing.", variant: "critical" });
         return;
     }
     playAudio(audio, { volume: rule.volume });
@@ -75,11 +75,11 @@ export function RuleList() {
         if (!file) return;
 
         if (!isAllowedMime(file.type)) {
-            showToast("That file type isn't supported.", "failure");
+            showToast({ text: "That file type isn't supported.", variant: "critical" });
             return;
         }
         if (file.size > MAX_FILE_BYTES) {
-            showToast(`Sounds have to stay under ${Math.round(MAX_FILE_BYTES / 1000)} KB.`, "failure");
+            showToast({ text: `Sounds have to stay under ${Math.round(MAX_FILE_BYTES / 1000)} KB.`, variant: "critical" });
             return;
         }
 
@@ -88,9 +88,9 @@ export function RuleList() {
             try {
                 await addAudio(file.name.replace(/\.[^.]+$/, "").slice(0, 60), file.type, String(reader.result));
                 setFiles(listAudio());
-                showToast("Sound added — pick it from a right-click menu.", "success");
+                showToast({ text: "Sound added — pick it from a right-click menu.", variant: "success" });
             } catch (e) {
-                showToast(String((e as Error)?.message ?? "Could not add that sound."), "failure");
+                showToast({ text: String((e as Error)?.message ?? "Could not add that sound."), variant: "critical" });
             }
         };
         reader.readAsDataURL(file);
@@ -99,12 +99,12 @@ export function RuleList() {
     async function importCode() {
         const result = await importRules(code);
         if (!result) {
-            showToast("That isn't a valid sound pack.", "failure");
+            showToast({ text: "That isn't a valid sound pack.", variant: "critical" });
             return;
         }
         setCode("");
         setFiles(listAudio());
-        showToast(`Added ${result.added} rule${result.added === 1 ? "" : "s"}.`, "success");
+        showToast({ text: `Added ${result.added} rule${result.added === 1 ? "" : "s"}.`, variant: "success" });
     }
 
     function share() {

@@ -49,7 +49,7 @@ async function moveUsers(guildId: string, userIds: string[], targetId: string) {
         if (moveDelay) await sleep(moveDelay * 1000);
     }
 
-    showToast(`Moved ${moved} of ${userIds.length} users.`, moved ? "success" : "failure");
+    showToast({ text: `Moved ${moved} of ${userIds.length} users.`, variant: moved ? "success" : "critical" });
 }
 
 const ChannelContext: NavContextMenuPatchCallback = (children, { channel }: { channel: Channel; }) => {

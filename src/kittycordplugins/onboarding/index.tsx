@@ -117,7 +117,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
             const theme = await applyGalleryThemeById(action.value);
             if (!theme) return false;
             markFriendConsumed(action);
-            showToast(`"${theme.name}" applied. 🎨`, "success");
+            showToast({ text: `"${theme.name}" applied. 🎨`, variant: "success" });
             return true;
         }
         const me = UserStore.getCurrentUser();
@@ -127,7 +127,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         const status = await InvitesNative.claim(me.id, action.value, auth);
         if (status !== "ok") return false;
         markFriendConsumed(action);
-        showToast("Thanks, your inviter just got the credit! 🐱", "success");
+        showToast({ text: "Thanks, your inviter just got the credit! 🐱", variant: "success" });
         return true;
     }
 
@@ -135,7 +135,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         if (!friend) return;
         const action = friend;
         setFriend(null);
-        if (!await runFriendAction(action)) showToast("Couldn't start from your friend just now. Try their code or link below.", "failure");
+        if (!await runFriendAction(action)) showToast({ text: "Couldn't start from your friend just now. Try their code or link below.", variant: "critical" });
     }
 
     async function claimReferral() {
@@ -152,7 +152,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         try {
             setPending(parseEnvelope(await file.text()));
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "That isn't a Kittycord setup file."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "That isn't a Kittycord setup file."), variant: "critical" });
         }
     }
 
@@ -169,7 +169,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 onClick: () => (IS_WEB ? location.reload() : relaunch())
             });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Import failed."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Import failed."), variant: "critical" });
         }
     }
 
@@ -177,7 +177,7 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
         set(SEEN_KEY, true);
         if (apply) {
             const restartNeeded = applyPacks(chosen);
-            showToast("You're all set.", "success");
+            showToast({ text: "You're all set.", variant: "success" });
             if (restartNeeded) {
                 showNotification({
                     title: "Almost done — restart to finish",

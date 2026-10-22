@@ -116,10 +116,10 @@ function SendModal({ rootProps, user }: { rootProps: RenderModalProps; user: Use
         setBusy(true);
         try {
             await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
-            showToast("Setup sent.", "success");
+            showToast({ text: "Setup sent.", variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send the setup."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -165,7 +165,7 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
         try {
             envelope = await fetchShare(attachment);
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not read that setup."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not read that setup."), variant: "critical" });
             return;
         }
 
@@ -191,7 +191,7 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
                     await applyShare(envelope);
                     restartPrompt();
                 } catch (e) {
-                    showToast(String((e as Error)?.message ?? "Import failed."), "failure");
+                    showToast({ text: String((e as Error)?.message ?? "Import failed."), variant: "critical" });
                 }
             }
         });
@@ -221,9 +221,9 @@ function FriendsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     async function sendTo(user: User) {
         try {
             await sendShare(user.id, scope, note.trim() || DEFAULT_NOTE);
-            showToast(`Sent to ${user.globalName || user.username}.`, "success");
+            showToast({ text: `Sent to ${user.globalName || user.username}.`, variant: "success" });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send the setup."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send the setup."), variant: "critical" });
         }
     }
 

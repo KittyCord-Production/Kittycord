@@ -50,7 +50,7 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 logger.error("Failed to render look card", e);
                 if (!cancelled) {
                     setData(null);
-                    showToast("Could not render your look card.", "failure");
+                    showToast({ text: "Could not render your look card.", variant: "critical" });
                 }
             }
         })();
@@ -63,24 +63,24 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
     function save() {
         if (!blob) return;
         saveFile(fileFromBlob(blob));
-        showToast("Saved your look card.", "success");
+        showToast({ text: "Saved your look card.", variant: "success" });
     }
 
     async function copy() {
         if (!blob) return;
         try {
             await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-            showToast("Copied to clipboard.", "success");
+            showToast({ text: "Copied to clipboard.", variant: "success" });
         } catch (e) {
             logger.warn("Clipboard copy failed", e);
-            showToast("Copying images isn't supported here — use Save instead.", "failure");
+            showToast({ text: "Copying images isn't supported here — use Save instead.", variant: "critical" });
         }
     }
 
     function postInChat() {
         if (!blob) return;
         const channel = getCurrentChannel();
-        if (!channel) return showToast("Open a chat first to post it there.", "failure");
+        if (!channel) return showToast({ text: "Open a chat first to post it there.", variant: "critical" });
         insertTextIntoChatInputBox(CAPTION);
         UploadHandler.promptToUpload([fileFromBlob(blob)], channel, DraftType.ChannelMessage);
         rootProps.onClose();
@@ -91,10 +91,10 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
         setBusy(true);
         try {
             await sendFileToUser(target.id, fileFromBlob(blob), CAPTION);
-            showToast(`Sent to ${target.globalName || target.username}. 💌`, "success");
+            showToast({ text: `Sent to ${target.globalName || target.username}. 💌`, variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send your look."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send your look."), variant: "critical" });
         } finally {
             setBusy(false);
         }

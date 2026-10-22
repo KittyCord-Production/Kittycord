@@ -52,10 +52,10 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalPro
             if (!channelId) throw new Error("Could not open a DM with them.");
 
             await sendMessage(channelId, { content: `Here's a command for you 🐱\n${payload}` });
-            showToast(`Sent to ${target.globalName || target.username}.`, "success");
+            showToast({ text: `Sent to ${target.globalName || target.username}.`, variant: "success" });
             rootProps.onClose();
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not send that."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not send that."), variant: "critical" });
         } finally {
             setBusy(false);
         }
@@ -93,7 +93,7 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalPro
 
 export function openShareModal(commands: CustomCommand[], label: string) {
     if (!commands.length) {
-        showToast("Create a command first — then you can share it.", "failure");
+        showToast({ text: "Create a command first — then you can share it.", variant: "critical" });
         return;
     }
     openModal(props => <ShareDialog rootProps={props} commands={commands} label={label} />);

@@ -86,9 +86,9 @@ function CommunityPanel() {
         setBusy(true);
         try {
             enableTheme(await saveTheme(t.params));
-            showToast(`"${t.name}" applied. 🎨`, "success");
+            showToast({ text: `"${t.name}" applied. 🎨`, variant: "success" });
         } catch (e) {
-            showToast(String((e as Error)?.message ?? "Could not apply that theme."), "failure");
+            showToast({ text: String((e as Error)?.message ?? "Could not apply that theme."), variant: "critical" });
         } finally {
             setBusy(false);
         }

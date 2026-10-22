@@ -61,7 +61,7 @@ async function addReminder(msg: Message, remindAt: number) {
         remindAt
     }];
     await save();
-    showToast(`Reminder set for ${new Date(remindAt).toLocaleString()}.`, "success");
+    showToast({ text: `Reminder set for ${new Date(remindAt).toLocaleString()}.`, variant: "success" });
 }
 
 function fire(r: Reminder) {

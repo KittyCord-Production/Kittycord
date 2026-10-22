@@ -112,9 +112,9 @@ export default definePlugin({
             const guildId = SelectedGuildStore.getGuildId();
             const guild = guildId ? GuildStore.getGuild(guildId) : null;
 
-            if (!guild) return showToast("Open the server you want to build a kit for first.", "failure");
+            if (!guild) return showToast({ text: "Open the server you want to build a kit for first.", variant: "critical" });
             if (!PermissionStore.can(PermissionsBits.MANAGE_GUILD, guild))
-                return showToast("Only someone who can manage the server can publish its kit.", "failure");
+                return showToast({ text: "Only someone who can manage the server can publish its kit.", variant: "critical" });
 
             openKitStudio(guild);
         }

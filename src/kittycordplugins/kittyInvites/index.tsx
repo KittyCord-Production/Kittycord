@@ -50,7 +50,7 @@ async function tryClaim() {
 async function openInviteStatsShare() {
     const me = UserStore.getCurrentUser();
     if (!Native || !me) {
-        showToast("Invite stats are available on the Kittycord desktop app.", "failure");
+        showToast({ text: "Invite stats are available on the Kittycord desktop app.", variant: "critical" });
         return;
     }
     try {
@@ -69,7 +69,7 @@ async function openInviteStatsShare() {
             />
         ));
     } catch {
-        showToast("Couldn't build your card — try again.", "failure");
+        showToast({ text: "Couldn't build your card — try again.", variant: "critical" });
     }
 }
 
@@ -121,10 +121,10 @@ function InvitesTab() {
         const res = await Native.setCode(me.id, code.trim(), auth);
         setSaving(false);
         if (res.ok) {
-            showToast("Creator code saved!", "success");
+            showToast({ text: "Creator code saved!", variant: "success" });
             load();
         } else {
-            showToast(res.error, "failure");
+            showToast({ text: res.error, variant: "critical" });
         }
     }
 
@@ -136,13 +136,13 @@ function InvitesTab() {
         const status = await Native.claim(me.id, claimInput.trim(), auth);
         setClaiming(false);
         if (status === "ok") {
-            showToast("Thanks — your inviter just got the credit! 🐱", "success");
+            showToast({ text: "Thanks — your inviter just got the credit! 🐱", variant: "success" });
             setClaimInput("");
             load();
         } else if (status === "error") {
-            showToast("Couldn't reach the server — check your connection and try again.", "failure");
+            showToast({ text: "Couldn't reach the server — check your connection and try again.", variant: "critical" });
         } else {
-            showToast("Couldn't count that — wrong code, your own code, or you were already counted.", "failure");
+            showToast({ text: "Couldn't count that — wrong code, your own code, or you were already counted.", variant: "critical" });
         }
     }
 
