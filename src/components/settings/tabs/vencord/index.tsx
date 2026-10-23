@@ -19,6 +19,7 @@ import { Paragraph } from "@components/Paragraph";
 import { openContributorModal, openPluginModal, SettingsTab, wrapTab } from "@components/settings";
 import { QuickAction, QuickActionCard } from "@components/settings/QuickAction";
 import { SpecialCard } from "@components/settings/SpecialCard";
+import NoTrack from "@plugins/_core/noTrack";
 import SettingsPlugin from "@plugins/_core/settings";
 import { ACCENT_PRESETS, KittycordAccent } from "@shared/accentPresets";
 import { gitRemote } from "@shared/vencordUserAgent";
@@ -48,12 +49,24 @@ type KeysOfType<Object, Type> = {
 
 function Switches() {
     const settings = useSettings(["useQuickCss", "enableReactDevtools", "mainWindowFrameless", "frameless", "nativeTitleBar", "transparent", "winCtrlQ", "disableMinSize"]);
+    const { disableAnalytics } = NoTrack.settings.use(["disableAnalytics"]);
 
     const Switches = [
         {
             key: "useQuickCss",
             title: "Enable Custom CSS",
             description: "Apply your configured QuickCSS"
+        },
+        {
+            value: disableAnalytics,
+            updateSetting(newValue) {
+                NoTrack.settings.store.disableAnalytics = newValue;
+            },
+            reactKey: "NoTrack::disableAnalytics",
+            key: null!,
+            title: "Block Discord Analytics",
+            description: NoTrack.settings.def.disableAnalytics.description,
+            restartRequired: NoTrack.settings.def.disableAnalytics.restartNeeded,
         },
         (!IS_WEB && !IS_DISCORD_DESKTOP || !IS_WINDOWS) && {
             key: "mainWindowFrameless",
@@ -104,10 +117,13 @@ function Switches() {
         },
     ] satisfies Array<false | {
         key: KeysOfType<typeof settings, boolean>;
+        reactKey?: string;
         title: string;
         description?: string;
         restartRequired?: boolean;
         warning?: string;
+        updateSetting?(newValue: boolean): void;
+        value?: boolean;
     }>;
 
     return Switches.map(setting => {
@@ -115,11 +131,11 @@ function Switches() {
             return null;
         }
 
-        const { key, title, description, restartRequired, warning } = setting;
+        const { reactKey, key, value, title, description, restartRequired, warning, updateSetting = v => (settings[key] = v) } = setting;
 
         return (
             <FormSwitch
-                key={key}
+                key={reactKey ?? key}
                 title={title}
                 description={
                     warning ? (
@@ -133,10 +149,10 @@ function Switches() {
                         description
                     )
                 }
-                value={settings[key]}
+                value={value ?? settings[key]}
                 hideBorder
                 onChange={v => {
-                    settings[key] = v;
+                    updateSetting(v);
 
                     if (restartRequired) {
                         promptToRestart("relaunch");
