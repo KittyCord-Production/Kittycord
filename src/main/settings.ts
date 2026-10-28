@@ -82,11 +82,13 @@ export interface NativeSettings {
     customCspRules: Record<string, string[]>;
     lastUpdateVerified?: boolean;
     lastHostRepairAt?: number;
+    migratedThemeLinkCsp: boolean;
 }
 
 const DefaultNativeSettings: NativeSettings = {
     plugins: {},
-    customCspRules: {}
+    customCspRules: {},
+    migratedThemeLinkCsp: false
 };
 
 const nativeSettings = readSettings<NativeSettings>("native", NATIVE_SETTINGS_FILE);
