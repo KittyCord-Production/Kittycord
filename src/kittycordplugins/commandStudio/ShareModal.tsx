@@ -4,12 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { sendMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, React, showToast, Text } from "@webpack/common";
+import { React, showToast } from "@webpack/common";
 
 import { ensureDmChannel } from "../_shared/dm";
 import { FriendPicker } from "../_shared/FriendPicker";
@@ -64,27 +66,27 @@ function ShareDialog({ rootProps, commands, label }: { rootProps: RenderModalPro
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Share {label}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Share {label}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "12px 0" }}>
+                <Text size="sm" style={{ opacity: 0.85, margin: "12px 0" }}>
                     They get a one-tap prompt to add it. Only the commands you picked are shared.
                 </Text>
 
-                <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
+                <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
                 <FriendPicker value={target} onChange={setTarget} />
 
                 <Text
-                    variant="text-sm/normal"
+                    size="sm"
                     style={{ margin: "12px 0", opacity: 0.7, userSelect: "text", overflowWrap: "anywhere" }}
                 >
                     {payload ?? "Preparing a link…"}
                 </Text>
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!target || !payload || busy} onClick={send}>Send</Button>
+                    <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                    <Button disabled={!target || !payload || busy} onClick={send}>Send</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>

@@ -7,12 +7,14 @@
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { get, set } from "@api/DataStore";
 import { showNotification } from "@api/Notifications";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getCurrentChannel, sendMessage } from "@utils/discord";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Channel, RenderModalProps } from "@vencord/discord-types";
-import { Button, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import { React, SearchableSelect, TextInput } from "@webpack/common";
 import type { SVGProps } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -167,23 +169,23 @@ function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: Rend
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Schedule</Text>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Schedule</Text>
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
                 <Flex style={{ flexDirection: "column", gap: 12, padding: "12px 0" }}>
                     <div>
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>What</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>What</Text>
                         <SearchableSelect options={KIND_OPTIONS} value={kind} onChange={(v: Kind) => setKind(v)} closeOnSelect />
                     </div>
                     <div>
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>{kind === "reminder" ? "Remind me about" : `Message to ${channelLabel}`}</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>{kind === "reminder" ? "Remind me about" : `Message to ${channelLabel}`}</Text>
                         <TextInput value={content} onChange={setContent} placeholder={kind === "reminder" ? "Take a break, drink water…" : "Type your message…"} />
                     </div>
                     <Flex style={{ gap: 8, alignItems: "flex-end" }}>
                         <div style={{ width: 90 }}>
-                            <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>In</Text>
+                            <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>In</Text>
                             <TextInput type="number" value={amount} onChange={setAmount} placeholder="30" />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -193,10 +195,10 @@ function ScheduleModal({ rootProps, channelId, channelLabel }: { rootProps: Rend
                             <SearchableSelect options={REPEAT_OPTIONS} value={repeat} onChange={(v: Repeat) => setRepeat(v)} closeOnSelect />
                         </div>
                     </Flex>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.75 }}>{valid ? `${kind === "reminder" ? "Reminds" : "Sends"} at ${fmtAbs(previewAt)}` : "Enter text and a time above."}</Text>
+                    <Text size="sm" style={{ opacity: 0.75 }}>{valid ? `${kind === "reminder" ? "Reminds" : "Sends"} at ${fmtAbs(previewAt)}` : "Enter text and a time above."}</Text>
                     <Flex style={{ justifyContent: "flex-end", gap: 8 }}>
-                        <Button color={Button.Colors.PRIMARY} look={Button.Looks.LINK} onClick={rootProps.onClose}>Cancel</Button>
-                        <Button color={Button.Colors.BRAND} disabled={!valid} onClick={add}>Schedule</Button>
+                        <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                        <Button disabled={!valid} onClick={add}>Schedule</Button>
                     </Flex>
                 </Flex>
             </ModalContent>
@@ -219,24 +221,24 @@ function ManagerModal({ rootProps }: { rootProps: RenderModalProps; }) {
         <ModalRoot {...rootProps} size={ModalSize.LARGE}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Scheduled ({shown.length})</Text>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Scheduled ({shown.length})</Text>
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
                 {shown.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>Nothing scheduled. Use the clock button in the chat bar to schedule a message or reminder.</Text>
+                    ? <Text style={{ padding: "16px 0" }}>Nothing scheduled. Use the clock button in the chat bar to schedule a message or reminder.</Text>
                     : shown.map(item => (
                         <Flex key={item.id} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold">
+                                <Text size="sm" weight="semibold">
                                     {item.kind === "reminder" ? "Reminder" : item.channelLabel}
                                     <span style={{ background: "var(--brand-500)", color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11, marginLeft: 6 }}>{fmtRel(item.fireAt)}</span>
                                     {item.repeat !== "none" && <span style={{ opacity: 0.6, fontSize: 11, marginLeft: 6 }}>{item.repeat}</span>}
                                 </Text>
-                                <Text variant="text-sm/normal" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.content}</Text>
+                                <Text size="sm" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.content}</Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} onClick={() => cancel(item.id)}>Cancel</Button>
+                            <Button size="small" variant="dangerPrimary" onClick={() => cancel(item.id)}>Cancel</Button>
                         </Flex>
                     ))}
             </ModalContent>

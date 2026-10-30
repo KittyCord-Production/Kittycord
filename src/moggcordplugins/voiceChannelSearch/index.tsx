@@ -8,12 +8,13 @@ import "./styles.css";
 
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { Heading } from "@components/Heading";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "@kittycordplugins/_shared/modal";
 import { openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
 import { findByPropsLazy, findStoreLazy } from "@webpack";
-import { Forms, React, useEffect, useRef, UserStore,useState } from "@webpack/common";
+import { React, useEffect, useRef, UserStore, useState } from "@webpack/common";
 
 const GuildStore = findStoreLazy("GuildStore");
 const GuildChannelStore = findStoreLazy("GuildChannelStore");
@@ -183,10 +184,10 @@ function VoiceSearchModal({ rootProps, channels }: { rootProps: RenderModalProps
     return (
         <ModalRoot {...rootProps} size="medium">
             <ModalHeader separator={false}>
-                <Forms.FormTitle tag="h4" style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#ffffff" }}>
+                <Heading tag="h4" style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#ffffff" }}>
                     <SearchIcon width={16} height={16} /> Voice Channels
                     {displayList !== null && <span className="vcs-count-badge">{count}</span>}
-                </Forms.FormTitle>
+                </Heading>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent className="vcs-content">

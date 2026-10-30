@@ -5,8 +5,9 @@
  */
 
 import { Button } from "@components/Button";
+import { Text } from "@components/Text";
 import { saveFile } from "@utils/web";
-import { React, Text } from "@webpack/common";
+import { React } from "@webpack/common";
 
 interface Entry {
     at: number;
@@ -51,7 +52,7 @@ export function RequestLog() {
 
     if (!bridge) {
         return (
-            <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+            <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>
                 The request monitor is only available in the desktop app.
             </Text>
         );
@@ -68,7 +69,7 @@ export function RequestLog() {
 
     return (
         <>
-            <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+            <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>
                 Every connection Kittycord itself opens, live. Discord's own traffic is not listed here, and neither is
                 anything from the plugins you turn on that talk to Discord.
             </Text>
@@ -86,13 +87,13 @@ export function RequestLog() {
             </div>
 
             {hosts.length > 0 && (
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 8 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 8 }}>
                     Servers so far: {hosts.join(", ")}
                 </Text>
             )}
 
             {entries?.length === 0 && (
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 12 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 12 }}>
                     Nothing yet. Kittycord has not contacted anything since it started.
                 </Text>
             )}

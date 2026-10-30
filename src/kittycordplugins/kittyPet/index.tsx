@@ -6,11 +6,13 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
+import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, SelectedChannelStore, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { React, SelectedChannelStore, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { animalArt } from "./animalArt";
@@ -253,35 +255,35 @@ function PetPanel() {
 
     return (
         <div style={{ margin: "12px 0" }}>
-                    <Text variant="heading-md/semibold">Level {level}{level >= MAX_LEVEL ? " (max)" : ""}</Text>
+                    <Text weight="semibold">Level {level}{level >= MAX_LEVEL ? " (max)" : ""}</Text>
                     <div style={{ height: 8, borderRadius: 999, background: "var(--background-tertiary)", margin: "8px 0" }}>
                         <div style={{ height: "100%", width: `${Math.round(progress * 100)}%`, borderRadius: 999, background: "linear-gradient(90deg, #ff5fa6, #ff8ac4)" }} />
                     </div>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.8 }}>
+                    <Text size="sm" style={{ opacity: 0.8 }}>
                         {next === null
                             ? copy.grown
                             : `${save.xp} / ${next} XP — click your pet and chat to level up.`}
                     </Text>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.8, marginTop: 4 }}>
+                    <Text size="sm" style={{ opacity: 0.8, marginTop: 4 }}>
                         Petted {save.pets} time{save.pets === 1 ? "" : "s"}.
                     </Text>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.8, marginTop: 4 }}>
+                    <Text size="sm" style={{ opacity: 0.8, marginTop: 4 }}>
                         {save.lastPetDay === new Date().toDateString()
                             ? `Petted today ✓ — ${save.streak} day streak.`
                             : "Pet me today for a bonus! 🐾"}
                     </Text>
 
                     <Flex style={{ gap: 8, marginTop: 12 }}>
-                        <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={() => onPlay()}>
+                        <Button size="small" onClick={() => onPlay()}>
                             {copy.play}
                         </Button>
                     </Flex>
 
-                    <Text variant="heading-md/semibold" style={{ marginTop: 16, marginBottom: 8 }}>Accessories</Text>
+                    <Text weight="semibold" style={{ marginTop: 16, marginBottom: 8 }}>Accessories</Text>
                     <Flex style={{ gap: 8, flexWrap: "wrap" }}>
                         <Button
-                            size={Button.Sizes.SMALL}
-                            color={save.equipped === null ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                            size="small"
+                            variant={save.equipped === null ? "primary" : "secondary"}
                             onClick={() => equip(null)}
                         >
                             None
@@ -292,8 +294,8 @@ function PetPanel() {
                             return (
                                 <Button
                                     key={id}
-                                    size={Button.Sizes.SMALL}
-                                    color={save.equipped === id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                                    size="small"
+                                    variant={save.equipped === id ? "primary" : "secondary"}
                                     disabled={locked}
                                     onClick={() => equip(id)}
                                 >
@@ -306,7 +308,7 @@ function PetPanel() {
                         })}
                     </Flex>
 
-                    <Text variant="heading-md/semibold" style={{ marginTop: 16, marginBottom: 8 }}>Name</Text>
+                    <Text weight="semibold" style={{ marginTop: 16, marginBottom: 8 }}>Name</Text>
                     <TextInput
                         value={name}
                         placeholder={copy.namePlaceholder}
@@ -314,18 +316,18 @@ function PetPanel() {
                         onChange={renameTo}
                     />
                     {!settings.store.nametag && (
-                        <Text variant="text-sm/normal" style={{ opacity: 0.6, marginTop: 4 }}>
+                        <Text size="sm" style={{ opacity: 0.6, marginTop: 4 }}>
                             Turn on the name tag above to show this name over your pet.
                         </Text>
                     )}
 
-                    <Text variant="heading-md/semibold" style={{ marginTop: 16, marginBottom: 8 }}>Colour</Text>
+                    <Text weight="semibold" style={{ marginTop: 16, marginBottom: 8 }}>Colour</Text>
                     <Flex style={{ gap: 8, flexWrap: "wrap" }}>
                         {Object.keys(TINTS).map(id => (
                             <Button
                                 key={id}
-                                size={Button.Sizes.SMALL}
-                                color={save.tint === id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                                size="small"
+                                variant={save.tint === id ? "primary" : "secondary"}
                                 onClick={async () => { await updateSave(profile, { tint: id }); controller?.setTint(TINTS[id]); forceUpdate(); }}
                             >
                                 {cap(id)}
@@ -333,13 +335,13 @@ function PetPanel() {
                         ))}
                     </Flex>
 
-                    <Text variant="heading-md/semibold" style={{ marginTop: 16, marginBottom: 8 }}>Aura</Text>
+                    <Text weight="semibold" style={{ marginTop: 16, marginBottom: 8 }}>Aura</Text>
                     <Flex style={{ gap: 8, flexWrap: "wrap" }}>
                         {Object.keys(AURAS).map(id => (
                             <Button
                                 key={id}
-                                size={Button.Sizes.SMALL}
-                                color={save.aura === id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                                size="small"
+                                variant={save.aura === id ? "primary" : "secondary"}
                                 onClick={async () => { await updateSave(profile, { aura: id }); controller?.setAura(AURAS[id]); forceUpdate(); }}
                             >
                                 {cap(id)}
@@ -356,7 +358,7 @@ function PetModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Your {copy.title}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Your {copy.title}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>

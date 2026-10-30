@@ -6,10 +6,11 @@
 
 import { BRAND_ICON } from "@branding";
 import { ErrorBoundary } from "@components/index";
+import { Text } from "@components/Text";
 import { openPrivateChannel, openUserProfile } from "@utils/discord";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, Text, UserStore, useStateFromStores } from "@webpack/common";
+import { Alerts, IconUtils, PresenceStore, React, RelationshipStore, ScrollerThin, showToast, UserStore, useStateFromStores } from "@webpack/common";
 import type { ReactNode } from "react";
 
 import { sendFileToUser } from "../_shared/dm";
@@ -64,10 +65,10 @@ export function askConsent(reload: () => void) {
         title: "Find friends who use Kittycord?",
         body: (
             <div style={{ textAlign: "left" }}>
-                <Text variant="text-md/normal">
+                <Text>
                     To show which of your friends use Kittycord, your friend list is sent to the Kittycord server, which replies with the ones that have it.
                 </Text>
-                <Text variant="text-sm/normal" style={{ marginTop: 8, opacity: 0.8 }}>
+                <Text size="sm" style={{ marginTop: 8, opacity: 0.8 }}>
                     The server only ever stores a salted hash of each opted-in user's id — never your friend list, your token, or any messages. You can turn this off anytime.
                 </Text>
             </div>
@@ -128,7 +129,7 @@ export function KittycordFriendsRoster({ phase, friends, reload, onStopDiscovera
     if (phase === "needConsent")
         return (
             <div className="kc-fr-consent">
-                <Text variant="text-sm/normal" style={{ color: "var(--text-normal)", marginBottom: 10 }}>
+                <Text size="sm" style={{ color: "var(--text-normal)", marginBottom: 10 }}>
                     See which of your friends use Kittycord and reach them in one click.
                 </Text>
                 <button className="kc-fr-btn kc-fr-btn-primary" onClick={() => askConsent(reload)}>Find my Kittycord friends</button>
@@ -214,12 +215,12 @@ function SendModeModal({ rootProps, user }: { rootProps: RenderModalProps; user:
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Send a mode to {displayName(user)}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Send a mode to {displayName(user)}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
                 {modes.length === 0 ? (
-                    <Text variant="text-sm/normal" style={{ margin: "12px 0", opacity: 0.8 }}>
+                    <Text size="sm" style={{ margin: "12px 0", opacity: 0.8 }}>
                         You haven't created any modes yet. Make one from the Kittycord menu → Modes.
                     </Text>
                 ) : (
@@ -283,7 +284,7 @@ export function FriendsListModal({ rootProps }: { rootProps: RenderModalProps; }
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
                 <img src={BRAND_ICON} width={24} height={24} style={{ borderRadius: 7, marginRight: 10 }} alt="" />
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Your Kittycord friends</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Your Kittycord friends</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>

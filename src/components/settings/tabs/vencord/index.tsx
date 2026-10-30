@@ -48,7 +48,7 @@ type KeysOfType<Object, Type> = {
 }[keyof Object];
 
 function Switches() {
-    const settings = useSettings(["useQuickCss", "enableReactDevtools", "mainWindowFrameless", "frameless", "nativeTitleBar", "transparent", "winCtrlQ", "disableMinSize"]);
+    const settings = useSettings(["useQuickCss", "enableReactDevtools", "mainWindowFrameless", "frameless", "nativeTitleBar", "noRoundCorners", "transparent", "winCtrlQ", "disableMinSize"]);
     const { disableAnalytics } = NoTrack.settings.use(["disableAnalytics"]);
 
     const Switches = [
@@ -88,6 +88,12 @@ function Switches() {
                 restartRequired: true,
             }
         ),
+        IS_DISCORD_DESKTOP && {
+            key: "noRoundCorners",
+            title: "Disable Rounded Window Corners",
+            description: "Makes the corners of the Discord window squared instead of rounded.",
+            restartRequired: true
+        },
         !IS_WEB && {
             key: "transparent",
             title: "Enable Window Transparency",

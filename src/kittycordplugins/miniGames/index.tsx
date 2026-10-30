@@ -5,12 +5,14 @@
  */
 
 import { updateMessage } from "@api/MessageUpdater";
+import { Button } from "@components/Button";
 import { ErrorBoundary } from "@components/index";
+import { Text } from "@components/Text";
 import { sendMessage } from "@utils/discord";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import type { Message, RenderModalProps, User } from "@vencord/discord-types";
-import { Button, ChannelStore, Menu, MessageStore, React, SelectedChannelStore, showToast, Text, UserStore } from "@webpack/common";
+import { ChannelStore, Menu, MessageStore, React, SelectedChannelStore, showToast, UserStore } from "@webpack/common";
 
 import { ensureDmChannel } from "../_shared/dm";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -55,7 +57,7 @@ function GamePickerModal({ rootProps, user }: { rootProps: RenderModalProps; use
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Play a game with {user.username}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Play a game with {user.username}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
@@ -71,7 +73,7 @@ function GamePickerModal({ rootProps, user }: { rootProps: RenderModalProps; use
                         </>
                     ) : (
                         <>
-                            <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>
+                            <Text size="sm" style={{ opacity: 0.85 }}>
                                 Your move is sealed and only revealed after they pick — no cheating possible.
                             </Text>
                             <div style={{ display: "flex", gap: 8 }}>
@@ -130,7 +132,7 @@ function GameAccessoryInner({ message }: { message: Message; }) {
     if (!state) {
         return (
             <GameCard title={GAME_LABELS[payload.t]}>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>Scroll up to load this game.</Text>
+                <Text size="sm" style={{ opacity: 0.85 }}>Scroll up to load this game.</Text>
             </GameCard>
         );
     }

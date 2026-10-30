@@ -5,11 +5,13 @@
  */
 
 import { get, set } from "@api/DataStore";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import { ChannelStore, GuildStore, MessageActions, React, SearchableSelect, TextInput } from "@webpack/common";
 import type { PropsWithChildren } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -167,7 +169,7 @@ function SavedModal({ rootProps, index }: { rootProps: RenderModalProps; index: 
             <ModalHeader>
                 <Flex style={{ flexDirection: "column", gap: 8, width: "100%" }}>
                     <Flex style={{ alignItems: "center" }}>
-                        <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Saved ({shown.length}/{index.length})</Text>
+                        <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Saved ({shown.length}/{index.length})</Text>
                         <ModalCloseButton onClick={rootProps.onClose} />
                     </Flex>
                     <Flex style={{ gap: 8 }}>
@@ -194,7 +196,7 @@ function SavedModal({ rootProps, index }: { rootProps: RenderModalProps; index: 
                         <div style={{ width: 130 }}>
                             <TextInput value={newFolder} onChange={setNewFolder} placeholder="New folder…" />
                         </div>
-                        <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} disabled={!newFolder.trim()} onClick={createFolder}>Add</Button>
+                        <TextButton disabled={!newFolder.trim()} onClick={createFolder}>Add</TextButton>
                     </Flex>
                     {allTags.length > 0 && (
                         <Flex style={{ gap: 6, flexWrap: "wrap" }}>
@@ -207,25 +209,25 @@ function SavedModal({ rootProps, index }: { rootProps: RenderModalProps; index: 
             </ModalHeader>
             <ModalContent>
                 {shown.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>{index.length === 0 ? "Nothing saved yet. Bookmark a message or right-click → Tags, and it shows up here." : "Nothing matches your filters."}</Text>
+                    ? <Text style={{ padding: "16px 0" }}>{index.length === 0 ? "Nothing saved yet. Bookmark a message or right-click → Tags, and it shows up here." : "Nothing matches your filters."}</Text>
                     : shown.map(it => (
                         <Flex key={it.messageId} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold">
+                                <Text size="sm" weight="semibold">
                                     {it.author}
                                     {it.sources.includes("bookmark") && <Chip color="var(--background-modifier-accent)">bookmark</Chip>}
                                     {it.tags.map(t => <Chip key={t}>{t}</Chip>)}
                                 </Text>
-                                <Text variant="text-sm/normal" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.content || "(no text)"}</Text>
+                                <Text size="sm" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.content || "(no text)"}</Text>
                             </div>
                             {folder
-                                ? <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} onClick={() => removeFromFolder(folder, it.messageId)}>Remove</Button>
+                                ? <Button size="small" variant="dangerPrimary" onClick={() => removeFromFolder(folder, it.messageId)}>Remove</Button>
                                 : folderNames.length > 0 && (
                                     <div style={{ width: 130 }}>
                                         <SearchableSelect options={folderNames.map(n => ({ label: "→ " + n, value: n }))} value={""} placeholder="Add to folder" onChange={(v: string) => addToFolder(v, it.messageId)} closeOnSelect />
                                     </div>
                                 )}
-                            <Button size={Button.Sizes.SMALL} onClick={() => {
+                            <Button size="small" onClick={() => {
                                 MessageActions.jumpToMessage({ channelId: it.channelId, messageId: it.messageId, flash: true });
                                 rootProps.onClose();
                             }}>Jump</Button>

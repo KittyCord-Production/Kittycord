@@ -7,12 +7,14 @@
 import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
 import { updateMessage } from "@api/MessageUpdater";
+import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message, RenderModalProps } from "@vencord/discord-types";
-import { Button, Menu, MessageActions, React, Text, TextInput } from "@webpack/common";
+import { Menu, MessageActions, React, TextInput } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -88,7 +90,7 @@ function TagsModal({ rootProps }: { rootProps: RenderModalProps; }) {
             <ModalHeader>
                 <Flex style={{ flexDirection: "column", gap: 8, width: "100%" }}>
                     <Flex style={{ alignItems: "center" }}>
-                        <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Tagged messages ({shown.length}/{entries.length})</Text>
+                        <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Tagged messages ({shown.length}/{entries.length})</Text>
                         <ModalCloseButton onClick={rootProps.onClose} />
                     </Flex>
                     <TextInput value={query} onChange={setQuery} placeholder="Search by author or text…" />
@@ -107,22 +109,22 @@ function TagsModal({ rootProps }: { rootProps: RenderModalProps; }) {
             </ModalHeader>
             <ModalContent>
                 {shown.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>{entries.length === 0 ? "No tagged messages yet. Right-click a message → Tags." : "Nothing matches your search."}</Text>
+                    ? <Text style={{ padding: "16px 0" }}>{entries.length === 0 ? "No tagged messages yet. Right-click a message → Tags." : "Nothing matches your search."}</Text>
                     : shown.map(([id, e]) => (
                         <Flex key={id} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold">{e.author} {e.tags.map(t => (
+                                <Text size="sm" weight="semibold">{e.author} {e.tags.map(t => (
                                     <span key={t} style={{ background: "var(--brand-500)", color: "var(--white)", borderRadius: 8, padding: "1px 6px", fontSize: 11, marginLeft: 4 }}>{t}</span>
                                 ))}</Text>
-                                <Text variant="text-sm/normal" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                <Text size="sm" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                     {e.content || "(no text)"}
                                 </Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} onClick={() => {
+                            <Button size="small" onClick={() => {
                                 MessageActions.jumpToMessage({ channelId: e.channelId, messageId: id, flash: true });
                                 rootProps.onClose();
                             }}>Jump</Button>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} onClick={() => removeAll(id)}>Remove</Button>
+                            <Button size="small" variant="dangerPrimary" onClick={() => removeAll(id)}>Remove</Button>
                         </Flex>
                     ))}
             </ModalContent>

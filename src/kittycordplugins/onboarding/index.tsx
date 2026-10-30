@@ -9,15 +9,17 @@ import { showNotification } from "@api/Notifications";
 import { isPluginEnabled, pluginRequiresRestart, plugins, startPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
 import { BRAND_WEBSITE } from "@branding";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { parseUrl } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { React, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { type FriendAction, friendConsumed, markFriendConsumed, ONBOARDING_SEEN_KEY as SEEN_KEY, subscribeFriendAction, takeFriendAction } from "../_shared/friendLink";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -51,8 +53,8 @@ function ImportSection() {
 
     return (
         <div style={{ margin: "4px 0 12px" }}>
-            <Text variant="text-md/semibold">Already using another client mod?</Text>
-            <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+            <Text weight="semibold">Already using another client mod?</Text>
+            <Text size="sm" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
                 Kittycord found a setup on this computer. Bring your plugins, themes and custom CSS along instead of
                 starting over.
             </Text>
@@ -192,11 +194,11 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Welcome to Kittycord 🐱</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Welcome to Kittycord 🐱</Text>
                 <ModalCloseButton onClick={() => finish(false)} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-md/normal" style={{ margin: "12px 0" }}>
+                <Text style={{ margin: "12px 0" }}>
                     Pick what you'd like turned on. You can change any of this later in Settings → Plugins.
                 </Text>
 
@@ -210,23 +212,23 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
                     />
                 ))}
 
-                <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "12px 0" }}>
+                <Text size="sm" style={{ opacity: 0.75, margin: "12px 0" }}>
                     Tip: click the Kittycord button in the channel header for Modes, bookmarks, tags and “Share setup with a friend”.
                 </Text>
 
                 {friend && (
                     <div style={{ margin: "4px 0 12px" }}>
-                        <Text variant="text-md/semibold">Start from a friend 🐱</Text>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+                        <Text weight="semibold">Start from a friend 🐱</Text>
+                        <Text size="sm" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
                             {friend.kind === "theme"
                                 ? "A friend shared their Kittycord theme with you. Apply it to start with their look."
                                 : "A friend invited you. Confirm so it counts for them."}
                         </Text>
                         <Flex style={{ gap: 8 }}>
-                            <Button color={Button.Colors.BRAND} size={Button.Sizes.SMALL} onClick={confirmFriend}>
+                            <Button size="small" onClick={confirmFriend}>
                                 {friend.kind === "theme" ? "Use their theme" : "Confirm"}
                             </Button>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} size={Button.Sizes.SMALL} onClick={() => setFriend(null)}>Skip</Button>
+                            <TextButton onClick={() => setFriend(null)}>Skip</TextButton>
                         </Flex>
                     </div>
                 )}
@@ -234,22 +236,22 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
                 <ImportSection />
 
                 <div style={{ margin: "4px 0 12px" }}>
-                    <Text variant="text-md/semibold">Coming from a friend?</Text>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+                    <Text weight="semibold">Coming from a friend?</Text>
+                    <Text size="sm" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
                         If a friend sent you their Kittycord setup file, open it here to start with the same plugins and themes.
                     </Text>
                     {importDone ? (
-                        <Text variant="text-sm/normal" style={{ color: "var(--text-positive)" }}>Imported — restart to finish. 🐱</Text>
+                        <Text size="sm" style={{ color: "var(--text-positive)" }}>Imported — restart to finish. 🐱</Text>
                     ) : pending ? (
                         <Flex style={{ gap: 8, alignItems: "center" }}>
-                            <Text variant="text-sm/normal" style={{ flexGrow: 1 }}>
+                            <Text size="sm" style={{ flexGrow: 1 }}>
                                 Found {pending.sender.username || "a friend"}'s setup — {shareSummary(pending)}.
                             </Text>
-                            <Button color={Button.Colors.BRAND} size={Button.Sizes.SMALL} onClick={importFriendSetup}>Import</Button>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} size={Button.Sizes.SMALL} onClick={() => setPending(null)}>Cancel</Button>
+                            <Button size="small" onClick={importFriendSetup}>Import</Button>
+                            <TextButton onClick={() => setPending(null)}>Cancel</TextButton>
                         </Flex>
                     ) : (
-                        <Button color={Button.Colors.PRIMARY} size={Button.Sizes.SMALL} onClick={() => fileRef.current?.click()}>
+                        <Button variant="secondary" size="small" onClick={() => fileRef.current?.click()}>
                             Choose setup file…
                         </Button>
                     )}
@@ -258,39 +260,39 @@ function OnboardingModal({ rootProps }: { rootProps: RenderModalProps; }) {
 
                 {InvitesNative && (
                     <div style={{ margin: "4px 0 12px" }}>
-                        <Text variant="text-md/semibold">Have a friend's code or link?</Text>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
+                        <Text weight="semibold">Have a friend's code or link?</Text>
+                        <Text size="sm" style={{ opacity: 0.75, margin: "2px 0 6px" }}>
                             Paste a friend's creator code or a kittycord.dev share link to start where they did.
                         </Text>
                         {refState === "done" ? (
-                            <Text variant="text-sm/normal" style={{ color: "var(--text-positive)" }}>Done, thanks! 🐱</Text>
+                            <Text size="sm" style={{ color: "var(--text-positive)" }}>Done, thanks! 🐱</Text>
                         ) : (
                             <Flex style={{ gap: 8 }}>
                                 <div style={{ flexGrow: 1 }}>
                                     <TextInput value={refCode} onChange={setRefCode} placeholder="their code or share link" maxLength={200} />
                                 </div>
-                                <Button color={Button.Colors.BRAND} disabled={refState === "saving" || !refCode.trim()} onClick={claimReferral}>Go</Button>
+                                <Button disabled={refState === "saving" || !refCode.trim()} onClick={claimReferral}>Go</Button>
                             </Flex>
                         )}
                         {refState === "fail" && (
-                            <Text variant="text-sm/normal" style={{ color: "var(--text-danger)", marginTop: 4 }}>That didn't work. Check the code or link and try again.</Text>
+                            <Text size="sm" style={{ color: "var(--text-danger)", marginTop: 4 }}>That didn't work. Check the code or link and try again.</Text>
                         )}
                     </div>
                 )}
 
-                <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
+                <Text size="sm" style={{ opacity: 0.75, margin: "0 0 4px" }}>
                     Everything you turn on here can be changed later: click the cat icon in the channel header and pick
                     Kittycord settings.
                 </Text>
 
-                <Text variant="text-sm/normal" style={{ opacity: 0.75, margin: "0 0 4px" }}>
+                <Text size="sm" style={{ opacity: 0.75, margin: "0 0 4px" }}>
                     New here? Find guides and more at{" "}
                     <a role="button" onClick={() => VencordNative.native.openExternal(BRAND_WEBSITE)} style={{ cursor: "pointer", color: "var(--text-link)" }}>kittycord.dev</a>.
                 </Text>
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "8px 0 16px" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => finish(false)}>Skip</Button>
-                    <Button color={Button.Colors.BRAND} onClick={() => finish(true)}>Apply &amp; finish</Button>
+                    <TextButton onClick={() => finish(false)}>Skip</TextButton>
+                    <Button onClick={() => finish(true)}>Apply &amp; finish</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>

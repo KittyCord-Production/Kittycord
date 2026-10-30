@@ -6,14 +6,16 @@
 
 import { get, set } from "@api/DataStore";
 import { packShareUrl } from "@branding";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { Alerts, React, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import type { GalleryPack } from "./native";
@@ -142,11 +144,11 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalPro
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Add "{pack.name}"?</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Add "{pack.name}"?</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "12px 0" }}>
+                <Text size="sm" style={{ opacity: 0.85, margin: "12px 0" }}>
                     by {pack.authorName} — these commands get added to your own list. Nothing is sent anywhere; they only expand into text when you type them.
                 </Text>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
@@ -166,15 +168,15 @@ function ImportDialog({ rootProps, pack, commands }: { rootProps: RenderModalPro
                     ))}
                 </div>
                 {clashes.length > 0 && (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-danger)", marginBottom: 12 }}>
+                    <Text size="sm" style={{ color: "var(--text-danger)", marginBottom: 12 }}>
                         {clashes.length === 1
                             ? `You already have ${prefix}${clashes[0].trigger} — it will be replaced.`
                             : `${clashes.length} of your commands have the same trigger and will be replaced.`}
                     </Text>
                 )}
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} onClick={confirm}>Add commands</Button>
+                    <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                    <Button onClick={confirm}>Add commands</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>
@@ -223,7 +225,7 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
             body: `This permanently removes "${pack.name}" from the community gallery.`,
             confirmText: "Remove",
             cancelText: "Cancel",
-            confirmColor: Button.Colors.RED,
+            confirmColor: "danger",
             onConfirm: async () => {
                 if (await deletePack(pack.id)) {
                     showToast({ text: "Removed from the gallery.", variant: "success" });
@@ -239,10 +241,10 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
         <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
             <div>
                 {pack.featured && (
-                    <Text variant="text-xs/semibold" style={{ color: "#ff8ac4", marginBottom: 2 }}>⭐ Staff pick</Text>
+                    <Text size="xs" weight="semibold" style={{ color: "#ff8ac4", marginBottom: 2 }}>⭐ Staff pick</Text>
                 )}
-                <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pack.name}</Text>
-                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {pack.authorName} · {pack.commandCount} command{pack.commandCount === 1 ? "" : "s"}</Text>
+                <Text weight="semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pack.name}</Text>
+                <Text size="xs" style={{ opacity: 0.6 }}>by {pack.authorName} · {pack.commandCount} command{pack.commandCount === 1 ? "" : "s"}</Text>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, minHeight: 22 }}>
                 {(pack.triggers ?? []).map(t => (
@@ -262,10 +264,10 @@ function PackCard({ pack, onChanged }: { pack: GalleryPack; onChanged(): void; }
                 ))}
             </div>
             <Flex style={{ gap: 6, alignItems: "center" }}>
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={add}>Add</Button>
-                <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={like}>♥ {likes}</Button>
-                <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={() => copyShareLink(pack.id)}>Share</Button>
-                {mine && <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} look={Button.Looks.LINK} onClick={remove}>Remove</Button>}
+                <Button size="small" disabled={busy} onClick={add}>Add</Button>
+                <TextButton onClick={like}>♥ {likes}</TextButton>
+                <TextButton onClick={() => copyShareLink(pack.id)}>Share</TextButton>
+                {mine && <TextButton variant="danger" onClick={remove}>Remove</TextButton>}
             </Flex>
         </div>
     );
@@ -290,17 +292,23 @@ function PackGalleryModal({ rootProps }: { rootProps: RenderModalProps; }) {
         <ModalRoot {...rootProps} size={ModalSize.LARGE}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Command Packs ⌨️</Text>
-                    <Button size={Button.Sizes.SMALL} look={sort === "featured" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</Button>
-                    <Button size={Button.Sizes.SMALL} look={sort === "top" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("top")} style={{ marginRight: 4 }}>Top</Button>
-                    <Button size={Button.Sizes.SMALL} look={sort === "new" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("new")} style={{ marginRight: 8 }}>New</Button>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Command Packs ⌨️</Text>
+                    {sort === "featured"
+                        ? <Button size="small" variant="secondary" onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</Button>
+                        : <TextButton onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</TextButton>}
+                    {sort === "top"
+                        ? <Button size="small" variant="secondary" onClick={() => load("top")} style={{ marginRight: 4 }}>Top</Button>
+                        : <TextButton onClick={() => load("top")} style={{ marginRight: 4 }}>Top</TextButton>}
+                    {sort === "new"
+                        ? <Button size="small" variant="secondary" onClick={() => load("new")} style={{ marginRight: 8 }}>New</Button>
+                        : <TextButton onClick={() => load("new")} style={{ marginRight: 8 }}>New</TextButton>}
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
-                {packs === null && <Text variant="text-md/normal" style={{ padding: "24px 0", opacity: 0.7 }}>Loading packs…</Text>}
+                {packs === null && <Text style={{ padding: "24px 0", opacity: 0.7 }}>Loading packs…</Text>}
                 {packs !== null && packs.length === 0 && (
-                    <Text variant="text-md/normal" style={{ padding: "24px 0" }}>
+                    <Text style={{ padding: "24px 0" }}>
                         {sort === "featured"
                             ? "No staff picks yet — check back soon, or browse Top and New."
                             : "No packs here yet — be the first to publish one from your own commands!"}
@@ -343,35 +351,35 @@ function PublishDialog({ rootProps, commands }: { rootProps: RenderModalProps; c
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Publish a command pack</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Publish a command pack</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
                 {publishedId ? (
                     <>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "12px 0" }}>
+                        <Text size="sm" style={{ opacity: 0.85, margin: "12px 0" }}>
                             Your pack is live. Copy its share link and paste it into any chat — one click adds it to a friend's commands.
                         </Text>
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Done</Button>
-                            <Button color={Button.Colors.BRAND} onClick={() => copyShareLink(publishedId)}>Copy share link</Button>
+                            <TextButton onClick={rootProps.onClose}>Done</TextButton>
+                            <Button onClick={() => copyShareLink(publishedId)}>Copy share link</Button>
                         </Flex>
                     </>
                 ) : (
                     <>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "12px 0" }}>
+                        <Text size="sm" style={{ opacity: 0.85, margin: "12px 0" }}>
                             This shares {commands.length} command{commands.length === 1 ? "" : "s"} and the display name you choose — nothing else. No account, no messages. You can remove it anytime.
                         </Text>
 
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Pack name</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Pack name</Text>
                         <TextInput value={name} onChange={setName} maxLength={40} placeholder="Team replies" />
 
-                        <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Show as</Text>
+                        <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>Show as</Text>
                         <TextInput value={authorName} onChange={setAuthorName} maxLength={40} placeholder="Your display name" />
 
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                            <Button color={Button.Colors.BRAND} disabled={!nameValid || !authorValid || busy} onClick={publish}>Publish</Button>
+                            <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                            <Button disabled={!nameValid || !authorValid || busy} onClick={publish}>Publish</Button>
                         </Flex>
                     </>
                 )}

@@ -6,11 +6,13 @@
 
 import { get, set } from "@api/DataStore";
 import { updateMessage } from "@api/MessageUpdater";
+import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message, RenderModalProps } from "@vencord/discord-types";
-import { Button, ChannelStore, GuildStore, MessageActions, React, SearchableSelect, Text, TextInput } from "@webpack/common";
+import { ChannelStore, GuildStore, MessageActions, React, SearchableSelect, TextInput } from "@webpack/common";
 import type { SVGProps } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -93,7 +95,7 @@ function BookmarksModal({ rootProps }: { rootProps: RenderModalProps; }) {
             <ModalHeader>
                 <Flex style={{ flexDirection: "column", gap: 8, width: "100%" }}>
                     <Flex style={{ alignItems: "center" }}>
-                        <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Bookmarks ({shown.length}/{list.length})</Text>
+                        <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Bookmarks ({shown.length}/{list.length})</Text>
                         <ModalCloseButton onClick={rootProps.onClose} />
                     </Flex>
                     <TextInput value={query} onChange={setQuery} placeholder="Search by author or text…" />
@@ -104,20 +106,20 @@ function BookmarksModal({ rootProps }: { rootProps: RenderModalProps; }) {
             </ModalHeader>
             <ModalContent>
                 {shown.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>{list.length === 0 ? "No bookmarks yet. Hover a message and click the bookmark button." : "Nothing matches your search."}</Text>
+                    ? <Text style={{ padding: "16px 0" }}>{list.length === 0 ? "No bookmarks yet. Hover a message and click the bookmark button." : "Nothing matches your search."}</Text>
                     : shown.map(b => (
                         <Flex key={b.messageId} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold">{b.author}</Text>
-                                <Text variant="text-sm/normal" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                <Text size="sm" weight="semibold">{b.author}</Text>
+                                <Text size="sm" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                     {b.content || "(no text)"}
                                 </Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} onClick={() => {
+                            <Button size="small" onClick={() => {
                                 MessageActions.jumpToMessage({ channelId: b.channelId, messageId: b.messageId, flash: true });
                                 rootProps.onClose();
                             }}>Jump</Button>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} onClick={() => remove(b.messageId)}>Remove</Button>
+                            <Button size="small" variant="dangerPrimary" onClick={() => remove(b.messageId)}>Remove</Button>
                         </Flex>
                     ))}
             </ModalContent>

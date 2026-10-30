@@ -7,10 +7,13 @@
 import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
 import { UserIcon } from "@components/Icons";
 import { ErrorBoundary } from "@components/index";
+import { Paragraph } from "@components/Paragraph";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
@@ -19,7 +22,7 @@ import { ModalSize, openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import definePlugin, { OptionType } from "@utils/types";
 import type { Message, MessageAttachment, RenderModalProps, User } from "@vencord/discord-types";
-import { Alerts, Button, Forms, Menu, React, RelationshipStore, SearchableSelect, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { Alerts, Menu, React, RelationshipStore, SearchableSelect, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { FriendsListModal, KittycordFriendsRoster, KittycordFriendsTab, useKittycordFriends } from "./friends";
@@ -69,9 +72,9 @@ function FriendDiscoveryToggle() {
                 hideBorder
             />
             {!configured && (
-                <Forms.FormText style={{ opacity: 0.7 }}>
+                <Paragraph style={{ opacity: 0.7 }}>
                     Friend discovery isn't available here.
-                </Forms.FormText>
+                </Paragraph>
             )}
         </>
     );
@@ -128,7 +131,7 @@ function SendModal({ rootProps, user }: { rootProps: RenderModalProps; user: Use
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Send your Kittycord setup</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Send your Kittycord setup</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
@@ -138,19 +141,19 @@ function SendModal({ rootProps, user }: { rootProps: RenderModalProps; user: Use
                     </div>
                 )}
 
-                <Text variant="text-sm/normal" style={{ margin: "12px 0" }}>
+                <Text size="sm" style={{ margin: "12px 0" }}>
                     Sends {getUniqueUsername(user)} this preview plus a file they can import — the preview shows even if they don't have Kittycord yet. Your account token is never included.
                 </Text>
 
-                <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>What to share</Text>
+                <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>What to share</Text>
                 <SearchableSelect options={SCOPE_OPTIONS} value={scope} onChange={(v: ShareScope) => setScope(v)} closeOnSelect />
 
-                <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} disabled={busy} onClick={send}>Send</Button>
+                    <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                    <Button disabled={busy} onClick={send}>Send</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>
@@ -173,13 +176,13 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
             title: own ? "Restore your Kittycord setup?" : `Import ${author}'s Kittycord setup?`,
             body: (
                 <div style={{ textAlign: "left" }}>
-                    <Text variant="text-md/normal">Includes: <b>{scopeLabel(envelope.scope)}</b></Text>
+                    <Text>Includes: <b>{scopeLabel(envelope.scope)}</b></Text>
                     {envelope.enabledPlugins.length > 0 && (
-                        <Text variant="text-sm/normal" style={{ opacity: 0.8, marginTop: 4 }}>
+                        <Text size="sm" style={{ opacity: 0.8, marginTop: 4 }}>
                             {envelope.enabledPlugins.length} enabled plugin(s) in this setup.
                         </Text>
                     )}
-                    <Text variant="text-sm/normal" style={{ marginTop: 8 }}>
+                    <Text size="sm" style={{ marginTop: 8 }}>
                         This merges into your current settings and needs a restart afterwards. It can't be undone automatically.
                     </Text>
                 </div>
@@ -199,8 +202,8 @@ function ImportCardInner({ message, attachment, own }: { message: Message; attac
 
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>
-            <Text variant="text-md/semibold" style={{ flex: 1 }}>📦 {own ? "Your Kittycord setup" : `${author} shared their Kittycord setup`}</Text>
-            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={startImport}>{own ? "Restore" : "Import"}</Button>
+            <Text weight="semibold" style={{ flex: 1 }}>📦 {own ? "Your Kittycord setup" : `${author} shared their Kittycord setup`}</Text>
+            <Button size="small" onClick={startImport}>{own ? "Restore" : "Import"}</Button>
         </div>
     );
 }
@@ -230,14 +233,14 @@ function FriendsModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Share with a Kittycord friend</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Share with a Kittycord friend</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>What to share</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>What to share</Text>
                 <SearchableSelect options={SCOPE_OPTIONS} value={scope} onChange={(v: ShareScope) => setScope(v)} closeOnSelect />
 
-                <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />
 
                 <KittycordFriendsRoster

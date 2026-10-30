@@ -5,12 +5,14 @@
  */
 
 import { themeShareUrl } from "@branding";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { Alerts, React, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { browseGallery, deleteGalleryTheme, enableTheme, type GallerySort, type GalleryTheme, isMyTheme, likeGalleryTheme, publishTheme, saveTheme } from "./store";
@@ -64,7 +66,7 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
             body: `This permanently removes "${theme.name}" from the community gallery.`,
             confirmText: "Remove",
             cancelText: "Cancel",
-            confirmColor: Button.Colors.RED,
+            confirmColor: "danger",
             onConfirm: async () => {
                 if (await deleteGalleryTheme(theme.id)) {
                     showToast({ text: "Removed from the gallery.", variant: "success" });
@@ -81,16 +83,16 @@ function GalleryCard({ theme, onChanged }: { theme: GalleryTheme; onChanged(): v
             <Swatches params={theme.params} />
             <div>
                 {theme.featured && (
-                    <Text variant="text-xs/semibold" style={{ color: "#ff8ac4", marginBottom: 2 }}>⭐ Staff pick</Text>
+                    <Text size="xs" weight="semibold" style={{ color: "#ff8ac4", marginBottom: 2 }}>⭐ Staff pick</Text>
                 )}
-                <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{theme.name}</Text>
-                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {theme.authorName}</Text>
+                <Text weight="semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{theme.name}</Text>
+                <Text size="xs" style={{ opacity: 0.6 }}>by {theme.authorName}</Text>
             </div>
             <Flex style={{ gap: 6, alignItems: "center" }}>
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={apply}>Apply</Button>
-                <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={like}>♥ {likes}</Button>
-                <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={copyLink}>Share</Button>
-                {mine && <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} look={Button.Looks.LINK} onClick={remove}>Remove</Button>}
+                <Button size="small" disabled={busy} onClick={apply}>Apply</Button>
+                <TextButton onClick={like}>♥ {likes}</TextButton>
+                <TextButton onClick={copyLink}>Share</TextButton>
+                {mine && <TextButton variant="danger" onClick={remove}>Remove</TextButton>}
             </Flex>
         </div>
     );
@@ -115,17 +117,23 @@ function GalleryModal({ rootProps }: { rootProps: RenderModalProps; }) {
         <ModalRoot {...rootProps} size={ModalSize.LARGE}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Theme Gallery 🎨</Text>
-                    <Button size={Button.Sizes.SMALL} look={sort === "featured" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</Button>
-                    <Button size={Button.Sizes.SMALL} look={sort === "top" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("top")} style={{ marginRight: 4 }}>Top</Button>
-                    <Button size={Button.Sizes.SMALL} look={sort === "new" ? Button.Looks.FILLED : Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => load("new")} style={{ marginRight: 8 }}>New</Button>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Theme Gallery 🎨</Text>
+                    {sort === "featured"
+                        ? <Button size="small" variant="secondary" onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</Button>
+                        : <TextButton onClick={() => load("featured")} style={{ marginRight: 4 }}>Featured</TextButton>}
+                    {sort === "top"
+                        ? <Button size="small" variant="secondary" onClick={() => load("top")} style={{ marginRight: 4 }}>Top</Button>
+                        : <TextButton onClick={() => load("top")} style={{ marginRight: 4 }}>Top</TextButton>}
+                    {sort === "new"
+                        ? <Button size="small" variant="secondary" onClick={() => load("new")} style={{ marginRight: 8 }}>New</Button>
+                        : <TextButton onClick={() => load("new")} style={{ marginRight: 8 }}>New</TextButton>}
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
-                {themes === null && <Text variant="text-md/normal" style={{ padding: "24px 0", opacity: 0.7 }}>Loading the gallery…</Text>}
+                {themes === null && <Text style={{ padding: "24px 0", opacity: 0.7 }}>Loading the gallery…</Text>}
                 {themes !== null && themes.length === 0 && (
-                    <Text variant="text-md/normal" style={{ padding: "24px 0" }}>
+                    <Text style={{ padding: "24px 0" }}>
                         {sort === "featured"
                             ? "No staff picks yet — check back soon, or browse Top and New."
                             : "No themes here yet — be the first to publish one from your Studio themes!"}
@@ -176,7 +184,7 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Publish "{params.name}"</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Publish "{params.name}"</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
@@ -185,26 +193,26 @@ function PublishModal({ rootProps, params }: { rootProps: RenderModalProps; para
                 </div>
                 {publishedId ? (
                     <>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 12 }}>
+                        <Text size="sm" style={{ opacity: 0.85, marginBottom: 12 }}>
                             "{params.name}" is live in the gallery. Copy its share link and paste it into any chat so friends can preview and apply it.
                         </Text>
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Done</Button>
-                            <Button color={Button.Colors.BRAND} onClick={copyShareLink}>Copy share link</Button>
+                            <TextButton onClick={rootProps.onClose}>Done</TextButton>
+                            <Button onClick={copyShareLink}>Copy share link</Button>
                         </Flex>
                     </>
                 ) : (
                     <>
-                        <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 12 }}>
+                        <Text size="sm" style={{ opacity: 0.85, marginBottom: 12 }}>
                             This shares the theme's colors and the display name you choose with the community gallery — nothing else. No account, no messages, no personal data. You can remove it anytime.
                         </Text>
 
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Show as</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Show as</Text>
                         <TextInput value={authorName} onChange={setAuthorName} maxLength={40} placeholder="Your display name" />
 
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                            <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                            <Button color={Button.Colors.BRAND} disabled={!nameValid || busy} onClick={publish}>Publish</Button>
+                            <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                            <Button disabled={!nameValid || busy} onClick={publish}>Publish</Button>
                         </Flex>
                     </>
                 )}

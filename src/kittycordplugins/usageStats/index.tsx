@@ -6,9 +6,10 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { FormSwitch } from "@components/FormSwitch";
+import { Paragraph } from "@components/Paragraph";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
-import { Alerts, Forms, React } from "@webpack/common";
+import { Alerts, React } from "@webpack/common";
 
 const Telemetry = VencordNative.kittycordTelemetry;
 const logger = new Logger("UsageStats");
@@ -33,9 +34,9 @@ function ConsentSetting() {
                 hideBorder
             />
             {!configured && (
-                <Forms.FormText style={{ opacity: 0.7 }}>
+                <Paragraph style={{ opacity: 0.7 }}>
                     The stats backend isn't set up yet, so nothing is sent regardless of this toggle.
-                </Forms.FormText>
+                </Paragraph>
             )}
         </>
     );

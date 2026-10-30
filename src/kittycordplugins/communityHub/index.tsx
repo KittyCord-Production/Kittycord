@@ -6,16 +6,18 @@
 
 import { get, set } from "@api/DataStore";
 import { BRAND_DISCORD_INVITE } from "@branding";
+import { Button, TextButton } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { WebsiteIcon } from "@components/Icons";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { openInviteModal } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text } from "@webpack/common";
+import { React, showToast } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { openGallery } from "../kittycordStudio/GalleryModal";
@@ -99,26 +101,26 @@ function CommunityPanel() {
 
     return (
         <ErrorBoundary noop>
-            <Text variant="text-md/normal" style={{ marginBottom: 14, color: "var(--text-muted)" }}>
+            <Text style={{ marginBottom: 14, color: "var(--text-muted)" }}>
                 What's happening across Kittycord — news, community themes and where to hang out.
             </Text>
 
             {visibleNews.length > 0 && (
                 <>
-                    <Text variant="text-sm/semibold" style={{ marginBottom: 6 }}>Latest</Text>
+                    <Text size="sm" weight="semibold" style={{ marginBottom: 6 }}>Latest</Text>
                     {visibleNews.map(n => (
                         <div key={n.id} style={{ background: "var(--background-secondary)", borderRadius: 10, padding: 12, marginBottom: 8 }}>
                             <Flex style={{ alignItems: "flex-start", gap: 8 }}>
                                 <div style={{ flexGrow: 1, minWidth: 0 }}>
-                                    <Text variant="text-md/semibold">{n.title}</Text>
-                                    <Text variant="text-sm/normal" style={{ opacity: 0.85, marginTop: 2 }}>{n.body}</Text>
+                                    <Text weight="semibold">{n.title}</Text>
+                                    <Text size="sm" style={{ opacity: 0.85, marginTop: 2 }}>{n.body}</Text>
                                     {n.url && (
                                         <a role="button" onClick={() => open(n.url!)} style={{ cursor: "pointer", color: "var(--text-link)", fontSize: 13, display: "inline-block", marginTop: 6 }}>
                                             Learn more
                                         </a>
                                     )}
                                 </div>
-                                <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => dismiss(n.id)}>Dismiss</Button>
+                                <TextButton onClick={() => dismiss(n.id)}>Dismiss</TextButton>
                             </Flex>
                         </div>
                     ))}
@@ -128,8 +130,8 @@ function CommunityPanel() {
             {topTheme && (
                 <>
                     <Flex style={{ alignItems: "center", marginTop: 6, marginBottom: 6 }}>
-                        <Text variant="text-sm/semibold" style={{ flexGrow: 1 }}>{anyFeatured ? "Theme of the week" : "Popular theme"}</Text>
-                        <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={openGallery}>Browse all</Button>
+                        <Text size="sm" weight="semibold" style={{ flexGrow: 1 }}>{anyFeatured ? "Theme of the week" : "Popular theme"}</Text>
+                        <TextButton onClick={openGallery}>Browse all</TextButton>
                     </Flex>
                     <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 14, marginBottom: 8 }}>
                         <Swatches params={topTheme.params} width="100%" height={44} />
@@ -137,35 +139,35 @@ function CommunityPanel() {
                             <div style={{ flexGrow: 1, minWidth: 0 }}>
                                 <Flex style={{ alignItems: "center", gap: 6 }}>
                                     {topTheme.featured && <span style={{ fontSize: 12 }}>⭐</span>}
-                                    <Text variant="text-md/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topTheme.name}</Text>
+                                    <Text weight="semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topTheme.name}</Text>
                                 </Flex>
-                                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {topTheme.authorName}</Text>
+                                <Text size="xs" style={{ opacity: 0.6 }}>by {topTheme.authorName}</Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={() => like(topTheme)}>
+                            <TextButton onClick={() => like(topTheme)}>
                                 ♥ {likes[topTheme.id] ?? topTheme.likes}
-                            </Button>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={() => applyTheme(topTheme)}>Apply</Button>
+                            </TextButton>
+                            <Button size="small" disabled={busy} onClick={() => applyTheme(topTheme)}>Apply</Button>
                         </Flex>
                     </div>
                     {moreThemes.map(t => (
                         <div key={t.id} style={{ background: "var(--background-secondary)", borderRadius: 10, padding: 10, marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
                             <Swatches params={t.params} />
                             <div style={{ flexGrow: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</Text>
-                                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>by {t.authorName}</Text>
+                                <Text size="sm" weight="semibold" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</Text>
+                                <Text size="xs" style={{ opacity: 0.6 }}>by {t.authorName}</Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={() => applyTheme(t)}>Apply</Button>
+                            <Button size="small" disabled={busy} onClick={() => applyTheme(t)}>Apply</Button>
                         </div>
                     ))}
                 </>
             )}
 
             <div style={{ background: "var(--background-secondary)", borderRadius: 10, padding: 14, marginTop: 6 }}>
-                <Text variant="text-md/semibold">Join the community</Text>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85, margin: "2px 0 10px" }}>
+                <Text weight="semibold">Join the community</Text>
+                <Text size="sm" style={{ opacity: 0.85, margin: "2px 0 10px" }}>
                     Chat, swap themes and share your setup with other Kittycord users.
                 </Text>
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={joinDiscord}>Join our Discord</Button>
+                <Button size="small" onClick={joinDiscord}>Join our Discord</Button>
             </div>
         </ErrorBoundary>
     );
@@ -175,7 +177,7 @@ function CommunityModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Kittycord Community</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Kittycord Community</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>

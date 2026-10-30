@@ -21,7 +21,7 @@ import "./kittycordTab.css";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { handleComponentFailed } from "@components/handleComponentFailed";
 import { onlyOnce } from "@utils/onlyOnce";
-import { Modal,openModal } from "@webpack/common";
+import { Modal, openModal } from "@webpack/common";
 import type { ComponentType, PropsWithChildren } from "react";
 
 export function SettingsTab({ children }: PropsWithChildren) {

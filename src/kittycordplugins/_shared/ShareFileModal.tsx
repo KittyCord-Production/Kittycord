@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getCurrentChannel } from "@utils/discord";
 import { ModalSize } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, DraftType, React, showToast, Text, TextInput, UploadHandler } from "@webpack/common";
+import { DraftType, React, showToast, TextInput, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -49,21 +51,21 @@ export function ShareFileModal({ rootProps, title, blurb, buildFile, defaultNote
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>{title}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>{title}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-sm/normal" style={{ margin: "12px 0", opacity: 0.8 }}>{blurb}</Text>
+                <Text size="sm" style={{ margin: "12px 0", opacity: 0.8 }}>{blurb}</Text>
 
-                <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
+                <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
                 <FriendPicker value={target} onChange={setTarget} />
 
-                <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={setNote} />
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={postInChat}>Post in current chat</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!target || busy} onClick={sendDm}>Send</Button>
+                    <TextButton onClick={postInChat}>Post in current chat</TextButton>
+                    <Button disabled={!target || busy} onClick={sendDm}>Send</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>

@@ -5,12 +5,14 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType, type PluginNative } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { React, showToast, TextInput, UserStore } from "@webpack/common";
 import type { CSSProperties } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -89,7 +91,7 @@ function NameStyleEditor() {
 
     if (!Native) {
         return (
-            <Text variant="text-sm/normal" style={{ opacity: 0.8 }}>
+            <Text size="sm" style={{ opacity: 0.8 }}>
                 Name styles are available on the Kittycord desktop app.
             </Text>
         );
@@ -138,7 +140,7 @@ function NameStyleEditor() {
 
     return (
         <>
-            <Text variant="text-sm/normal" style={{ opacity: 0.8, marginBottom: 8 }}>
+            <Text size="sm" style={{ opacity: 0.8, marginBottom: 8 }}>
                 Pick one color for a solid name or two for a gradient. Everyone using Kittycord sees it in chat and the member list.
             </Text>
             <Flex style={{ gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
@@ -168,18 +170,18 @@ function NameStyleEditor() {
                 <div style={{ width: 110 }}>
                     <TextInput value={color2} onChange={setColor2} placeholder="#FF8AC4" maxLength={7} />
                 </div>
-                <Text variant="text-md/semibold" style={validPreview ? nameStyle(color1.trim(), HEX_RE.test(color2.trim()) ? color2.trim() : undefined) : {}}>
+                <Text weight="semibold" style={validPreview ? nameStyle(color1.trim(), HEX_RE.test(color2.trim()) ? color2.trim() : undefined) : {}}>
                     {previewName}
                 </Text>
             </Flex>
             <Flex style={{ gap: 8 }}>
-                <Button color={Button.Colors.BRAND} size={Button.Sizes.SMALL} disabled={busy} onClick={save}>
+                <Button size="small" disabled={busy} onClick={save}>
                     Save
                 </Button>
                 {persisted && (
-                    <Button color={Button.Colors.RED} look={Button.Looks.LINK} size={Button.Sizes.SMALL} disabled={busy} onClick={remove}>
+                    <TextButton variant="danger" disabled={busy} onClick={remove}>
                         Remove
-                    </Button>
+                    </TextButton>
                 )}
             </Flex>
         </>
@@ -190,7 +192,7 @@ function NameStyleModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.SMALL}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Style your name</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Style your name</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>

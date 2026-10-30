@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Button, React, Text, UserStore } from "@webpack/common";
+import { Button } from "@components/Button";
+import { Text } from "@components/Text";
+import { React, UserStore } from "@webpack/common";
 
 import { RPS_CHOICES, RPS_NAMES, RpsState, rpsWinner, TttState } from "./engine";
 import { sha256Hex } from "./protocol";
@@ -20,7 +22,7 @@ export function name(id: string): string {
 export function GameCard({ title, children }: { title: string; children: React.ReactNode; }) {
     return (
         <div style={{ display: "inline-block", padding: 12, margin: "4px 0", borderRadius: 8, border: "1px solid rgba(255, 95, 166, 0.25)", background: "var(--background-secondary)", minWidth: 220 }}>
-            <Text variant="text-md/semibold" style={{ color: ACCENT, marginBottom: 8 }}>🎮 {title}</Text>
+            <Text weight="semibold" style={{ color: ACCENT, marginBottom: 8 }}>🎮 {title}</Text>
             {children}
         </div>
     );
@@ -69,9 +71,9 @@ export function TttBoard({ state, meId, onMove, onRematch }: TttProps) {
                     </button>
                 ))}
             </div>
-            <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>{status}</Text>
+            <Text size="sm" style={{ opacity: 0.85 }}>{status}</Text>
             {participant && over && (
-                <Button size={Button.Sizes.SMALL} style={{ marginTop: 8 }} onClick={onRematch}>
+                <Button size="small" style={{ marginTop: 8 }} onClick={onRematch}>
                     Rematch
                 </Button>
             )}
@@ -103,19 +105,19 @@ export function RpsBoard({ state, meId, pendingChoice, onCounter, onReveal, onRe
 
     let body: React.ReactNode;
     if (!state.valid) {
-        body = <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>This game got tangled — start a fresh one.</Text>;
+        body = <Text size="sm" style={{ opacity: 0.85 }}>This game got tangled — start a fresh one.</Text>;
     } else if (state.phase === "waitCounter") {
         body = meId === state.vs ? (
             <>
-                <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 6 }}>{name(state.starter)} sealed a move. Pick yours:</Text>
+                <Text size="sm" style={{ opacity: 0.85, marginBottom: 6 }}>{name(state.starter)} sealed a move. Pick yours:</Text>
                 <div style={{ display: "flex", gap: 6 }}>
                     {RPS_CHOICES.map((emoji, i) => (
-                        <Button key={i} size={Button.Sizes.SMALL} onClick={() => onCounter(i)}>{emoji}</Button>
+                        <Button key={i} size="small" onClick={() => onCounter(i)}>{emoji}</Button>
                     ))}
                 </div>
             </>
         ) : (
-            <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>
+            <Text size="sm" style={{ opacity: 0.85 }}>
                 {meId === state.starter && pendingChoice !== null
                     ? `You sealed ${RPS_CHOICES[pendingChoice]} — waiting for ${name(state.vs)} to pick…`
                     : `Waiting for ${name(state.vs)} to pick…`}
@@ -125,14 +127,14 @@ export function RpsBoard({ state, meId, pendingChoice, onCounter, onReveal, onRe
         body = meId === state.starter ? (
             pendingChoice !== null ? (
                 <>
-                    <Text variant="text-sm/normal" style={{ opacity: 0.85, marginBottom: 6 }}>{name(state.vs)} picked! Time to reveal.</Text>
-                    <Button size={Button.Sizes.SMALL} onClick={onReveal}>Reveal my move</Button>
+                    <Text size="sm" style={{ opacity: 0.85, marginBottom: 6 }}>{name(state.vs)} picked! Time to reveal.</Text>
+                    <Button size="small" onClick={onReveal}>Reveal my move</Button>
                 </>
             ) : (
-                <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>Your sealed move was lost on this device — call it a draw 😿</Text>
+                <Text size="sm" style={{ opacity: 0.85 }}>Your sealed move was lost on this device — call it a draw 😿</Text>
             )
         ) : (
-            <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>Waiting for {name(state.starter)} to reveal…</Text>
+            <Text size="sm" style={{ opacity: 0.85 }}>Waiting for {name(state.starter)} to reveal…</Text>
         );
     } else {
         const starterMove = state.revealMove!;
@@ -141,22 +143,22 @@ export function RpsBoard({ state, meId, pendingChoice, onCounter, onReveal, onRe
         const winnerId = result === "draw" ? null : result === "starter" ? state.starter : state.vs;
         body = (
             <>
-                <Text variant="text-md/normal" style={{ marginBottom: 4 }}>
+                <Text style={{ marginBottom: 4 }}>
                     {RPS_CHOICES[starterMove]} {name(state.starter)} vs {name(state.vs)} {RPS_CHOICES[vsMove]}
                 </Text>
                 {fair === false ? (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-danger)" }}>
+                    <Text size="sm" style={{ color: "var(--text-danger)" }}>
                         ⚠️ {name(state.starter)}'s reveal doesn't match the sealed move.
                     </Text>
                 ) : (
-                    <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>
+                    <Text size="sm" style={{ opacity: 0.85 }}>
                         {winnerId === null
                             ? `Draw — ${RPS_NAMES[starterMove]} on both sides!`
                             : winnerId === meId ? "You win! 🎉" : `${name(winnerId)} wins!`}
                     </Text>
                 )}
                 {participant && (
-                    <Button size={Button.Sizes.SMALL} style={{ marginTop: 8 }} onClick={onRematch}>
+                    <Button size="small" style={{ marginTop: 8 }} onClick={onRematch}>
                         Rematch
                     </Button>
                 )}

@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Button, moment, React, Text, UserStore } from "@webpack/common";
+import { moment, React, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { clearHistory, getHistory, HistoryEntry } from "./history";
@@ -19,14 +21,14 @@ function Row({ entry }: { entry: HistoryEntry; }) {
     return (
         <Flex style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-                <Text variant="text-sm/semibold">{user?.globalName || user?.username || entry.userId}</Text>
-                <Text variant="text-sm/normal" style={{ opacity: 0.75 }}>
+                <Text size="sm" weight="semibold">{user?.globalName || user?.username || entry.userId}</Text>
+                <Text size="sm" style={{ opacity: 0.75 }}>
                     <span style={{ color: bucketColor(entry.from) }}>{bucketLabel(entry.from)}</span>
                     {" → "}
                     <span style={{ color: bucketColor(entry.to) }}>{bucketLabel(entry.to)}</span>
                 </Text>
             </div>
-            <Text variant="text-xs/normal" style={{ opacity: 0.6, whiteSpace: "nowrap" }}>
+            <Text size="xs" style={{ opacity: 0.6, whiteSpace: "nowrap" }}>
                 {moment(entry.at).calendar()}
             </Text>
         </Flex>
@@ -40,20 +42,20 @@ function HistoryModal({ rootProps }: { rootProps: RenderModalProps; }) {
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Status Changes</Text>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Status Changes</Text>
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
                 {list.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>Nothing here yet. Changes show up once someone you watch switches status.</Text>
+                    ? <Text style={{ padding: "16px 0" }}>Nothing here yet. Changes show up once someone you watch switches status.</Text>
                     : (
                         <>
                             {list.map(entry => <Row key={`${entry.userId}-${entry.at}`} entry={entry} />)}
                             <Flex style={{ justifyContent: "flex-end", margin: "16px 0" }}>
                                 <Button
-                                    size={Button.Sizes.SMALL}
-                                    color={Button.Colors.RED}
+                                    size="small"
+                                    variant="dangerPrimary"
                                     onClick={async () => {
                                         await clearHistory();
                                         setList([]);

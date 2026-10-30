@@ -8,13 +8,15 @@ import { get, set } from "@api/DataStore";
 import { isPluginEnabled, plugins, startPlugin, stopPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
+import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
 import { SafetyIcon } from "@components/Icons";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
-import { Button, React, Text } from "@webpack/common";
+import { React } from "@webpack/common";
 
 import style from "./style.css?managed";
 
@@ -97,21 +99,21 @@ function SafetyTab() {
     return (
         <ErrorBoundary noop>
             <div className="kc-safety">
-                <Text variant="heading-lg/semibold">Account safety 🐱</Text>
-                <Text variant="text-md/normal" style={{ marginTop: 6 }}>
+                <Text size="lg" weight="semibold">Account safety 🐱</Text>
+                <Text style={{ marginTop: 6 }}>
                     A quick overview of your privacy choices and a short checklist to keep your Discord account safe. Everything here stays on your device.
                 </Text>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Security checklist ({done}/{CHECKLIST.length})</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Security checklist ({done}/{CHECKLIST.length})</Text>
                 <div className="kc-safety-progress"><div className="kc-safety-bar" style={{ width: `${(done / CHECKLIST.length) * 100}%` }} /></div>
                 {CHECKLIST.map(c => (
                     <FormSwitch key={c.id} title={c.label} description={c.hint} value={!!checks[c.id]} onChange={v => toggleCheck(c.id, v)} hideBorder />
                 ))}
                 <div className="kc-safety-btns">
-                    <Button color={Button.Colors.PRIMARY} onClick={() => open(TWO_FA_HELP)}>How to turn on 2FA</Button>
+                    <Button variant="secondary" onClick={() => open(TWO_FA_HELP)}>How to turn on 2FA</Button>
                 </div>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Privacy controls</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Privacy controls</Text>
                 {telemetry && (
                     <ConsentToggle
                         bridge={telemetry}
@@ -133,15 +135,15 @@ function SafetyTab() {
                     onChange={v => { setBadgeOn(v); setPluginEnabled("UsesKittycord", v); }}
                     hideBorder
                 />
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 8 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 8 }}>
                     Want the full breakdown of exactly what leaves your computer? Open the Privacy &amp; Security tab.
                 </Text>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Today on Discord</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Today on Discord</Text>
                 {today === undefined
-                    ? <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>Loading…</Text>
+                    ? <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>Loading…</Text>
                     : today === null
-                        ? <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>Turn on the Wellbeing plugin to see your local screen-time insights here. This data never leaves your device.</Text>
+                        ? <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>Turn on the Wellbeing plugin to see your local screen-time insights here. This data never leaves your device.</Text>
                         : (
                             <div className="kc-safety-stats">
                                 <div className="kc-safety-stat"><b>{fmtMin(today.activeMin)}</b><span>active today</span></div>

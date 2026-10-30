@@ -5,12 +5,14 @@
  */
 
 import { get, set } from "@api/DataStore";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
+import { Text } from "@components/Text";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Slider, Text, TextInput } from "@webpack/common";
+import { Alerts, React, showToast, Slider, TextInput } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -72,8 +74,8 @@ function ColorRow({ label, hint, value, onChange }: { label: string; hint: strin
                 style={{ width: 36, height: 36, border: "none", borderRadius: 8, padding: 0, background: "none", cursor: "pointer" }}
             />
             <div style={{ flex: 1, minWidth: 0 }}>
-                <Text variant="text-sm/semibold">{label}</Text>
-                <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>{hint}</Text>
+                <Text size="sm" weight="semibold">{label}</Text>
+                <Text size="xs" style={{ opacity: 0.6 }}>{hint}</Text>
             </div>
             <div style={{ width: 110 }}>
                 <TextInput value={draft} onChange={commit} maxLength={7} />
@@ -177,7 +179,7 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Kittycord Studio 🎨</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Kittycord Studio 🎨</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
@@ -185,22 +187,22 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                     <PreviewPane params={params} />
                 </div>
 
-                <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Theme name</Text>
+                <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Theme name</Text>
                 <TextInput value={params.name} onChange={(v: string) => setParams(prev => ({ ...prev, name: v }))} maxLength={40} />
                 {!nameValid && (
-                    <Text variant="text-xs/normal" style={{ opacity: 0.7, marginTop: 4 }}>
+                    <Text size="xs" style={{ opacity: 0.7, marginTop: 4 }}>
                         Use 1–40 letters, numbers, spaces or - ' ! &amp; .
                     </Text>
                 )}
 
-                <Text variant="text-sm/semibold" style={{ margin: "14px 0 2px" }}>Colors</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "14px 0 2px" }}>Colors</Text>
                 {COLOR_FIELDS.map(f => {
                     const fallback = COLOR_FALLBACK[f.key];
                     const value = params.colors[f.key] || (fallback && params.colors[fallback]) || "#000000";
                     return <ColorRow key={f.key} label={f.label} hint={f.hint} value={value} onChange={v => setColor(f.key, v)} />;
                 })}
 
-                <Text variant="text-sm/semibold" style={{ margin: "14px 0 8px" }}>Roundness</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "14px 0 8px" }}>Roundness</Text>
                 <Slider
                     initialValue={params.roundness}
                     minValue={0}
@@ -211,13 +213,13 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                     onValueRender={(v: number) => `${Math.round(v)}px`}
                 />
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 6px" }}>Background</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "16px 0 6px" }}>Background</Text>
                 <Flex style={{ gap: 6 }}>
                     {([["none", "None"], ["hosted", "Curated"], ["url", "Custom URL"]] as const).map(([k, label]) => (
                         <Button
                             key={k}
-                            size={Button.Sizes.SMALL}
-                            color={params.bg.kind === k ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                            size="small"
+                            variant={params.bg.kind === k ? "primary" : "secondary"}
                             onClick={() => setBg(k === "hosted" ? { kind: "hosted", id: BG_IDS[0] } : k === "url" ? { kind: "url", url: "" } : { kind: "none" })}
                         >
                             {label}
@@ -240,31 +242,31 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                     <div style={{ marginTop: 8 }}>
                         <TextInput value={params.bg.url ?? ""} onChange={(v: string) => setBg({ kind: "url", url: v })} placeholder="https://example.com/wallpaper.png" maxLength={MAX_BG_URL_LEN} />
                         {!bgUrlValid && (params.bg.url ?? "").length > 0 && (
-                            <Text variant="text-xs/normal" style={{ opacity: 0.7, marginTop: 4 }}>Use a direct https image link.</Text>
+                            <Text size="xs" style={{ opacity: 0.7, marginTop: 4 }}>Use a direct https image link.</Text>
                         )}
-                        <Text variant="text-xs/normal" style={{ opacity: 0.6, marginTop: 4 }}>
+                        <Text size="xs" style={{ opacity: 0.6, marginTop: 4 }}>
                             Anyone who applies a shared theme loads this through Kittycord, not your link directly.
                         </Text>
                     </div>
                 )}
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 6px" }}>Pattern</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "16px 0 6px" }}>Pattern</Text>
                 <Flex style={{ gap: 6, flexWrap: "wrap" }}>
-                    <Button size={Button.Sizes.SMALL} color={!params.pattern ? Button.Colors.BRAND : Button.Colors.PRIMARY} onClick={() => setParams(prev => ({ ...prev, pattern: "" }))}>None</Button>
+                    <Button size="small" variant={!params.pattern ? "primary" : "secondary"} onClick={() => setParams(prev => ({ ...prev, pattern: "" }))}>None</Button>
                     {PATTERN_IDS.map(id => (
-                        <Button key={id} size={Button.Sizes.SMALL} color={params.pattern === id ? Button.Colors.BRAND : Button.Colors.PRIMARY} onClick={() => setParams(prev => ({ ...prev, pattern: id }))}>{id}</Button>
+                        <Button key={id} size="small" variant={params.pattern === id ? "primary" : "secondary"} onClick={() => setParams(prev => ({ ...prev, pattern: id }))}>{id}</Button>
                     ))}
                 </Flex>
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 6px" }}>Font</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "16px 0 6px" }}>Font</Text>
                 <Flex style={{ gap: 6, flexWrap: "wrap" }}>
-                    <Button size={Button.Sizes.SMALL} color={!params.font ? Button.Colors.BRAND : Button.Colors.PRIMARY} onClick={() => setParams(prev => ({ ...prev, font: "" }))}>Default</Button>
+                    <Button size="small" variant={!params.font ? "primary" : "secondary"} onClick={() => setParams(prev => ({ ...prev, font: "" }))}>Default</Button>
                     {FONT_IDS.map(id => (
-                        <Button key={id} size={Button.Sizes.SMALL} color={params.font === id ? Button.Colors.BRAND : Button.Colors.PRIMARY} onClick={() => setParams(prev => ({ ...prev, font: id }))}>{FONTS[id].label}</Button>
+                        <Button key={id} size="small" variant={params.font === id ? "primary" : "secondary"} onClick={() => setParams(prev => ({ ...prev, font: id }))}>{FONTS[id].label}</Button>
                     ))}
                 </Flex>
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 8px" }}>Surface opacity</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "16px 0 8px" }}>Surface opacity</Text>
                 <Slider
                     initialValue={params.opacity}
                     minValue={0}
@@ -274,11 +276,11 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                     onValueChange={(v: number) => setParams(prev => ({ ...prev, opacity: Math.round(v) }))}
                     onValueRender={(v: number) => `${Math.round(v)}%`}
                 />
-                <Text variant="text-xs/normal" style={{ opacity: 0.6, marginTop: 4 }}>
+                <Text size="xs" style={{ opacity: 0.6, marginTop: 4 }}>
                     100% is fully solid and lightest on your PC. Lower it to let the backdrop and background show through.
                 </Text>
 
-                <Text variant="text-sm/semibold" style={{ margin: "16px 0 8px" }}>Backdrop blur</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "16px 0 8px" }}>Backdrop blur</Text>
                 <Slider
                     initialValue={params.blur}
                     minValue={0}
@@ -288,7 +290,7 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                     onValueChange={(v: number) => setParams(prev => ({ ...prev, blur: Math.round(v) }))}
                     onValueRender={(v: number) => `${Math.round(v)}px`}
                 />
-                <Text variant="text-xs/normal" style={{ opacity: 0.6, marginTop: 4 }}>
+                <Text size="xs" style={{ opacity: 0.6, marginTop: 4 }}>
                     Frosts the chat and sidebars. Turns off automatically in Performance Mode.
                 </Text>
 
@@ -302,8 +304,8 @@ function EditorModal({ rootProps, initial, initialFileName, onSaved }: { rootPro
                 </div>
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "8px 0 16px" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!nameValid || busy} onClick={save}>Save &amp; apply</Button>
+                    <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                    <Button disabled={!nameValid || busy} onClick={save}>Save &amp; apply</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>
@@ -327,16 +329,16 @@ function StudioListModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Kittycord Studio 🎨</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Kittycord Studio 🎨</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
-                <Text variant="text-sm/normal" style={{ margin: "12px 0", opacity: 0.8 }}>
+                <Text size="sm" style={{ margin: "12px 0", opacity: 0.8 }}>
                     Build your own Discord theme from a few colors — no CSS needed. Saved themes apply instantly and live in your themes folder.
                 </Text>
 
                 {ready && themes.length === 0 && (
-                    <Text variant="text-md/normal" style={{ padding: "8px 0" }}>
+                    <Text style={{ padding: "8px 0" }}>
                         No Studio themes yet — create your first one!
                     </Text>
                 )}
@@ -350,12 +352,12 @@ function StudioListModal({ rootProps }: { rootProps: RenderModalProps; }) {
                                 ))}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-md/semibold">{params.name}</Text>
-                                {isThemeEnabled(fileName) && <Text variant="text-xs/normal" style={{ opacity: 0.6 }}>active</Text>}
+                                <Text weight="semibold">{params.name}</Text>
+                                {isThemeEnabled(fileName) && <Text size="xs" style={{ opacity: 0.6 }}>active</Text>}
                             </div>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={() => { enableTheme(fileName); forceUpdate(); }}>Apply</Button>
-                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={() => openEditor(params, fileName)}>Edit</Button>
-                            <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={() => openModal(props => (
+                            <Button size="small" onClick={() => { enableTheme(fileName); forceUpdate(); }}>Apply</Button>
+                            <TextButton onClick={() => openEditor(params, fileName)}>Edit</TextButton>
+                            <TextButton onClick={() => openModal(props => (
                                 <ShareFileModal
                                     rootProps={props}
                                     title={`Share "${params.name}"`}
@@ -363,16 +365,16 @@ function StudioListModal({ rootProps }: { rootProps: RenderModalProps; }) {
                                     buildFile={() => buildThemeFile(params)}
                                     defaultNote={`Here's my "${params.name}" theme, made with Kittycord Studio — add it with one tap!`}
                                 />
-                            ))}>Share</Button>
-                            {galleryAvailable() && <Button size={Button.Sizes.SMALL} look={Button.Looks.LINK} onClick={() => openPublish(params)}>Publish</Button>}
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} look={Button.Looks.LINK} onClick={async () => { await removeTheme(fileName); forceUpdate(); }}>Delete</Button>
+                            ))}>Share</TextButton>
+                            {galleryAvailable() && <TextButton onClick={() => openPublish(params)}>Publish</TextButton>}
+                            <TextButton variant="danger" onClick={async () => { await removeTheme(fileName); forceUpdate(); }}>Delete</TextButton>
                         </Flex>
                     );
                 })}
 
                 <Flex style={{ margin: "16px 0", gap: 8 }}>
-                    <Button color={Button.Colors.BRAND} onClick={() => openEditor(defaultParams())}>+ New theme</Button>
-                    {galleryAvailable() && <Button color={Button.Colors.PRIMARY} look={Button.Looks.LINK} onClick={openGallery}>Browse gallery</Button>}
+                    <Button onClick={() => openEditor(defaultParams())}>+ New theme</Button>
+                    {galleryAvailable() && <TextButton onClick={openGallery}>Browse gallery</TextButton>}
                 </Flex>
             </ModalContent>
         </ModalRoot>

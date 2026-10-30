@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { ErrorBoundary } from "@components/index";
+import { Text } from "@components/Text";
 import definePlugin from "@utils/types";
 import type { Message, User } from "@vencord/discord-types";
-import { Button, Menu, Text, UserStore } from "@webpack/common";
+import { Menu, UserStore } from "@webpack/common";
 
 import { INVITE_FILENAME } from "../_shared/inviteCard";
 import { openInvite } from "../_shared/inviteModal";
@@ -16,11 +18,11 @@ function InviteAccessoryInner({ message }: { message: Message; }) {
     const own = message.author?.id === UserStore.getCurrentUser()?.id;
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>
-            <Text variant="text-md/semibold" style={{ flex: 1 }}>
+            <Text weight="semibold" style={{ flex: 1 }}>
                 {own ? "💌 Your Kittycord invite" : "💖 You already have Kittycord — share the love!"}
             </Text>
             {!own && (
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={() => openInvite(null)}>
+                <Button size="small" onClick={() => openInvite(null)}>
                     Invite someone
                 </Button>
             )}

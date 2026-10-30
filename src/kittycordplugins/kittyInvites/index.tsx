@@ -6,15 +6,17 @@
 
 import { disableStyle, enableStyle } from "@api/Styles";
 import { inviteClaimUrl } from "@branding";
+import { Button, TextButton } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { OwnerCrownIcon } from "@components/Icons";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import SettingsPlugin from "@plugins/_core/settings";
 import { copyWithToast } from "@utils/discord";
 import { removeFromArray } from "@utils/misc";
 import { openModal } from "@utils/modal";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Button, IconUtils, React, showToast, Text, TextInput, UserStore, UserUtils } from "@webpack/common";
+import { IconUtils, React, showToast, TextInput, UserStore, UserUtils } from "@webpack/common";
 
 import { INVITE_STATS_FILENAME, renderInviteStatsCard } from "../_shared/inviteStatsCard";
 import { ShareFileModal } from "../_shared/ShareFileModal";
@@ -164,27 +166,24 @@ function InvitesTab() {
     return (
         <ErrorBoundary noop>
             <div className="kc-inv-card">
-                <Text variant="heading-md/semibold">Your creator code</Text>
-                <Text variant="text-sm/normal" style={{ opacity: .75, margin: "4px 0 10px" }}>
+                <Text weight="semibold">Your creator code</Text>
+                <Text size="sm" style={{ opacity: .75, margin: "4px 0 10px" }}>
                     Share it with friends — when they install Kittycord and type your code, it counts for you.
                 </Text>
                 <div className="kc-inv-coderow">
                     <TextInput value={code} onChange={setCode} placeholder="e.g. yourname" maxLength={20} />
-                    <Button size={Button.Sizes.MEDIUM} disabled={saving || !code.trim()} onClick={save}>
+                    <Button disabled={saving || !code.trim()} onClick={save}>
                         {mine.code && mine.code === code.trim().toLowerCase() ? "Saved" : "Save"}
                     </Button>
                 </div>
                 {shareUrl && (
-                    <Button
-                        size={Button.Sizes.SMALL}
-                        look={Button.Looks.LINK}
-                        color={Button.Colors.PRIMARY}
+                    <TextButton
                         onClick={() => copyWithToast(shareUrl, "Invite link copied — paste it in any chat.")}
                     >
                         Copy invite link
-                    </Button>
+                    </TextButton>
                 )}
-                <Text variant="text-sm/normal" style={{ opacity: .75, marginTop: 10 }}>
+                <Text size="sm" style={{ opacity: .75, marginTop: 10 }}>
                     {seasonMode
                         ? (mine.seasonInvites > 0
                             ? `This season you've invited ${mine.seasonInvites} ${mine.seasonInvites === 1 ? "person" : "people"} — rank #${mine.seasonRank}. 🐱`
@@ -195,17 +194,17 @@ function InvitesTab() {
                 </Text>
 
                 {mine.invitedBy ? (
-                    <Text variant="text-sm/normal" style={{ opacity: .75, marginTop: 10 }}>
+                    <Text size="sm" style={{ opacity: .75, marginTop: 10 }}>
                         You were invited by <b>{userName(mine.invitedBy)}</b>. 💕
                     </Text>
                 ) : (
                     <>
-                        <Text variant="text-sm/normal" style={{ opacity: .75, margin: "14px 0 6px" }}>
+                        <Text size="sm" style={{ opacity: .75, margin: "14px 0 6px" }}>
                             Were you invited? Enter your inviter's code (once):
                         </Text>
                         <div className="kc-inv-coderow">
                             <TextInput value={claimInput} onChange={setClaimInput} placeholder="their creator code" maxLength={20} />
-                            <Button size={Button.Sizes.MEDIUM} color={Button.Colors.BRAND} disabled={claiming || !claimInput.trim()} onClick={doClaim}>
+                            <Button disabled={claiming || !claimInput.trim()} onClick={doClaim}>
                                 Claim
                             </Button>
                         </div>
@@ -224,7 +223,7 @@ function InvitesTab() {
                     <div className="kc-inv-mile-track">
                         <div className="kc-inv-mile-fill" style={{ transform: `scaleX(${milePct})` }} />
                     </div>
-                    <Text variant="text-sm/normal" style={{ opacity: .75, marginTop: 8 }}>
+                    <Text size="sm" style={{ opacity: .75, marginTop: 8 }}>
                         {nextFrame
                             ? `${nextFrame.minInvites - mine.invites} more ${nextFrame.minInvites - mine.invites === 1 ? "invite" : "invites"} to unlock it in KittyDeko.`
                             : "You've earned every invite-locked frame in KittyDeko."}
@@ -233,14 +232,14 @@ function InvitesTab() {
             )}
 
             <div className="kc-inv-boardhead">
-                <Text variant="heading-lg/semibold">{seasonMode ? "This season" : "All-time"} top inviters</Text>
+                <Text size="lg" weight="semibold">{seasonMode ? "This season" : "All-time"} top inviters</Text>
                 <div className="kc-inv-toggle">
                     <button type="button" className={"kc-inv-seg" + (seasonMode ? " kc-inv-seg-on" : "")} onClick={() => setSeasonMode(true)}>Season</button>
                     <button type="button" className={"kc-inv-seg" + (!seasonMode ? " kc-inv-seg-on" : "")} onClick={() => setSeasonMode(false)}>All-time</button>
                 </div>
             </div>
             {seasonMode && mine.season && (
-                <Text variant="text-sm/normal" style={{ opacity: .7, margin: "0 0 10px" }}>
+                <Text size="sm" style={{ opacity: .7, margin: "0 0 10px" }}>
                     {mine.season.label} — {daysLeft(mine.season.end)} left. The board resets next month, so it's anyone's to win. 🐱
                 </Text>
             )}
@@ -251,12 +250,12 @@ function InvitesTab() {
             )}
             <div className="kc-inv-board">
                 {list.length === 0 && (
-                    <Text variant="text-sm/normal" style={{ opacity: .6 }}>
+                    <Text size="sm" style={{ opacity: .6 }}>
                         {seasonMode ? "No invites yet this season — be the first!" : "Nobody on the board yet — be the first!"}
                     </Text>
                 )}
                 {list.length > 0 && rows.length === 0 && (
-                    <Text variant="text-sm/normal" style={{ opacity: .6 }}>
+                    <Text size="sm" style={{ opacity: .6 }}>
                         No inviters match your search.
                     </Text>
                 )}

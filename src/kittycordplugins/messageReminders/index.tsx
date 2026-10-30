@@ -7,11 +7,13 @@
 import { findGroupChildrenByChildId } from "@api/ContextMenu";
 import { get, set } from "@api/DataStore";
 import { showNotification } from "@api/Notifications";
+import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
 import { Message, RenderModalProps } from "@vencord/discord-types";
-import { Button, ChannelStore, Menu, MessageActions, React, showToast, Text } from "@webpack/common";
+import { ChannelStore, Menu, MessageActions, React, showToast } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 
@@ -94,26 +96,26 @@ function RemindersModal({ rootProps }: { rootProps: RenderModalProps; }) {
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
                 <Flex style={{ alignItems: "center", width: "100%" }}>
-                    <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Reminders ({list.length})</Text>
+                    <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Reminders ({list.length})</Text>
                     <ModalCloseButton onClick={rootProps.onClose} />
                 </Flex>
             </ModalHeader>
             <ModalContent>
                 {list.length === 0
-                    ? <Text variant="text-md/normal" style={{ padding: "16px 0" }}>No reminders yet. Right-click a message and choose Remind me.</Text>
+                    ? <Text style={{ padding: "16px 0" }}>No reminders yet. Right-click a message and choose Remind me.</Text>
                     : list.map(r => (
                         <Flex key={r.id} style={{ padding: "8px 0", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <Text variant="text-sm/semibold">{new Date(r.remindAt).toLocaleString()}</Text>
-                                <Text variant="text-sm/normal" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                <Text size="sm" weight="semibold">{new Date(r.remindAt).toLocaleString()}</Text>
+                                <Text size="sm" style={{ opacity: 0.75, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                     {r.author}: {r.content || "(no text)"}
                                 </Text>
                             </div>
-                            <Button size={Button.Sizes.SMALL} onClick={() => {
+                            <Button size="small" onClick={() => {
                                 MessageActions.jumpToMessage({ channelId: r.channelId, messageId: r.messageId, flash: true });
                                 rootProps.onClose();
                             }}>Jump</Button>
-                            <Button size={Button.Sizes.SMALL} color={Button.Colors.RED} onClick={() => cancel(r.id)}>Cancel</Button>
+                            <Button size="small" variant="dangerPrimary" onClick={() => cancel(r.id)}>Cancel</Button>
                         </Flex>
                     ))}
             </ModalContent>

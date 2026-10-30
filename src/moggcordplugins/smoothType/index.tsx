@@ -5,8 +5,8 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { Heading } from "@components/Heading";
 import definePlugin, { OptionType } from "@utils/types";
-import { Forms } from "@webpack/common";
 
 const STYLE_ID = "vc-smoothtype";
 
@@ -37,7 +37,7 @@ const settings = definePluginSettings({
             const hex = "#" + ((settings.store.caretColor ?? 0xffffff).toString(16).padStart(6, "0"));
             return (
                 <div>
-                    <Forms.FormTitle tag="h3">Caret Color</Forms.FormTitle>
+                    <Heading tag="h3">Caret Color</Heading>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <input
                             type="color"

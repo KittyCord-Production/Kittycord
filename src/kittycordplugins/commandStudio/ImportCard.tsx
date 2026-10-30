@@ -5,10 +5,12 @@
  */
 
 import { BRAND_WEBSITE } from "@branding";
+import { Button } from "@components/Button";
 import { ErrorBoundary } from "@components/index";
+import { Text } from "@components/Text";
 import { escapeRegExp } from "@utils/text";
 import type { Message } from "@vencord/discord-types";
-import { Button, Text, UserStore } from "@webpack/common";
+import { UserStore } from "@webpack/common";
 
 import { openCommandsImport, openPackImport } from "./PackGallery";
 import { importCommands, settings } from "./settings";
@@ -48,10 +50,10 @@ function ImportCardInner({ message }: { message: Message; }) {
 
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>
-            <Text variant="text-md/semibold" style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
+            <Text weight="semibold" style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
                 ⌨️ {own ? `You shared ${what}` : `${sender} shared ${what}`}
             </Text>
-            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={add}>Add</Button>
+            <Button size="small" onClick={add}>Add</Button>
         </div>
     );
 }

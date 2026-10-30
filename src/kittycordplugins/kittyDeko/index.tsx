@@ -5,14 +5,16 @@
  */
 
 import { disableStyle, enableStyle } from "@api/Styles";
+import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { PaintbrushIcon } from "@components/Icons";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import { isOverlayWindow } from "@utils/overlay";
 import definePlugin, { type PluginNative } from "@utils/types";
-import { Alerts, Button, IconUtils, React, showToast,Text, UserStore } from "@webpack/common";
+import { Alerts, IconUtils, React, showToast, UserStore } from "@webpack/common";
 
 import { assetUrl, byId, CATALOG, Deko, KITTY_DEKO_SKU } from "./catalog";
 import style from "./style.css?managed";
@@ -150,8 +152,8 @@ function DekoShop() {
     return (
         <>
             <div className="kc-deko-wallet">
-                <Text variant="text-md/semibold">🪙 {coins.toLocaleString()} KittyCoins</Text>
-                <Text variant="text-xs/normal" style={{ color: "var(--text-muted)" }}>
+                <Text weight="semibold">🪙 {coins.toLocaleString()} KittyCoins</Text>
+                <Text size="xs" style={{ color: "var(--text-muted)" }}>
                     Earn coins with the bot in the Kittycord Discord, then send them here with !transfer.
                 </Text>
             </div>
@@ -161,8 +163,8 @@ function DekoShop() {
                         <img className="kc-deko-avatar" src={avatar} alt="" />
                     </div>
                     <Button
-                        size={Button.Sizes.SMALL}
-                        color={equipped == null ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                        size="small"
+                        variant={equipped == null ? "primary" : "secondary"}
                         disabled={saving != null}
                         onClick={() => equip(null)}
                     >
@@ -180,8 +182,8 @@ function DekoShop() {
                                 <img className="kc-deko-frame" src={assetUrl(d.id)} alt="" />
                             </div>
                             <Button
-                                size={Button.Sizes.SMALL}
-                                color={equipped === d.id ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                                size="small"
+                                variant={equipped === d.id ? "primary" : "secondary"}
                                 disabled={saving != null || locked}
                                 onClick={() => (forSale && price !== undefined ? confirmBuy(d, price) : equip(d.id))}
                             >
@@ -204,7 +206,7 @@ function DekoShop() {
 function DekoTab() {
     return (
         <ErrorBoundary noop>
-            <Text variant="text-md/normal" style={{ marginBottom: 16, color: "var(--text-muted)" }}>
+            <Text style={{ marginBottom: 16, color: "var(--text-muted)" }}>
                 Pick a decoration for your avatar — everyone on Kittycord will see it. Most are free, some unlock as you invite friends with your creator code, a few golden ones are a thank-you for supporters, and the rest you can buy with KittyCoins you earn in our Discord.
             </Text>
             <DekoShop />

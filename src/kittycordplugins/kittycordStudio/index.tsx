@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { ErrorBoundary } from "@components/index";
+import { Text } from "@components/Text";
 import definePlugin from "@utils/types";
 import type { Message } from "@vencord/discord-types";
-import { Alerts, Button, showToast, Text, UserStore } from "@webpack/common";
+import { Alerts, showToast, UserStore } from "@webpack/common";
 
 import { openGallery } from "./GalleryModal";
 import { fetchTheme, findThemeAttachment } from "./share";
@@ -21,7 +23,7 @@ function importBody(params: StudioParams, sender: string) {
             <div style={{ margin: "4px 0 12px" }}>
                 <PreviewPane params={params} />
             </div>
-            <Text variant="text-md/normal">
+            <Text>
                 "{params.name}" by {sender} — made with Kittycord Studio. Adding it saves the theme to your themes folder.
             </Text>
         </div>
@@ -59,10 +61,10 @@ function ThemeImportCardInner({ message }: { message: Message; }) {
 
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, margin: "4px 0", borderRadius: 8, background: "var(--background-secondary)" }}>
-            <Text variant="text-md/semibold" style={{ flex: 1 }}>
+            <Text weight="semibold" style={{ flex: 1 }}>
                 🎨 {own ? "Your shared Studio theme" : `${message.author?.username ?? "Someone"} shared a theme made with Kittycord Studio`}
             </Text>
-            <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={startImport}>Preview &amp; add</Button>
+            <Button size="small" onClick={startImport}>Preview &amp; add</Button>
         </div>
     );
 }

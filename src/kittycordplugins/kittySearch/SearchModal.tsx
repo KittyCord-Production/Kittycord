@@ -9,13 +9,14 @@ import "./style.css";
 import { isPluginEnabled, isSettingHidden, plugins } from "@api/PluginManager";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { BackupAndRestoreTab, ChangelogTab, CloudTab, openPluginModal, openSettingsTabModal, PluginsTab, ThemesTab, UpdaterTab, VencordTab } from "@components/settings";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { classNameFactory } from "@utils/css";
 import { closeModal, ModalSize, openModal } from "@utils/modal";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
 import { OptionType } from "@utils/types";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { React, ScrollerThin, Text, TextInput, useEffect, useMemo, useState } from "@webpack/common";
+import { React, ScrollerThin, TextInput, useEffect, useMemo, useState } from "@webpack/common";
 import type { ComponentType, KeyboardEvent } from "react";
 
 import { ModalContent, ModalRoot } from "../_shared/modal";
@@ -137,7 +138,7 @@ function SearchModal({ rootProps }: { rootProps: RenderModalProps; }) {
                     />
                     <ScrollerThin className={cl("results")}>
                         {results.length === 0
-                            ? <Text variant="text-sm/normal" className={cl("empty")}>No matches.</Text>
+                            ? <Text size="sm" className={cl("empty")}>No matches.</Text>
                             : results.map((e, i) => (
                                 <div
                                     key={`${e.label}-${i}`}
@@ -145,8 +146,8 @@ function SearchModal({ rootProps }: { rootProps: RenderModalProps; }) {
                                     onClick={() => run(e)}
                                     onMouseEnter={() => setSel(i)}
                                 >
-                                    <Text variant="text-md/semibold" className={cl("label")}>{e.label}</Text>
-                                    {e.sublabel ? <Text variant="text-sm/normal" className={cl("sub")}>{e.sublabel}</Text> : null}
+                                    <Text weight="semibold" className={cl("label")}>{e.label}</Text>
+                                    {e.sublabel ? <Text size="sm" className={cl("sub")}>{e.sublabel}</Text> : null}
                                 </div>
                             ))}
                     </ScrollerThin>

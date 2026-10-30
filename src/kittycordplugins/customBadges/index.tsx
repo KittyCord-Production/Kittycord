@@ -6,11 +6,13 @@
 
 import { addProfileBadge, BadgePosition, ProfileBadge, removeProfileBadge } from "@api/Badges";
 import { definePluginSettings } from "@api/Settings";
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { parseBadgeLink } from "@shared/badgeLink";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, React, showToast, Text, TextInput, Tooltip, UserStore } from "@webpack/common";
+import { React, showToast, TextInput, Tooltip, UserStore } from "@webpack/common";
 
 import { openBadgeLink } from "./LinkWarningModal";
 
@@ -150,8 +152,8 @@ function BadgeEditor() {
 
     return (
         <>
-            <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Your custom badges</Text>
-            <Text variant="text-sm/normal" style={{ opacity: 0.8, marginBottom: 8 }}>
+            <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Your custom badges</Text>
+            <Text size="sm" style={{ opacity: 0.8, marginBottom: 8 }}>
                 Use an emoji or an https image/GIF link (Tenor, Imgur, Discord and Catbox load best) plus a short label. Optionally add a https link; people who click the badge get a safety warning first. Up to {MAX_SLOTS} badges. They show on your profile for everyone using Kittycord.
             </Text>
             {entries.map(entry => (
@@ -178,12 +180,12 @@ function BadgeEditor() {
                             ? <img src={entry.icon} height={22} style={{ borderRadius: 4 }} alt="" />
                             : <span style={{ fontSize: 20 }}>{entry.icon}</span>
                         : null}
-                    <Button color={Button.Colors.BRAND} size={Button.Sizes.SMALL} disabled={busy} onClick={() => saveEntry(entry.slot)}>
+                    <Button size="small" disabled={busy} onClick={() => saveEntry(entry.slot)}>
                         Save
                     </Button>
-                    <Button color={Button.Colors.RED} look={Button.Looks.LINK} size={Button.Sizes.SMALL} disabled={busy} onClick={() => removeEntry(entry.slot)}>
+                    <TextButton variant="danger" disabled={busy} onClick={() => removeEntry(entry.slot)}>
                         Remove
-                    </Button>
+                    </TextButton>
                 </Flex>
                 <TextInput
                     value={entry.link}
@@ -195,8 +197,8 @@ function BadgeEditor() {
             ))}
             {entries.length < MAX_SLOTS && (
                 <Button
-                    color={Button.Colors.GREEN}
-                    size={Button.Sizes.SMALL}
+                    variant="positive"
+                    size="small"
                     onClick={addEntry}
                     style={{ marginTop: 4 }}
                 >

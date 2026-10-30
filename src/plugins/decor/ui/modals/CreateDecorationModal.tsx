@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
+import { Card } from "@components/Card";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Heading } from "@components/Heading";
 import { Link } from "@components/Link";
-import { Notice } from "@components/Notice";
 import { Paragraph } from "@components/Paragraph";
 import { GUILD_ID, INVITE_KEY, RAW_SKU_ID } from "@plugins/decor/lib/constants";
 import { useCurrentUserDecorationsStore } from "@plugins/decor/lib/stores/CurrentUserDecorationsStore";
@@ -80,16 +79,16 @@ function CreateDecorationModal(props: RenderModalProps) {
     >
         <div className={cl("create-decoration-modal-content", DecorationModalClasses.modal)}>
             <ErrorBoundary>
-                <Notice variant="warning">
+                <Card variant="warning">
                     Make sure your decoration does not violate <Link
                         href="https://github.com/decor-discord/.github/blob/main/GUIDELINES.md"
                     >
                         the guidelines
                     </Link> before submitting it.
-                </Notice>
+                </Card>
                 <div className={cl("create-decoration-modal-form-preview-container")}>
                     <div className={cl("create-decoration-modal-form")}>
-                        {error !== null && <BaseText size="xs" color="text-danger">{error.message}</BaseText>}
+                        {error !== null && <Paragraph size="xs" style={{ color: "var(--text-danger, var(--text-default))" }}>{error.message}</Paragraph>}
                         <section>
                             <Heading>File</Heading>
                             <FileUpload
@@ -122,7 +121,7 @@ function CreateDecorationModal(props: RenderModalProps) {
                         />
                     </div>
                 </div>
-                <Notice variant="info" className={Margins.bottom8}>
+                <Card variant="brand" defaultPadding className={Margins.bottom8}>
                     To receive updates on your decoration's review, join <Link
                         href={`https://discord.gg/${INVITE_KEY}`}
                         onClick={async e => {
@@ -142,7 +141,7 @@ function CreateDecorationModal(props: RenderModalProps) {
                     >
                         Decor's Discord server
                     </Link> and allow direct messages.
-                </Notice>
+                </Card>
             </ErrorBoundary>
         </div>
     </Modal>;

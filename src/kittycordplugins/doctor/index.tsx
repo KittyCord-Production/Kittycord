@@ -6,9 +6,11 @@
 
 import { isPluginEnabled, pluginRequiresRestart, plugins, startPlugin } from "@api/PluginManager";
 import { Settings } from "@api/Settings";
+import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { ShieldIcon } from "@components/Icons";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { gitHashShort } from "@shared/vencordUserAgent";
 import { IS_WINDOWS } from "@utils/constants";
@@ -18,7 +20,7 @@ import { relaunch } from "@utils/native";
 import definePlugin from "@utils/types";
 import { checkForUpdates, update } from "@utils/updater";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, React, showToast, Text } from "@webpack/common";
+import { Alerts, React, showToast } from "@webpack/common";
 import { getBuildNumber, patchResilience } from "@webpack/patcher";
 import type { ReactNode } from "react";
 
@@ -78,12 +80,12 @@ function StatusCard({ title, ok, children }: { title: string; ok: boolean; child
     return (
         <div style={{ background: "var(--background-secondary)", borderRadius: 12, padding: 14, marginBottom: 10 }}>
             <Flex style={{ alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <Text variant="text-md/semibold" style={{ flexGrow: 1 }}>{title}</Text>
-                <Text variant="text-sm/semibold" style={{ color: ok ? "var(--text-positive)" : WARN_COLOR }}>
+                <Text weight="semibold" style={{ flexGrow: 1 }}>{title}</Text>
+                <Text size="sm" weight="semibold" style={{ color: ok ? "var(--text-positive)" : WARN_COLOR }}>
                     {ok ? "Healthy" : "Attention"}
                 </Text>
             </Flex>
-            <Text variant="text-sm/normal" style={{ opacity: 0.85 }}>{children}</Text>
+            <Text size="sm" style={{ opacity: 0.85 }}>{children}</Text>
         </div>
     );
 }
@@ -153,7 +155,7 @@ function DoctorPanel() {
 
     return (
         <ErrorBoundary noop>
-            <Text variant="text-md/normal" style={{ marginBottom: 12, color: "var(--text-muted)" }}>
+            <Text style={{ marginBottom: 12, color: "var(--text-muted)" }}>
                 A quick health check for your Kittycord install. {allHealthy ? "Everything looks good." : "Something needs attention below."}
             </Text>
 
@@ -183,7 +185,7 @@ function DoctorPanel() {
                         : "No heavy themes active and your device has power to spare."}
                 {perfAttention && (
                     <span style={{ display: "block", marginTop: 8 }}>
-                        <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={onEnablePerf}>
+                        <Button size="small" onClick={onEnablePerf}>
                             Turn on PerformanceMode
                         </Button>
                     </span>
@@ -207,24 +209,24 @@ function DoctorPanel() {
             )}
 
             <Flex style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-                <Button size={Button.Sizes.SMALL} color={Button.Colors.PRIMARY} onClick={() => setData(scan())}>Re-scan</Button>
+                <Button size="small" variant="secondary" onClick={() => setData(scan())}>Re-scan</Button>
                 {canUpdate && updateState !== "outdated" && (
-                    <Button size={Button.Sizes.SMALL} color={Button.Colors.PRIMARY} disabled={updateState === "checking"} onClick={onCheckUpdates}>
+                    <Button size="small" variant="secondary" disabled={updateState === "checking"} onClick={onCheckUpdates}>
                         Check for updates
                     </Button>
                 )}
                 {canUpdate && updateState === "outdated" && (
-                    <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} disabled={busy} onClick={onUpdate}>
+                    <Button size="small" disabled={busy} onClick={onUpdate}>
                         Update &amp; restart
                     </Button>
                 )}
                 {canRepairHost && (
-                    <Button size={Button.Sizes.SMALL} color={Button.Colors.BRAND} onClick={onRepair}>Repair Kittycord</Button>
+                    <Button size="small" onClick={onRepair}>Repair Kittycord</Button>
                 )}
             </Flex>
 
             {!canRepairHost && !IS_WEB && (
-                <Text variant="text-xs/normal" style={{ opacity: 0.6, marginTop: 8 }}>
+                <Text size="xs" style={{ opacity: 0.6, marginTop: 8 }}>
                     If features go missing after a Discord update, run the Kittycord installer again and choose Install or repair. On a Mac that is Kittycord-Install-macOS.command.
                 </Text>
             )}
@@ -236,7 +238,7 @@ function DoctorModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Kittycord Doctor</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Kittycord Doctor</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>

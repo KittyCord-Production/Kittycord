@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
+import { Text } from "@components/Text";
 import { getCurrentChannel, insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
 import type { RenderModalProps } from "@vencord/discord-types";
-import { Alerts, Button, DraftType, React, showToast, Text, UploadHandler } from "@webpack/common";
+import { Alerts, DraftType, React, showToast, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { renderCard, renderShareCard, SKINS, type WrappedVariant } from "./card";
@@ -101,7 +103,7 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
             body: "This permanently deletes everything Kittycord Wrapped has measured on this device. Live stats like your servers and account age stay. This can't be undone.",
             confirmText: "Delete my stats",
             cancelText: "Cancel",
-            confirmColor: Button.Colors.RED,
+            confirmColor: "danger",
             onConfirm: async () => {
                 setBusy(true);
                 try {
@@ -124,14 +126,14 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>{TITLES[variant]}</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>{TITLES[variant]}</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
                 <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
                     {previewUrl
                         ? <img src={previewUrl} alt="Your Kittycord Wrapped card" style={{ width: landscape ? "100%" : "60%", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
-                        : <Text variant="text-md/normal" style={{ padding: "48px 0", opacity: 0.7 }}>Rendering your card…</Text>}
+                        : <Text style={{ padding: "48px 0", opacity: 0.7 }}>Rendering your card…</Text>}
                 </div>
 
                 <FormSwitch
@@ -148,15 +150,15 @@ function WrappedModal({ rootProps, variant }: { rootProps: RenderModalProps; var
                     onChange={setLandscape}
                 />
 
-                <Text variant="text-xs/normal" style={{ opacity: 0.6, margin: "8px 0 16px" }}>
+                <Text size="xs" style={{ opacity: 0.6, margin: "8px 0 16px" }}>
                     Everything here is measured and rendered 100% on your device. Nothing is uploaded unless you choose to send it.
                 </Text>
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", marginBottom: 12, flexWrap: "wrap" }}>
-                    <Button color={Button.Colors.RED} look={Button.Looks.LINK} disabled={busy} onClick={reset}>Reset stats</Button>
-                    <Button color={Button.Colors.PRIMARY} disabled={!blob || busy} onClick={copy}>Copy</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!blob || busy} onClick={save}>Save</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!blob || busy} onClick={send}>Send in chat</Button>
+                    <TextButton variant="danger" disabled={busy} onClick={reset}>Reset stats</TextButton>
+                    <Button variant="secondary" disabled={!blob || busy} onClick={copy}>Copy</Button>
+                    <Button disabled={!blob || busy} onClick={save}>Save</Button>
+                    <Button disabled={!blob || busy} onClick={send}>Send in chat</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>

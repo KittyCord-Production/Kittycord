@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Button } from "@components/Button";
+import { Button, ButtonProps } from "@components/Button";
 import { Heart } from "@components/Heart";
-import { ButtonProps } from "@vencord/discord-types";
 
 export function DonateButton({
     equicord = false,

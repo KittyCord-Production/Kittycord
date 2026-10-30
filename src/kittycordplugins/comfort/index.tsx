@@ -13,10 +13,11 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
 import { EyeIcon } from "@components/Icons";
 import { openSettingsTabModal } from "@components/settings";
+import { Text } from "@components/Text";
 import SettingsPlugin from "@plugins/_core/settings";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
-import { Select, Text, TextInput } from "@webpack/common";
+import { Select, TextInput } from "@webpack/common";
 
 const WATCHED = ["plugins.*"] satisfies Parameters<typeof useSettings>[0];
 
@@ -138,11 +139,11 @@ function QuietHoursRow() {
             {enabled && (
                 <div className="kc-comfort-times">
                     <label>
-                        <Text variant="text-sm/normal">From</Text>
+                        <Text size="sm">From</Text>
                         <TextInput value={store.startTime} onChange={v => store.startTime = v} placeholder="23:00" />
                     </label>
                     <label>
-                        <Text variant="text-sm/normal">Until</Text>
+                        <Text size="sm">Until</Text>
                         <TextInput value={store.endTime} onChange={v => store.endTime = v} placeholder="08:00" />
                     </label>
                 </div>
@@ -172,7 +173,7 @@ function BreaksRow() {
             />
             {on && (
                 <div className="kc-comfort-select">
-                    <Text variant="text-sm/normal">Remind me after</Text>
+                    <Text size="sm">Remind me after</Text>
                     <Select
                         options={[45, 60, 90, 120].map(m => ({ label: `${m} minutes`, value: m }))}
                         select={v => store.breakInterval = v}
@@ -191,8 +192,8 @@ function ComfortTab() {
     return (
         <ErrorBoundary noop>
             <div className="kc-comfort">
-                <Text variant="heading-lg/semibold">Comfort</Text>
-                <Text variant="text-md/normal" style={{ marginTop: 6 }}>
+                <Text size="lg" weight="semibold">Comfort</Text>
+                <Text style={{ marginTop: 6 }}>
                     Everything that makes Discord calmer, in one place. These are the same switches as in the plugins
                     they belong to, so changing them here changes them there.
                 </Text>
@@ -202,11 +203,11 @@ function ComfortTab() {
                         <Button key={preset.id} variant="secondary" onClick={preset.apply}>{preset.label}</Button>
                     ))}
                 </div>
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>
                     {PRESETS.map(p => `${p.label}: ${p.description}`).join(" ")}
                 </Text>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Movement</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Movement</Text>
                 <PluginSwitch
                     plugin="PerformanceMode"
                     setting="noAnimations"
@@ -226,7 +227,7 @@ function ComfortTab() {
                     description="Applies the same rule to the extra transitions KittyMotion adds."
                 />
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>A quieter picture</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>A quieter picture</Text>
                 <PluginSwitch
                     plugin="PerformanceMode"
                     setting="noBlur"
@@ -252,11 +253,11 @@ function ComfortTab() {
                     description="The coloured plates behind names in the member list are hidden."
                 />
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>When people reach you</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>When people reach you</Text>
                 <QuietHoursRow />
                 <BreaksRow />
 
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 20 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 20 }}>
                     Looking for the rest? Every switch here also lives in its own plugin, with more options.
                 </Text>
             </div>

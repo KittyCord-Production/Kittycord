@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getCurrentChannel, insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import { saveFile } from "@utils/web";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, DraftType, React, showToast, Text, UploadHandler } from "@webpack/common";
+import { DraftType, React, showToast, UploadHandler } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -103,12 +105,12 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Show off your Kittycord look ✨</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Show off your Kittycord look ✨</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
                 {data === null ? (
-                    <Text variant="text-md/normal" style={{ padding: "32px 0", opacity: 0.8 }}>
+                    <Text style={{ padding: "32px 0", opacity: 0.8 }}>
                         Set a name colour, a badge or an avatar decoration first (Settings → Kittycord), then come back to show it off. 🐱
                     </Text>
                 ) : (
@@ -116,17 +118,17 @@ function LookModal({ rootProps }: { rootProps: RenderModalProps; }) {
                         <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
                             {previewUrl
                                 ? <img src={previewUrl} alt="Your Kittycord look card" style={{ width: "100%", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
-                                : <Text variant="text-md/normal" style={{ padding: "48px 0", opacity: 0.7 }}>Rendering your look…</Text>}
+                                : <Text style={{ padding: "48px 0", opacity: 0.7 }}>Rendering your look…</Text>}
                         </div>
 
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Send to a friend</Text>
                         <FriendPicker value={target} onChange={setTarget} />
 
                         <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0", flexWrap: "wrap" }}>
-                            <Button color={Button.Colors.PRIMARY} disabled={!blob || busy} onClick={copy}>Copy</Button>
-                            <Button color={Button.Colors.PRIMARY} disabled={!blob || busy} onClick={save}>Save</Button>
-                            <Button color={Button.Colors.BRAND} disabled={!blob || busy} onClick={postInChat}>Post in this chat</Button>
-                            <Button color={Button.Colors.BRAND} disabled={!blob || !target || busy} onClick={sendToFriend}>Send to friend</Button>
+                            <Button variant="secondary" disabled={!blob || busy} onClick={copy}>Copy</Button>
+                            <Button variant="secondary" disabled={!blob || busy} onClick={save}>Save</Button>
+                            <Button disabled={!blob || busy} onClick={postInChat}>Post in this chat</Button>
+                            <Button disabled={!blob || !target || busy} onClick={sendToFriend}>Send to friend</Button>
                         </Flex>
                     </>
                 )}

@@ -5,17 +5,19 @@
  */
 
 import { disableStyle, enableStyle } from "@api/Styles";
+import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
 import { ShieldIcon } from "@components/Icons";
 import { openSettingsTabModal } from "@components/settings";
+import { Text } from "@components/Text";
 import type { BuildInfo } from "@main/buildInfo";
 import SettingsPlugin from "@plugins/_core/settings";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { removeFromArray } from "@utils/misc";
 import definePlugin from "@utils/types";
-import { Button, React, Text } from "@webpack/common";
+import { React } from "@webpack/common";
 
 import { RequestLog } from "./RequestLog";
 import style from "./style.css?managed";
@@ -61,12 +63,12 @@ function BuildIdentity() {
         <div className="kc-priv-build">
             <div><b>This build</b> {info.gitHash.slice(0, 9)}</div>
             <div><b>File on disk</b> <code>{asarHash}</code></div>
-            <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+            <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>
                 {verified} Rebuild the same commit yourself and you get exactly this file back — the steps are in SECURITY.md.
             </Text>
             <div className="kc-priv-btns">
-                <Button color={Button.Colors.PRIMARY} onClick={() => copyWithToast(asarHash, "Checksum copied.")}>Copy checksum</Button>
-                <Button color={Button.Colors.PRIMARY} onClick={() => open(`${REPO}/blob/main/SECURITY.md`)}>How to rebuild it</Button>
+                <Button variant="secondary" onClick={() => copyWithToast(asarHash, "Checksum copied.")}>Copy checksum</Button>
+                <Button variant="secondary" onClick={() => open(`${REPO}/blob/main/SECURITY.md`)}>How to rebuild it</Button>
             </div>
         </div>
     );
@@ -76,31 +78,31 @@ function PrivacyTab() {
     return (
         <ErrorBoundary noop>
             <div>
-                <Text variant="heading-lg/semibold">Is Kittycord safe? 🐱</Text>
-                <Text variant="text-md/normal" style={{ marginTop: 6 }}>
+                <Text size="lg" weight="semibold">Is Kittycord safe? 🐱</Text>
+                <Text style={{ marginTop: 6 }}>
                     Yes — and you don't have to take our word for it. Kittycord is fully open source. It <b>never reads your Discord login token</b>, <b>never logs your keystrokes</b> and <b>never collects your messages</b>. Every line is public, so anyone can check.
                 </Text>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Verify it yourself</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Verify it yourself</Text>
                 <div className="kc-priv-btns">
                     <Button onClick={() => open(REPO)}>Read the source code</Button>
-                    <Button color={Button.Colors.PRIMARY} onClick={() => open(`${REPO}/actions`)}>See how it's built</Button>
-                    <Button color={Button.Colors.PRIMARY} onClick={() => open(`${REPO}/releases/latest`)}>Check your download</Button>
+                    <Button variant="secondary" onClick={() => open(`${REPO}/actions`)}>See how it's built</Button>
+                    <Button variant="secondary" onClick={() => open(`${REPO}/releases/latest`)}>Check your download</Button>
                 </div>
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 8 }}>
+                <Text size="sm" style={{ opacity: .7, marginTop: 8 }}>
                     The installer is built automatically from this exact source by GitHub — nothing is added behind the scenes. Compare the published SHA-256 checksum with your download to be 100% sure.
                 </Text>
 
                 <BuildIdentity />
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>What leaves your computer</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>What leaves your computer</Text>
                 <div className="kc-priv-yes">✅ Only if you turn it on: an anonymous install ID + version, your Discord ID for the friend features and the Kittycord badge, plus any public cosmetics you choose to show (name color, avatar decoration, creator code).</div>
                 <div className="kc-priv-no">❌ Never: your login token, your password, your keystrokes, your messages, or your IP address.</div>
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>What Kittycord sent</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>What Kittycord sent</Text>
                 <RequestLog />
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Your data, your choice</Text>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Your data, your choice</Text>
                 <ConsentToggle
                     bridge={VencordNative.kittycordTelemetry}
                     title="Share anonymous usage stats"
@@ -117,14 +119,14 @@ function PrivacyTab() {
                     description="If a Kittycord feature hits an error, sends only a scrubbed message and stack plus the version, so it can be fixed. No account, no messages, no personal data. Off unless you enable it."
                 />
 
-                <Text variant="heading-md/semibold" style={{ marginTop: 20 }}>Why your antivirus might warn</Text>
-                <Text variant="text-sm/normal" style={{ opacity: .7, marginTop: 6 }}>
+                <Text weight="semibold" style={{ marginTop: 20 }}>Why your antivirus might warn</Text>
+                <Text size="sm" style={{ opacity: .7, marginTop: 6 }}>
                     The installer isn't code-signed yet and it modifies the Discord app — both trip generic antivirus heuristics, which flag almost every Discord client mod the same way. It's a false alarm; use the links above to verify exactly what runs on your PC.
                 </Text>
 
                 <div className="kc-priv-report">
-                    <Text variant="text-sm/normal">Found something concerning? Please tell us:</Text>
-                    <Button color={Button.Colors.PRIMARY} onClick={() => open(`${REPO}/issues`)}>Report a security concern</Button>
+                    <Text size="sm">Found something concerning? Please tell us:</Text>
+                    <Button variant="secondary" onClick={() => open(`${REPO}/issues`)}>Report a security concern</Button>
                 </div>
             </div>
         </ErrorBoundary>

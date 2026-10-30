@@ -4,12 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button, TextButton } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Text } from "@components/Text";
 import { getUniqueUsername } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { ModalSize, openModal } from "@utils/modal";
 import type { RenderModalProps, User } from "@vencord/discord-types";
-import { Button, IconUtils, React, showToast, Text, TextInput, UserStore } from "@webpack/common";
+import { IconUtils, React, showToast, TextInput, UserStore } from "@webpack/common";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
 import { sendFileToUser } from "./dm";
@@ -105,41 +107,41 @@ function InviteModal({ rootProps, user }: { rootProps: RenderModalProps; user: U
     return (
         <ModalRoot {...rootProps} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Invite a friend to Kittycord</Text>
+                <Text size="lg" weight="semibold" style={{ flexGrow: 1 }}>Invite a friend to Kittycord</Text>
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent>
                 <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
                     {previewUrl
                         ? <img src={previewUrl} alt="Kittycord invite card" style={{ width: "100%", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }} />
-                        : <Text variant="text-md/normal" style={{ padding: "48px 0", opacity: 0.7 }}>Rendering the invite…</Text>}
+                        : <Text style={{ padding: "48px 0", opacity: 0.7 }}>Rendering the invite…</Text>}
                 </div>
 
                 {!user && (
                     <>
-                        <Text variant="text-sm/semibold" style={{ marginBottom: 4 }}>Send to</Text>
+                        <Text size="sm" weight="semibold" style={{ marginBottom: 4 }}>Send to</Text>
                         <FriendPicker value={target} onChange={setTarget} />
                     </>
                 )}
                 {user && (
-                    <Text variant="text-sm/normal" style={{ opacity: 0.8 }}>
+                    <Text size="sm" style={{ opacity: 0.8 }}>
                         Sends {getUniqueUsername(user)} this card with your message — works even if they don't have Kittycord yet.
                     </Text>
                 )}
 
-                <Text variant="text-sm/semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
+                <Text size="sm" weight="semibold" style={{ margin: "12px 0 4px" }}>Message</Text>
                 <TextInput value={note} onChange={v => { editedRef.current = true; setNote(v); }} />
                 {myCode
-                    ? <Text variant="text-sm/normal" style={{ marginTop: 6, opacity: 0.8 }}>
+                    ? <Text size="sm" style={{ marginTop: 6, opacity: 0.8 }}>
                         Your creator code <span style={{ color: "var(--brand-500)", fontWeight: 600 }}>{myCode}</span> is included — your friend enters it in the installer (or Settings → Invites) to credit you. 💖
                     </Text>
-                    : <Text variant="text-sm/normal" style={{ marginTop: 6, opacity: 0.6 }}>
+                    : <Text size="sm" style={{ marginTop: 6, opacity: 0.6 }}>
                         Tip: set a creator code in Settings → Invites so the friends you invite count toward you.
                     </Text>}
 
                 <Flex style={{ gap: 8, justifyContent: "flex-end", margin: "16px 0" }}>
-                    <Button look={Button.Looks.LINK} color={Button.Colors.PRIMARY} onClick={rootProps.onClose}>Cancel</Button>
-                    <Button color={Button.Colors.BRAND} disabled={!blob || !target || busy} onClick={send}>Send invite</Button>
+                    <TextButton onClick={rootProps.onClose}>Cancel</TextButton>
+                    <Button disabled={!blob || !target || busy} onClick={send}>Send invite</Button>
                 </Flex>
             </ModalContent>
         </ModalRoot>

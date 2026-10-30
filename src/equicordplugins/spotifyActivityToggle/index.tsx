@@ -48,6 +48,7 @@ function SpotifyActivityToggleButton({ iconForeground, hideTooltips, nameplate }
     }, []);
 
     if (!isLoaded || !spotifyId || location !== "PANEL" && isPluginEnabled("KittycordMenu")) return null;
+    const id = spotifyId;
 
     return (
         <UserAreaButton
@@ -62,7 +63,7 @@ function SpotifyActivityToggleButton({ iconForeground, hideTooltips, nameplate }
                 forceUpdate?.();
 
                 await RestAPI.patch({
-                    url: Constants.Endpoints.CONNECTION("spotify", spotifyId),
+                    url: Constants.Endpoints.CONNECTION("spotify", id),
                     body: { show_activity: showActivity },
                 });
             }}
@@ -101,6 +102,7 @@ export default definePlugin({
         const { location } = settings.use(["location"]);
 
         if (!spotifyId || location !== "TOOLBOX") return null;
+        const id = spotifyId;
 
         return (
             <Menu.MenuItem
@@ -110,7 +112,7 @@ export default definePlugin({
                     showActivity = !showActivity;
 
                     await RestAPI.patch({
-                        url: Constants.Endpoints.CONNECTION("spotify", spotifyId),
+                        url: Constants.Endpoints.CONNECTION("spotify", id),
                         body: { show_activity: showActivity },
                     });
                 }}
