@@ -26,7 +26,7 @@ import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { FormSwitch } from "@components/FormSwitch";
-import { HeadingTertiary } from "@components/Heading";
+import { Heading } from "@components/Heading";
 import { Notice } from "@components/Notice";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab } from "@components/settings";
@@ -68,7 +68,7 @@ function ReloadRequiredCard({ required, enabledPlugins, openWarningModal, resetC
         <Card className={classes(cl("info-card"), required && "vc-warning-card")}>
             {required ? (
                 <>
-                    <HeadingTertiary>Restart required!</HeadingTertiary>
+                    <Heading tag="h4">Restart required!</Heading>
                     <Paragraph className={cl("dep-text")}>
                         Restart now to apply new plugins and their settings
                     </Paragraph>
@@ -78,7 +78,7 @@ function ReloadRequiredCard({ required, enabledPlugins, openWarningModal, resetC
                 </>
             ) : (
                 <>
-                    <HeadingTertiary>Plugin Management</HeadingTertiary>
+                    <Heading tag="h4">Plugin Management</Heading>
                     <Paragraph>Press the cog wheel or info icon to get more info on a plugin</Paragraph>
                     <Paragraph>Plugins with a cog wheel have settings you can modify!</Paragraph>
                 </>
@@ -135,7 +135,7 @@ function SettingsHint() {
 function CustomPluginsCard({ enabled, onChange }: { enabled: boolean; onChange(value: boolean): void; }) {
     return (
         <Card className={cl("info-card")}>
-            <HeadingTertiary>Custom Plugins</HeadingTertiary>
+            <Heading tag="h4">Custom Plugins</Heading>
             <FormSwitch
                 title="Load plugins from your plugins folder"
                 description={
@@ -161,7 +161,7 @@ function CustomPluginsCard({ enabled, onChange }: { enabled: boolean; onChange(v
             </Button>
             {customPluginErrors.length > 0 && (
                 <Card className={classes(cl("info-card"), "vc-warning-card", Margins.top8)}>
-                    <HeadingTertiary>These files could not be loaded</HeadingTertiary>
+                    <Heading tag="h4">These files could not be loaded</Heading>
                     {customPluginErrors.map(({ fileName, message }) => (
                         <Paragraph key={fileName} className={cl("dep-text")}>
                             {fileName}: {message}
@@ -504,9 +504,9 @@ export default function PluginSettings() {
                 <UIElementsButton />
             </div>
 
-            <HeadingTertiary className={classes(Margins.top20, Margins.bottom8)}>
+            <Heading tag="h4" className={classes(Margins.top20, Margins.bottom8)}>
                 Filters
-            </HeadingTertiary>
+            </Heading>
 
             <ErrorBoundary noop>
                 <TextInput
@@ -550,7 +550,7 @@ export default function PluginSettings() {
                 </div>
             </ErrorBoundary>
 
-            <HeadingTertiary className={Margins.top20}>Plugins</HeadingTertiary>
+            <Heading tag="h4" className={Margins.top20}>Plugins</Heading>
 
             {plugins.length || requiredPlugins.length
                 ? (
@@ -571,9 +571,9 @@ export default function PluginSettings() {
 
             <Divider className={Margins.top20} />
 
-            <HeadingTertiary className={classes(Margins.top20, Margins.bottom8)}>
+            <Heading tag="h4" className={classes(Margins.top20, Margins.bottom8)}>
                 Required Plugins
-            </HeadingTertiary>
+            </Heading>
 
             <div className={cl("grid")}>
                 {requiredPlugins.length

@@ -6,6 +6,7 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Heading } from "@components/Heading";
+import { Margins } from "@components/margins";
 import definePlugin, { OptionType } from "@utils/types";
 
 const STYLE_ID = "vc-smoothtype";
@@ -37,7 +38,7 @@ const settings = definePluginSettings({
             const hex = "#" + ((settings.store.caretColor ?? 0xffffff).toString(16).padStart(6, "0"));
             return (
                 <div>
-                    <Heading tag="h3">Caret Color</Heading>
+                    <Heading className={Margins.bottom8}>Caret Color</Heading>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <input
                             type="color"

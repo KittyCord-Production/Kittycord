@@ -9,7 +9,8 @@ import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
-import { HeadingSecondary } from "@components/Heading";
+import { Heading } from "@components/Heading";
+import { Margins } from "@components/margins";
 import { Paragraph } from "@components/Paragraph";
 import { getKittyAuth } from "@kittycordplugins/_shared/kittyAuth";
 import { copyWithToast } from "@utils/discord";
@@ -138,12 +139,12 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
             ) : (
                 <Flex flexDirection="column" gap={12}>
                     <section>
-                        <HeadingSecondary>Name</HeadingSecondary>
+                        <Heading className={Margins.bottom8}>Name</Heading>
                         <TextInput value={name} onChange={setName} maxLength={60} />
                     </section>
 
                     <section>
-                        <HeadingSecondary>Theme</HeadingSecondary>
+                        <Heading className={Margins.bottom8}>Theme</Heading>
                         {themes.length === 0 ? (
                             <Paragraph size="sm" style={{ color: "var(--text-muted)" }}>
                                 Build one in Theme Studio first and it shows up here.
@@ -190,7 +191,7 @@ function KitDialog({ modalProps, guild }: { modalProps: RenderModalProps; guild:
                     />
 
                     <section>
-                        <HeadingSecondary>Recommended plugins</HeadingSecondary>
+                        <Heading className={Margins.bottom8}>Recommended plugins</Heading>
                         <Paragraph size="sm" style={{ color: "var(--text-muted)" }}>
                             Members choose whether to turn these on.
                         </Paragraph>

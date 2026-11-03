@@ -22,7 +22,7 @@ import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
-import { Heading, HeadingSecondary } from "@components/Heading";
+import { Heading } from "@components/Heading";
 import { Link } from "@components/Link";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
@@ -48,7 +48,7 @@ function EquibopSection() {
     return (
         <Flex className={Margins.bottom20} flexDirection="column" gap="1em">
             <Card variant="brand">
-                <HeadingSecondary>Kittycord</HeadingSecondary>
+                <Heading tag="h3" className={Margins.bottom8}>Kittycord</Heading>
                 <Paragraph>This updater keeps Kittycord up to date.</Paragraph>
                 <Paragraph className={Margins.top8}>
                     You may also get separate popups to update the Kittycord desktop app. You can grab the <Link href="https://kittycord.dev">latest version</Link> any time.
@@ -57,7 +57,7 @@ function EquibopSection() {
 
             {isEquibopOutdated && (
                 <Card variant="warning">
-                    <HeadingSecondary>Kittycord Outdated</HeadingSecondary>
+                    <Heading tag="h3" className={Margins.bottom8}>Kittycord Outdated</Heading>
                     <Flex flexDirection="column" gap="0.5em">
                         <Paragraph>Your version of the Kittycord app is outdated!</Paragraph>
                         <Button variant="link" onClick={() => VesktopNative.app.openUpdater()}>Open Kittycord Updater</Button>

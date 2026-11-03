@@ -48,7 +48,8 @@
     },
     "web_accessible_resources": [
         "dist/Kittycord.js",
-        "dist/Kittycord.css"
+        "dist/Kittycord.css",
+        "vendor/*"
     ],
     "browser_specific_settings": {
         "gecko": {

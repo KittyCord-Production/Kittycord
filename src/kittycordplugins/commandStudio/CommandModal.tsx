@@ -9,8 +9,9 @@ import { InlineCode } from "@components/CodeBlock";
 import { ExpandableSection } from "@components/ExpandableCard";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
-import { HeadingSecondary } from "@components/Heading";
+import { Heading } from "@components/Heading";
 import { DeleteIcon, InfoIcon } from "@components/Icons";
+import { Margins } from "@components/margins";
 import { Paragraph } from "@components/Paragraph";
 import { chooseFile } from "@utils/web";
 import { RenderModalProps } from "@vencord/discord-types";
@@ -66,7 +67,7 @@ function ImportDialog({ modalProps }: { modalProps: RenderModalProps; }) {
         >
             <Flex flexDirection="column" gap={12}>
                 <section>
-                    <HeadingSecondary>Command pack</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Command pack</Heading>
                     <TextArea value={code} onChange={setCode} placeholder="KCMD2:..." autosize />
                 </section>
                 {parsed && (
@@ -201,17 +202,17 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
         >
             <Flex flexDirection="column" gap={12}>
                 <section>
-                    <HeadingSecondary>Trigger</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Trigger</Heading>
                     <TextInput value={trigger} onChange={setTrigger} placeholder="termin" />
                 </section>
 
                 <section>
-                    <HeadingSecondary>What it does</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>What it does</Heading>
                     <TextInput value={description} onChange={setDescription} placeholder="Asks someone for a time" maxLength={MAX_DESCRIPTION} />
                 </section>
 
                 <section>
-                    <HeadingSecondary>Message</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Message</Heading>
                     <TextArea value={message} onChange={setMessage} placeholder={EXAMPLE_RESPONSE} autosize rows={4} />
                     <Flex gap={4} style={{ marginTop: 8, flexWrap: "wrap" }}>
                         {PLACEHOLDERS.map(p => (
@@ -229,7 +230,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
 
                 {preview.length > 0 && (
                     <section>
-                        <HeadingSecondary>Preview</HeadingSecondary>
+                        <Heading className={Margins.bottom8}>Preview</Heading>
                         <Paragraph size="sm" style={{ color: "var(--text-muted)" }}>
                             With <InlineCode>{`${prefix}${cleanTrigger || "termin"} Max morgen`}</InlineCode>
                             {preview.length > 1 ? `, sent as ${preview.length} messages:` : ":"}
@@ -241,7 +242,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
                 )}
 
                 <section>
-                    <HeadingSecondary>Other names for it</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Other names for it</Heading>
                     <TextInput value={aliasText} onChange={setAliasText} placeholder="t, meeting" />
                     <Paragraph size="sm" style={{ color: "var(--text-muted)" }}>
                         Separate with commas, up to {MAX_ALIASES}.
@@ -249,7 +250,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
                 </section>
 
                 <section>
-                    <HeadingSecondary>Category</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Category</Heading>
                     <TextInput value={category} onChange={setCategory} placeholder="Work" maxLength={MAX_CATEGORY} />
                     {knownCategories.length > 0 && (
                         <Flex gap={4} style={{ marginTop: 6, flexWrap: "wrap" }}>
@@ -261,7 +262,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
                 </section>
 
                 <section>
-                    <HeadingSecondary>Where it works</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Where it works</Heading>
                     <Select
                         options={[
                             { label: "Everywhere", value: "everywhere" },
@@ -289,7 +290,7 @@ function CommandDialog({ initialValue, modalProps }: { initialValue: CustomComma
                 </section>
 
                 <section>
-                    <HeadingSecondary>Files it sends along</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Files it sends along</Heading>
                     <Paragraph size="sm" style={{ color: "var(--text-muted)" }}>
                         Files are put into the chat box together with the text, so you send them yourself with Enter.
                         Up to {Math.round(MAX_FILE_BYTES / 1_000_000)} MB each, and they are not part of shared packs.
