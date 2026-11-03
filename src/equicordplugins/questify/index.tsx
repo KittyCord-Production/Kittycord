@@ -363,6 +363,7 @@ export default definePlugin({
         {
             // Prevent Video Quests from pausing on lost focus.
             find: "[QV] | Pausing video | playerState:",
+            toBuild: 661927,
             predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().preventVideoQuestsPausing,
             replacement: {
                 match: /(?<=setCaptionEnabled\),)({focused:)(\i)/,
@@ -371,7 +372,7 @@ export default definePlugin({
         },
         {
             // Prevent Video Quests from pausing on lost focus.
-            find: ",listenForHlsErrors:!1",
+            find: /pauseOnLostVisibility:!\i,autoFocus:/,
             predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().preventVideoQuestsPausing,
             replacement: {
                 match: /(?<=pauseOnLostVisibility:)!\i/,
