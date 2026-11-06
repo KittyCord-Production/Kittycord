@@ -579,8 +579,10 @@ export default definePlugin({
             find: '"SET_IMAGE_ZOOM_RATIO"',
             replacement: [
                 {
-                    match: /(?<=\i\.\i\((\i),)\{\},\{default:/,
-                    replace: "{default:()=>$self.wrapEditor($1.Editor)},{Editor:"
+                    match: /\{default:\(\)=>(\i)\}|(?<=\i\.\i\((\i),)\{\},\{default:/,
+                    replace: (_, editor, exports) => editor
+                        ? `{default:()=>$self.wrapEditor(${editor})}`
+                        : `{default:()=>$self.wrapEditor(${exports}.Editor)},{Editor:`
                 },
                 {
                     match: /(?<=#{intl::AVATAR_UPLOAD_EDIT_MEDIA}\),)size:"md",actionBarInput:/,

@@ -21,7 +21,7 @@ import definePlugin from "@utils/types";
 import { checkForUpdates, update } from "@utils/updater";
 import type { RenderModalProps } from "@vencord/discord-types";
 import { Alerts, React, showToast } from "@webpack/common";
-import { getBuildNumber, patchResilience } from "@webpack/patcher";
+import { patchResilience } from "@webpack/patcher";
 import type { ReactNode } from "react";
 
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot } from "../_shared/modal";
@@ -57,8 +57,7 @@ function scan(): Scan {
         if (!p.started && !p.required && !pluginRequiresRestart(p)) failed.push(p.name);
     }
 
-    let discordBuild = -1;
-    try { discordBuild = getBuildNumber(); } catch { /* build number unavailable */ }
+    const discordBuild = Number(window.GLOBAL_ENV.BUILD_NUMBER) || -1;
 
     const heavyThemeFile = Settings.enabledThemes.find(t => HEAVY_THEMES.includes(t));
 
