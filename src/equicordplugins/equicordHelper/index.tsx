@@ -37,22 +37,6 @@ export default definePlugin({
                 }
             ]
         },
-        // Fix a race condition
-        {
-            find: ".completeOperation(",
-            replacement: {
-                match: /(?<=this\.nextId\(\);)(\i\(\i\)),(.{0,200}reject:\i\}\))/,
-                replace: "$2,$1"
-            }
-        },
-        // Catch IndexedDB if it fails to open
-        {
-            find: "discarding speculative database",
-            replacement: {
-                match: /await \i\(\i\)(?=;.{0,15}this\.databases)/,
-                replace: "$&.catch(()=>null)"
-            }
-        },
         {
             find: ".USE_OSX_NATIVE_TRAFFIC_LIGHTS",
             replacement: {
@@ -65,11 +49,11 @@ export default definePlugin({
             find: '"refresh-title-bar-small"',
             replacement: [
                 {
-                    match: /\i===\i\.PlatformTypes\.WINDOWS/g,
+                    match: /\i===\i\.\i\.WINDOWS/g,
                     replace: "false"
                 },
                 {
-                    match: /\i===\i\.PlatformTypes\.WEB/g,
+                    match: /\i===\i\.\i\.WEB/g,
                     replace: "true"
                 }
             ],
@@ -79,7 +63,7 @@ export default definePlugin({
         {
             find: "renderEmptyFavorite",
             replacement: {
-                match: /(?<=handleContextMenu.{0,150})(?=link:(\i)\.url)/,
+                match: /(?<=handleContextMenu.{0,350})(?=link:(\i)\.url)/,
                 replace: "...$1,"
             }
         }

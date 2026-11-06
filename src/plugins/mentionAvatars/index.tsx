@@ -70,8 +70,8 @@ export default definePlugin({
         // show avatar in the chat input box
         find: '"text":"locked"',
         replacement: {
-            match: /(?<=null==(\i)\?`<@\$\{(\i)\}>`:)`@\$\{\1\}`/,
-            replace: "$self.renderInputMention($1,$2)"
+            match: /(?<=null==\i\?`<@\$\{(\i)\}>`:)`@\$\{(\i)\}`/,
+            replace: "$self.renderInputMention($2,$1)"
         }
     }],
 
