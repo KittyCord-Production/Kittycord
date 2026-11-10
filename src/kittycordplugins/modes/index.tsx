@@ -89,7 +89,7 @@ function ModeEditor({ rootProps, initial, onSaved }: { rootProps: RenderModalPro
             ...initial,
             name: name.trim() || "Untitled mode",
             emoji: emoji.trim() || undefined,
-            status: status ? (status as StatusValue) : undefined,
+            status: (status as StatusValue) || undefined,
             customStatus: csOn ? (csText.trim() ? { text: csText.trim() } : null) : undefined,
             themes: withThemes ? themes : undefined,
             plugins: Object.keys(pluginMap).length ? pluginMap : undefined,

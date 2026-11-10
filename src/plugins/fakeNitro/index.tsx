@@ -213,27 +213,27 @@ export default definePlugin({
             find: "canUseCustomStickersEverywhere:",
             replacement: [
                 {
-                    match: /(?<=canUseCustomStickersEverywhere:function\(\i\)\{)/,
-                    replace: "return true;",
+                    match: /(?<=canUseCustomStickersEverywhere:)/,
+                    replace: "()=>true||",
                     predicate: () => settings.store.enableStickerBypass
                 },
                 {
-                    match: /(?<=canUseHighVideoUploadQuality:function\(\i\)\{)/,
-                    replace: "return true;",
+                    match: /(?<=canUseHighVideoUploadQuality:)/,
+                    replace: "()=>true||",
                     predicate: () => settings.store.enableStreamQualityBypass
                 },
                 {
-                    match: /(?<=canStreamQuality:function\(\i,\i\)\{)/,
-                    replace: "return true;",
+                    match: /(?<=canStreamQuality:)/,
+                    replace: "()=>true||",
                     predicate: () => settings.store.enableStreamQualityBypass
                 },
                 {
-                    match: /(?<=canUseClientThemes:function\(\i\)\{)/,
-                    replace: "return true;"
+                    match: /(?<=canUseClientThemes:)/,
+                    replace: "()=>true||"
                 },
                 {
-                    match: /(?<=canUsePremiumAppIcons:function\(\i\)\{)/,
-                    replace: "return true;"
+                    match: /(?<=canUsePremiumAppIcons:)/,
+                    replace: "()=>true||"
                 }
             ],
         },

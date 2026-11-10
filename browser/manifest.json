@@ -11,22 +11,16 @@
         "48": "icon.png",
         "128": "icon.png"
     },
-    "host_permissions": [
-        "*://*.discord.com/*",
-        "https://raw.githubusercontent.com/*"
-    ],
-    "permissions": [
-        "declarativeNetRequestWithHostAccess"
-    ],
+
+    "host_permissions": ["*://*.discord.com/*", "https://raw.githubusercontent.com/*"],
+
+    "permissions": ["declarativeNetRequestWithHostAccess"],
+
     "content_scripts": [
         {
             "run_at": "document_start",
-            "matches": [
-                "*://*.discord.com/*"
-            ],
-            "js": [
-                "content.js"
-            ],
+            "matches": ["*://*.discord.com/*"],
+            "js": ["content.js"],
             "all_frames": true,
             "world": "ISOLATED"
         },
@@ -44,13 +38,8 @@
     ],
     "web_accessible_resources": [
         {
-            "resources": [
-                "dist/*",
-                "vendor/*"
-            ],
-            "matches": [
-                "*://*.discord.com/*"
-            ]
+            "resources": ["dist/*", "vendor/*"],
+            "matches": ["*://*.discord.com/*"]
         }
     ],
     "declarative_net_request": {

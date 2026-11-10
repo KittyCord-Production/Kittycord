@@ -39,9 +39,6 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Lint styles
-              run: pnpm lint-styles
-
             - name: Lint intl keys
               run: pnpm lint:intl
 

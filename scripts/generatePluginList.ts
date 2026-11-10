@@ -17,6 +17,7 @@
 */
 
 import { readdirSync, writeFileSync } from "fs";
+
 import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, PluginData } from "./utils";
 
 (async () => {
@@ -43,7 +44,6 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
     } else {
         dirs = ["src/plugins", "src/plugins/_core", "src/equicordplugins/_core", "src/equicordplugins", "src/moggcordplugins", "src/kittycordplugins"];
     }
-
 
     const outputPath = args.find(a => !a.startsWith("--")) ?? null;
 

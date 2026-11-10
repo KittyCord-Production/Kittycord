@@ -56,12 +56,6 @@ let LayoutTypes = {
 };
 waitFor(["SECTION", "SIDEBAR_ITEM", "PANEL", "CUSTOM"], v => LayoutTypes = v);
 
-const enum SectionType {
-    HEADER = "HEADER",
-    DIVIDER = "DIVIDER",
-    CUSTOM = "CUSTOM"
-}
-
 type SettingsLocation =
     | "top"
     | "aboveNitro"

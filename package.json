@@ -1,12 +1,14 @@
 {
     "name": "kittycord",
     "private": "true",
-    "version": "1.15.16.0",
+    "version": "1.15.17.2",
     "description": "Kittycord — a Discord client mod",
     "homepage": "https://kittycord.dev",
     "bugs": {
         "url": "https://github.com/KittyCord-Production/Kittycord/issues"
     },
+    "license": "GPL-3.0-or-later",
+    "author": "Kittycord",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/KittyCord-Production/Kittycord.git"
@@ -27,13 +29,13 @@
         "generateTypes": "tspc --emitDeclarationOnly --declaration --outDir packages/vencord-types --allowJs false",
         "inject": "node scripts/runInstaller.mjs --install",
         "uninject": "node scripts/runInstaller.mjs --uninstall",
-        "lint": "eslint",
-        "lint-styles": "stylelint \"src/**/*.css\" --ignore-pattern src/userplugins",
-        "lint-styles:fix": "pnpm lint-styles --fix",
+        "lint": "oxlint",
+        "fmt": "oxfmt \"**/*.{css,html,json,yml,yaml}\"",
+        "fmt:check": "pnpm fmt --check",
         "lint:fix": "pnpm lint --fix",
         "lint:intl": "node scripts/lintIntl.mjs",
         "lint:patches": "node scripts/lintPatches.mjs",
-        "test": "pnpm testTsc && pnpm lint && pnpm lint-styles && pnpm lint:intl && pnpm lint:patches && pnpm buildStandalone",
+        "test": "pnpm testTsc && pnpm lint && pnpm lint:intl && pnpm lint:patches && pnpm buildStandalone",
         "testWeb": "pnpm lint && pnpm testTsc && pnpm buildWeb",
         "testTsc": "tsc --noEmit"
     },
@@ -64,31 +66,29 @@
         "@vencord/discord-types": "link:packages/discord-types",
         "diff": "catalog:",
         "esbuild": "catalog:",
-        "eslint": "catalog:",
-        "eslint-plugin-react": "catalog:",
         "eslint-plugin-simple-header": "catalog:",
         "eslint-plugin-simple-import-sort": "catalog:",
-        "eslint-plugin-unused-imports": "catalog:",
         "html-minifier-terser": "catalog:",
         "lodash": "catalog:",
         "md5": "catalog:",
         "moment": "catalog:",
+        "oxfmt": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
         "p-limit": "catalog:",
         "puppeteer-core": "catalog:",
         "standalone-electron-types": "catalog:",
-        "stylelint": "catalog:",
-        "stylelint-config-standard": "catalog:",
+        "svgo": "catalog:",
         "ts-patch": "catalog:",
         "ts-pattern": "catalog:",
         "tsx": "catalog:",
         "type-fest": "catalog:",
         "typescript": "catalog:",
-        "typescript-eslint": "catalog:",
         "typescript-transform-paths": "catalog:",
         "zip-local": "catalog:"
     },
-    "packageManager": "pnpm@12.16.1",
     "engines": {
         "node": ">=22"
-    }
+    },
+    "packageManager": "pnpm@12.18.0"
 }
