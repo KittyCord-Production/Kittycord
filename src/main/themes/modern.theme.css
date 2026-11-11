@@ -345,21 +345,21 @@ pre,
   --serverlist-offset: var(--custom-guild-list-width);
 }
 
-.base__5e434[data-fullscreen=false] .content__5e434 {
+.base_pog62O[data-fullscreen=false] .content_pog62O {
   margin-top: var(--serverlist-offset);
   overflow: visible !important;
 }
 
-:fullscreen .content__5e434 {
+:fullscreen .content_pog62O {
   margin: 0 !important;
 }
 
-#app-mount .sidebar__5e434 {
+#app-mount .sidebar_pog62O {
   border-radius: 0;
   overflow: visible !important;
 }
 
-#app-mount .guilds__5e434 {
+#app-mount .guilds_pog62O {
   transform-origin: top left;
   rotate: -90deg;
   height: 100vw !important;
@@ -368,37 +368,37 @@ pre,
   left: 0;
 }
 
-#app-mount .tree_ef3116 {
+#app-mount .tree_5dqHTG {
   padding-top: var(--HSL-top-padding, var(--size-sm));
+  justify-content: var(--HSL-server-alignment);
 }
 
-#app-mount .wrapper__6e9f8,
-#app-mount .folderPreview__48112,
-#app-mount .folderIconWrapper__48112,
-#app-mount .lowerBadge_cc5dd2,
-#app-mount .upperBadge_cc5dd2 {
+#app-mount .wrapper_JJ-hgR,
+#app-mount .folderPreview_RTMSuZ,
+#app-mount .folderIconWrapper_RTMSuZ,
+#app-mount .lowerBadge_hqZPsU,
+#app-mount .upperBadge_hqZPsU {
   rotate: 90deg;
 }
 
-#app-mount .childWrapper__6e9f8 {
+#app-mount .childWrapper_JJ-hgR {
   rotate: 0deg;
 }
 
-#app-mount .itemsContainer_ef3116,
-#app-mount .stack_dbd263 {
+#app-mount .guilds_pog62O .stack_TWWX0S {
   flex-direction: var(--HSL-server-direction);
   justify-content: var(--HSL-server-alignment);
 }
 
-#app-mount .notice__6e2b9 {
+#app-mount .base_pog62O > [class^="notice_"] {
   height: var(--notices-height);
 }
 
-#app-mount .notice__6e2b9 + .content__5e434 {
+#app-mount .base_pog62O > [class^="notice_"] + .content_pog62O {
   --serverlist-offset: calc(var(--notices-height) + var(--custom-guild-list-width));
 }
 
-.container__5e434 > div[style]:not(.base__5e434) {
+.container_pog62O > div[style]:not(.base_pog62O) {
   width: 100vw !important;
   height: var(--serverlist-offset) !important;
   position: absolute;
@@ -407,11 +407,11 @@ pre,
   z-index: 1;
 }
 
-.container__5e434 > div[style]:not(.base__5e434) .guilds__5e434 {
+.container_pog62O > div[style]:not(.base_pog62O) .guilds_pog62O {
   pointer-events: all;
 }
 
-.container__5e434 > div[style]:not(.base__5e434) + .base__5e434 .content__5e434 {
+.container_pog62O > div[style]:not(.base_pog62O) + .base_pog62O .content_pog62O {
   margin-top: calc(var(--serverlist-offset) * 2);
 }
 
@@ -568,41 +568,68 @@ pre,
    ----------------------------------------------------------------------------
    Nur der Account-Knopf (Avatar + Name, accountPopoutButton...) wandert nach
    oben rechts. Die Regler (Mute/Deafen/Settings, buttons_...) bleiben unten
-   links unangetastet. Position justieren: --am-account-right (groesser = weiter
-   nach links). Der Status-Untertext wird ausgeblendet, damit es wie im Vorbild
-   einzeilig bleibt - die letzte Regel loeschen, wenn du den Status sehen willst.
+   links unangetastet. Abstand zur Icon-Leiste: --am-account-gap, Hoehe: --am-account-offset. Der
+   Status-Untertext wird ausgeblendet, damit es wie im Vorbild einzeilig
+   bleibt - die Regel mit panelSubtextContainer loeschen, wenn du ihn sehen willst.
    ========================================================================== */
 :root {
-  --am-account-right: 370px;
-  --am-account-top: 3px;
+  --am-account-gap: 8px;
+  --am-account-height: 26px;
+  --am-account-offset: 3px;
+}
+
+#app-mount .base_pog62O > [class*="bar_"] [class^="trailing_"] {
+  anchor-name: --am-titlebar-trailing;
 }
 
 #app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] {
   position: fixed !important;
-  top: var(--am-account-top) !important;
-  right: var(--am-account-right) !important;
+  top: calc((var(--custom-app-top-bar-height) - var(--am-account-height)) / 2 + var(--am-account-offset)) !important;
+  right: calc(anchor(--am-titlebar-trailing left, 370px) + var(--am-account-gap)) !important;
   left: auto !important;
   bottom: auto !important;
+  flex: none !important;
   width: auto !important;
   min-width: 0 !important;
-  height: 32px !important;
+  max-width: 220px;
+  height: var(--am-account-height) !important;
   margin: 0 !important;
-  padding: 0 8px !important;
-  display: flex !important;
-  align-items: center !important;
-  background: var(--am-bg-1) !important;
-  border-radius: var(--am-radius-sm) !important;
+  padding: 0 10px 0 3px !important;
+  gap: 8px !important;
+  background: transparent !important;
+  border-radius: 999px !important;
   z-index: 3001 !important;
   -webkit-app-region: no-drag;
+  transition: background-color .15s ease;
 }
 
-#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="accountPopoutButton_"] {
-  height: 100% !important;
-  min-height: 0 !important;
-  padding: 0 !important;
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"]:hover {
+  background: var(--background-modifier-hover) !important;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="wrapper_"][class*="avatar_"] {
+  zoom: .625;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="nameTag_"] {
+  margin: 0 !important;
+  min-width: 0;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="panelTitleContainer_"] {
+  margin: 0 !important;
+}
+
+#app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="panelTitleContainer_"] > * {
+  font-size: 13px !important;
+  line-height: 16px !important;
 }
 
 #app-mount [class*="panels_"] [class*="accountPopoutButtonWrapper_"] [class*="panelSubtextContainer_"] {
+  display: none !important;
+}
+
+#app-mount [class*="panels_"] [class*="fitInAccount_"] {
   display: none !important;
 }
 
