@@ -13,8 +13,6 @@ const PLATFORMS: Record<string, object> = {
     web: { browser: "Discord Web" },
     android: { browser: "Discord Android" },
     ios: { browser: "Discord iOS" },
-    xbox: { browser: "Discord Embedded" },
-    playstation: { browser: "Discord Embedded" },
     vr: { os: "android", browser: "Discord VR", device: "Discord VR" },
     hidden: { browser: "" }
 };
@@ -29,8 +27,6 @@ const settings = definePluginSettings({
             { label: "Web", value: "web" },
             { label: "Android", value: "android" },
             { label: "iOS", value: "ios" },
-            { label: "Xbox", value: "xbox" },
-            { label: "PlayStation", value: "playstation" },
             { label: "VR (experimental)", value: "vr" },
             { label: "Hidden (experimental, may still show an icon)", value: "hidden" }
         ]
@@ -40,7 +36,7 @@ const settings = definePluginSettings({
 function SpooferWarning() {
     return (
         <Notice.Warning>
-            Discord does not allow pretending to be on another device. We can't promise this won't get your account warned or banned. Xbox, PlayStation and VR can make Discord treat your client as outdated.
+            Discord does not allow pretending to be on another device. We can't promise this won't get your account warned or banned. VR can make Discord treat your client as outdated.
         </Notice.Warning>
     );
 }
