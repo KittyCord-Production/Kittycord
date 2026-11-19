@@ -19,7 +19,11 @@
 import "./style.css";
 
 import { definePluginSettings } from "@api/Settings";
+import { Card } from "@components/Card";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { Flex } from "@components/Flex";
+import { Heading } from "@components/Heading";
+import { Paragraph } from "@components/Paragraph";
 import { Devs, EquicordDevs } from "@utils/constants";
 import { classNameFactory } from "@utils/css";
 import { classes } from "@utils/misc";
@@ -81,11 +85,27 @@ function isUncategorized(objChannel: { channel: Channel; comparator: number; }) 
 
 export default definePlugin({
     name: "ShowHiddenChannels",
-    description: "Show channels that you do not have access to view.",
+    description: "Show channels that you do not have access to view. Discord no longer sends their names or topics, so only their position and type are visible.",
     tags: ["Servers", "Utility"],
     authors: [Devs.BigDuck, Devs.AverageReactEnjoyer, Devs.D3SOX, Devs.Ven, Devs.Nuckyz, Devs.Nickyux, Devs.Rini, EquicordDevs.Oggetto],
     isModified: true,
     settings,
+
+    settingsAboutComponent() {
+        return (
+            <Card variant="warning">
+                <Flex flexDirection="column" gap="0.5em">
+                    <Heading tag="h3">Limited by Discord</Heading>
+                    <Paragraph>
+                        Discord now strips the name, topic and permissions of channels you cannot view before sending them to your client. Those details are gone and no client can bring them back.
+                    </Paragraph>
+                    <Paragraph>
+                        What still works: hidden channels stay listed in their real position and category, with their real type, and you can still see who is sitting in a hidden voice channel.
+                    </Paragraph>
+                </Flex>
+            </Card>
+        );
+    },
 
     patches: [
         {

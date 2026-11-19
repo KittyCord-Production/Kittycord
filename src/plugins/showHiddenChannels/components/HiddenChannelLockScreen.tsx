@@ -56,7 +56,8 @@ const enum VideoQualityModes {
 
 const enum ChannelFlags {
     PINNED = 1 << 1,
-    REQUIRE_TAG = 1 << 4
+    REQUIRE_TAG = 1 << 4,
+    OBFUSCATED = 1 << 17
 }
 
 const ChatScrollClasses = findCssClassesLazy("auto", "managedReactiveScroller", "customTheme");
@@ -119,7 +120,11 @@ function HiddenChannelLockScreen({ channel }: { channel: Channel; }) {
         guild_id
     } = channel;
 
+    const isObfuscated = channel.hasFlag(ChannelFlags.OBFUSCATED);
+
     useEffect(() => {
+        if (isObfuscated) return;
+
         const membersToFetch: Array<string> = [];
 
         const guildOwnerId = GuildStore.getGuild(guild_id)?.ownerId;
@@ -263,6 +268,11 @@ function HiddenChannelLockScreen({ channel }: { channel: Channel; }) {
                         </div>
                     </div>
                 }
+                {isObfuscated ? (
+                    <Text>
+                        Discord does not send the name, topic or permissions of this channel to your client, so they can not be shown.
+                    </Text>
+                ) : (
                 <div className={cl("allowed-users-and-roles-container")}>
                     <div className={cl("allowed-users-and-roles-container-title")}>
                         {isPluginEnabled(PermissionsViewerPlugin.name) && (
@@ -308,6 +318,7 @@ function HiddenChannelLockScreen({ channel }: { channel: Channel; }) {
                     </div>
                     {defaultAllowedUsersAndRolesDropdownState && <ChannelBeginHeader channel={channel} />}
                 </div>
+                )}
             </div>
         </div>
     );
