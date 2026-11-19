@@ -16,26 +16,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { BRAND_DISCORD_INVITE } from "@branding";
 import { Button, ButtonProps } from "@components/Button";
 import { Heart } from "@components/Heart";
+import { OpenExternalIcon } from "@components/Icons";
+import { openInviteModal } from "@utils/discord";
+import { showToast } from "@webpack/common";
 
 export function DonateButton({
     equicord = false,
     className,
+    variant = "none",
     ...props
 }: Partial<ButtonProps> & { equicord?: boolean; }) {
     const link = equicord ? "https://github.com/sponsors/thororen1234" : "https://github.com/sponsors/Vendicated";
     return (
         <Button
-            {...props}
-            variant="none"
             size="medium"
             type="button"
+            variant={variant}
+            {...props}
             onClick={() => VencordNative.native.openExternal(link)}
             className={className || "vc-donate-button"}
         >
             <Heart />
             Donate
+        </Button>
+    );
+}
+
+export function InviteButton({
+    className,
+    variant = "none",
+    ...props
+}: Partial<ButtonProps>) {
+    return (
+        <Button
+            size="medium"
+            type="button"
+            variant={variant}
+            {...props}
+            onClick={async e => {
+                e.preventDefault();
+                openInviteModal(BRAND_DISCORD_INVITE).catch(() =>
+                    showToast({ text: "Invalid or expired invite" }),
+                );
+            }}
+            className={className || "vc-donate-button"}
+        >
+            Invite
+            <OpenExternalIcon className="vc-invite-link" />
         </Button>
     );
 }

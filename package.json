@@ -1,7 +1,7 @@
 {
     "name": "kittycord",
     "private": "true",
-    "version": "1.15.17.3",
+    "version": "1.15.18.0",
     "description": "Kittycord — a Discord client mod",
     "homepage": "https://kittycord.dev",
     "bugs": {
@@ -13,8 +13,6 @@
         "type": "git",
         "url": "git+https://github.com/KittyCord-Production/Kittycord.git"
     },
-    "license": "GPL-3.0-or-later",
-    "author": "Kittycord",
     "scripts": {
         "build": "node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs",
         "buildStandalone": "pnpm build --standalone",

@@ -32,6 +32,7 @@ import { ContextMenuApi, Menu, showToast, UserStore } from "@webpack/common";
 
 import Plugins, { PluginMeta } from "~plugins";
 
+import { BadgeDirectoryDetail } from "./BadgeDirectoryDetail";
 import { EquicordDonorModal, EquicordTranslatorModal, VencordDonorModal } from "./modals";
 
 const ContributorBadge: ProfileBadge = {
@@ -96,6 +97,11 @@ interface DonorBadge {
 let DonorBadges = {} as Record<string, Array<DonorBadge>>;
 let EquicordDonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
 let DirectoryBadges = {} as Record<string, DirectoryBadge>;
+let directoryState = {} as {
+    badge?: DirectoryBadge;
+    userId?: string;
+    isViewingOtherUser?: boolean;
+};
 
 async function loadBadges(url: string, noCache = false) {
     const init = {} as RequestInit;
@@ -129,7 +135,9 @@ function toDirectoryBadge(b: ProfileBadge, userId: string): DirectoryBadge {
         is_earnable: false,
         owned: true,
         hidden: false,
-        tiers: []
+        tiers: [],
+        userId,
+        originalBadgeId: b.id
     };
 }
 
@@ -210,10 +218,20 @@ export default definePlugin({
         },
         {
             find: "badge_directory_closed",
-            replacement: {
-                match: /(\i\.\i\.getBadges\((\i)\))(?=:\[\],\[\2\]\))/,
-                replace: "[...$1,...$self.getDirectoryBadges($2)]"
-            }
+            replacement: [
+                {
+                    match: /(\i\.\i\.getBadges\((\i)\))(?=:\[\],\[\2\]\))/,
+                    replace: "[...$1,...$self.getDirectoryBadges($2)]"
+                },
+                {
+                    match: /(?<=\}\),)(?=null!=(\i)&&(?:\(\i\?)?\(0,\i\.jsx\)\(\i,\{badge:\1,.{0,100}?isViewingOtherUser:(\i),.{0,100}?displayedUserId:(\i))/,
+                    replace: "$self.setDirectoryBadgeState($1,$3,$2),"
+                },
+                {
+                    match: /(?<=!\i&&\i)(?=\]\}\))/,
+                    replace: ",$self.renderDirectoryBadgeContent()"
+                }
+            ]
         }
     ],
 
@@ -244,6 +262,7 @@ export default definePlugin({
     async stop() {
         clearInterval(intervalId);
         DirectoryBadges = {};
+        directoryState = {};
     },
 
     getBadges(profile: { userId: string; guildId: string; }) {
@@ -280,6 +299,29 @@ export default definePlugin({
         const Component = badge.component!;
         return <Component {...badge} />;
     }, { noop: true }),
+
+    setDirectoryBadgeState(badge?: DirectoryBadge, userId?: string, isViewingOtherUser?: boolean) {
+        directoryState = { badge, userId, isViewingOtherUser };
+        return null;
+    },
+
+    renderDirectoryBadgeContent() {
+        const badgeId = typeof directoryState.badge?.badge_id === "string"
+            ? directoryState.badge.badge_id
+            : typeof directoryState.badge?.badge_id === "number"
+                ? String(directoryState.badge.badge_id)
+                : "";
+
+        return (
+            <ErrorBoundary key={badgeId} noop>
+                <BadgeDirectoryDetail
+                    badge={directoryState.badge}
+                    userId={directoryState.userId}
+                    isViewingOtherUser={directoryState.isViewingOtherUser}
+                />
+            </ErrorBoundary>
+        );
+    },
 
     getBadgeMouseEventHandlers(badge: ProfileBadge & BadgeUserArgs) {
         const handlers = {} as Record<string, (e: React.MouseEvent) => void>;
@@ -329,26 +371,31 @@ export default definePlugin({
     },
 
     getEquicordDonorBadges(userId: string) {
-        return EquicordDonorBadges[userId]?.map((badge, idx) => ({
-            id: `equicord_donor_badge_${idx}`,
-            iconSrc: badge.badge,
-            description: badge.tooltip,
-            name: badge.tooltip,
-            infoLabel: "Donor",
-            rarity: BadgeRarity.MYTHIC,
-            position: BadgePosition.START,
-            props: {
-                style: {
-                    borderRadius: "50%",
-                    transform: "scale(0.9)" // The image is a bit too big compared to default badges
-                }
-            },
-            onContextMenu(event, badge) {
-                ContextMenuApi.openContextMenu(event, () => <BadgeContextMenu badge={badge} />);
-            },
-            onClick() {
-                return badge.tooltip === "Equicord Translator" ? EquicordTranslatorModal() : EquicordDonorModal();
-            },
-        } satisfies ProfileBadge));
+        return EquicordDonorBadges[userId]?.map((badge, idx) => {
+            const isTranslator = badge.tooltip.endsWith("Translator");
+            const label = isTranslator ? "Kittycord Translator" : badge.tooltip;
+
+            return {
+                id: `equicord_donor_badge_${idx}`,
+                iconSrc: badge.badge,
+                description: label,
+                name: label,
+                infoLabel: isTranslator ? "Kittycord" : "Donor",
+                rarity: BadgeRarity.MYTHIC,
+                position: BadgePosition.START,
+                props: {
+                    style: {
+                        borderRadius: "50%",
+                        transform: "scale(0.9)" // The image is a bit too big compared to default badges
+                    }
+                },
+                onContextMenu(event, badge) {
+                    ContextMenuApi.openContextMenu(event, () => <BadgeContextMenu badge={badge} />);
+                },
+                onClick() {
+                    return isTranslator ? EquicordTranslatorModal() : EquicordDonorModal();
+                },
+            } satisfies ProfileBadge;
+        });
     }
 });

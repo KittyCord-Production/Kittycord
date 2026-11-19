@@ -18,7 +18,7 @@ export default definePlugin({
     dependencies: ["MessageAccessoriesAPI"],
     authors: [
         Devs.thororen,
-        EquicordDevs.nyx,
+        Devs.nyx,
         EquicordDevs.Naibuu,
     ],
     required: true,
