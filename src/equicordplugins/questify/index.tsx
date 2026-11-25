@@ -234,7 +234,7 @@ export default definePlugin({
         },
         {
             // Hides the sponsored banner on the Quests page.
-            find: "QUEST_HOME)},[]),",
+            find: /questHomeHero:\i,isLoading:\i,confirmedEmpty:/,
             predicate: () => !getQuestifySettings().disableQuestsEverything && getQuestifySettings().disableSponsoredBanner,
             replacement: {
                 match: /(?<=,{questHomeHero:(\i),isLoading:(\i),confirmedEmpty:(\i)}=.{0,300}?ORBS_BALANCE_MENU}\)},\[\]\);)/,
@@ -380,7 +380,7 @@ export default definePlugin({
             }
         },
         {
-            find: "QUEST_HOME)},[]),",
+            find: /questHomeHero:\i,isLoading:\i,confirmedEmpty:/,
             group: true,
             predicate: () => !getQuestifySettings().disableQuestsEverything,
             replacement: [

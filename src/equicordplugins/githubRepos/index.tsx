@@ -46,7 +46,7 @@ export default definePlugin({
     patches: [
         // User Profile Modal v2 tab bar
         {
-            find: "#{intl::USER_PROFILE_ACTIVITY}",
+            find: ".MUTUAL_GUILDS})),",
             replacement: {
                 match: /(\i)\.id!==\i\?\.id&&\i&&\(.{0,300}\.MUTUAL_GUILDS\}\)\)(?=,(\i))/,
                 replace: '$&,$self.shouldShowGitHub($1.id)&&$2.push({text:"GitHub",section:"GITHUB"})',

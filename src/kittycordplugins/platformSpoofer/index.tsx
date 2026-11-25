@@ -58,7 +58,7 @@ export default definePlugin({
                     replace: "false"
                 },
                 {
-                    match: /(?<=\("GatewaySocket"\)\}\),properties:)\i/,
+                    match: /(?<=capabilities:\d+,properties:)\i/,
                     replace: "$self.spoof($&)"
                 }
             ]
